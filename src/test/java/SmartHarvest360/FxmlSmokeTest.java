@@ -20,6 +20,8 @@ public final class FxmlSmokeTest {
         Platform.runLater(() -> {
             try {
                 for (String screen : List.of(
+                        "/fxml/FarmSetupScreen.fxml",
+                        "/fxml/CropSelectionScreen.fxml",
                         "/fxml/SimulationScreen.fxml",
                         "/fxml/HarvestMarketScreen.fxml",
                         "/fxml/SeasonReportScreen.fxml"

@@ -55,8 +55,8 @@ public class SeasonReportController {
 
     @FXML
     private void handleNewSeason() {
-        session.resetDemoSeason();
-        SceneNavigator.switchTo(newSeasonButton, "/fxml/SimulationScreen.fxml");
+        session.beginNewSeason();
+        SceneNavigator.switchTo(newSeasonButton, "/fxml/FarmSetupScreen.fxml");
     }
 
     @FXML

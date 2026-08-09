@@ -2,6 +2,7 @@ package SmartHarvest360.controllers;
 
 import SmartHarvest360.Crop;
 import SmartHarvest360.data.CsvDataStore;
+import SmartHarvest360.db.SaleRepository;
 import SmartHarvest360.model.SaleRecord;
 import SmartHarvest360.navigation.SceneNavigator;
 import SmartHarvest360.session.AppSession;
@@ -85,6 +86,7 @@ public class HarvestMarketController {
         try {
             CsvDataStore.appendHarvest(sale);
             session.addSale(sale);
+            SaleRepository.insert(session.getFarmId(), sale);
             sellButton.setDisable(true);
             statusLabel.setText("Sale saved successfully.");
             SceneNavigator.switchTo(sellButton, "/fxml/SeasonReportScreen.fxml");

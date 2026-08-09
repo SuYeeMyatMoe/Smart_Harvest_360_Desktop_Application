@@ -15,6 +15,8 @@ import java.util.List;
 public final class AppSession {
     private static final AppSession INSTANCE = new AppSession();
 
+    private String farmName;
+    private Long farmId;
     private Farm farm;
     private Crop activeCrop;
     private int currentDay;
@@ -29,6 +31,23 @@ public final class AppSession {
         return INSTANCE;
     }
 
+    public void prepareFarm(String name, Farm selectedFarm) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Farm name is required");
+        }
+        if (selectedFarm == null) {
+            throw new IllegalArgumentException("Farm is required");
+        }
+        farmName = name.trim();
+        farm = selectedFarm;
+        farmId = null;
+        activeCrop = null;
+        currentDay = 0;
+        completedGrowthDays = 0;
+        simulationLog.clear();
+        sales.clear();
+    }
+
     public void ensureDemoData() {
         if (farm != null && activeCrop != null) {
             return;
@@ -40,6 +59,8 @@ public final class AppSession {
                 "Tomato", 90, 50.0, 2.0, 500.0, 2.20, 5.50
         );
         demoFarm.addCrop(tomato);
+        farmName = "Demo Farm";
+        farmId = null;
         startSimulation(demoFarm, tomato);
     }
 
@@ -54,14 +75,33 @@ public final class AppSession {
         simulationLog.clear();
     }
 
-    public void resetDemoSeason() {
+    /** Clears season state and returns the user to Farm Setup (no demo injection). */
+    public void beginNewSeason() {
+        farmName = null;
+        farmId = null;
         farm = null;
         activeCrop = null;
         currentDay = 0;
         completedGrowthDays = 0;
         simulationLog.clear();
         sales.clear();
+    }
+
+    public void resetDemoSeason() {
+        beginNewSeason();
         ensureDemoData();
+    }
+
+    public String getFarmName() {
+        return farmName;
+    }
+
+    public void setFarmId(Long farmId) {
+        this.farmId = farmId;
+    }
+
+    public Long getFarmId() {
+        return farmId;
     }
 
     public Farm getFarm() {

@@ -296,6 +296,39 @@
     -fx-background-color: white;
 }
 
+.form-field {
+    -fx-background-color: #f8faf9;
+    -fx-background-radius: 8;
+    -fx-border-color: #d8e2dd;
+    -fx-border-radius: 8;
+    -fx-padding: 10 12 10 12;
+    -fx-pref-height: 40;
+}
+
+.form-field:focused {
+    -fx-border-color: #3c9872;
+    -fx-background-color: white;
+}
+
+.field-label {
+    -fx-text-fill: #355649;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+}
+
+.validation-text {
+    -fx-text-fill: #b45309;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+    -fx-min-height: 14;
+}
+
+.crop-list .list-cell:filled:selected {
+    -fx-background-color: #dcefe5;
+    -fx-text-fill: #14553c;
+    -fx-font-weight: 700;
+}
+
 .progress-bar {
     -fx-accent: #2b936a;
 }

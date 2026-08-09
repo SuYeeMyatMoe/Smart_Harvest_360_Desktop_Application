@@ -41,14 +41,20 @@
         <VBox spacing="14" styleClass="content-wrap">
             <padding><Insets top="18" right="30" bottom="18" left="30"/></padding>
 
-            <HBox alignment="CENTER" spacing="9">
-                <Label text="1" styleClass="step-dot, step-dot-active"/>
-                <Label text="SIMULATION" styleClass="step-text, step-text-active"/>
+            <HBox alignment="CENTER" spacing="7">
+                <Label text="1" styleClass="step-dot, step-dot-done"/>
+                <Label text="SETUP" styleClass="step-text"/>
+                <Region styleClass="step-line, step-line-done"/>
+                <Label text="2" styleClass="step-dot, step-dot-done"/>
+                <Label text="CROPS" styleClass="step-text"/>
+                <Region styleClass="step-line, step-line-done"/>
+                <Label text="3" styleClass="step-dot, step-dot-active"/>
+                <Label text="SIM" styleClass="step-text, step-text-active"/>
                 <Region styleClass="step-line"/>
-                <Label text="2" styleClass="step-dot"/>
+                <Label text="4" styleClass="step-dot"/>
                 <Label text="MARKET" styleClass="step-text"/>
                 <Region styleClass="step-line"/>
-                <Label text="3" styleClass="step-dot"/>
+                <Label text="5" styleClass="step-dot"/>
                 <Label text="REPORT" styleClass="step-text"/>
             </HBox>
 

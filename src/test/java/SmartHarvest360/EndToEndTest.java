@@ -70,7 +70,8 @@ public final class EndToEndTest {
                 Button newSeason = require(report, "#newSeasonButton", Button.class);
                 newSeason.fire();
                 check(AppSession.getInstance().getSales().isEmpty(), "New Season did not clear old sales");
-                require(stage.getScene().getRoot(), "#nextDayButton", Button.class);
+                require(stage.getScene().getRoot(), "#nextButton", Button.class);
+                check(AppSession.getInstance().getFarm() == null, "New Season did not clear farm state");
 
                 stage.close();
                 System.out.println("END-TO-END TEST PASSED");
@@ -78,7 +79,7 @@ public final class EndToEndTest {
                 System.out.println("Market: revenue/cost/profit calculations correct");
                 System.out.println("Report: ROI and PieChart correct");
                 System.out.println("CSV: harvest_log.csv and season_report.csv created");
-                System.out.println("New Season: state reset correctly");
+                System.out.println("New Season: returned to Farm Setup with cleared state");
             } catch (Throwable throwable) {
                 failure.set(throwable);
             } finally {

@@ -12,20 +12,26 @@ prices, records harvest sales, and displays a final season report.
 Use `Launcher` in VS Code. Running the JavaFX `SmartHarvestApp` class directly can trigger the
 JDK's "JavaFX runtime components are missing" launcher check.
 
+See [`report.md`](report.md) for MySQL setup, the full 5-screen walkthrough, and CSV locations.
+
 ## Application screens
 
-- `SimulationScreen.fxml` / `SimulationController.java`
-- `HarvestMarketScreen.fxml` / `HarvestMarketController.java`
-- `SeasonReportScreen.fxml` / `SeasonReportController.java`
+1. `FarmSetupScreen.fxml` / `FarmSetupController.java`
+2. `CropSelectionScreen.fxml` / `CropSelectionController.java`
+3. `SimulationScreen.fxml` / `SimulationController.java`
+4. `HarvestMarketScreen.fxml` / `HarvestMarketController.java`
+5. `SeasonReportScreen.fxml` / `SeasonReportController.java`
 
 ## Supporting components
 
 - `AppSession` shares the selected farm, crop, simulation progress, and sales between screens.
 - `SceneNavigator` centralizes JavaFX scene navigation.
+- `CSVFileHandler` loads `data/crops.csv`.
 - `CsvDataStore` writes `harvest_log.csv` and `season_report.csv`.
+- `SmartHarvest360.db` optionally mirrors farms, crops, and sales in MySQL.
 - `SaleRecord` stores the details of a completed sale.
 
-The farm setup or crop selection flow can start the simulation with:
+Farm Setup prepares the session; Crop Selection starts the simulation with:
 
 ```java
 AppSession.getInstance().startSimulation(farm, selectedCrop);

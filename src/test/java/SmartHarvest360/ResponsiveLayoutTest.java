@@ -29,6 +29,8 @@ public final class ResponsiveLayoutTest {
         Platform.startup(() -> { });
         Platform.runLater(() -> {
             try {
+                verify("FarmSetupScreen.fxml", "#nextButton");
+                verify("CropSelectionScreen.fxml", "#startButton");
                 verify("SimulationScreen.fxml", "#nextDayButton");
                 verify("HarvestMarketScreen.fxml", "#sellButton");
                 verify("SeasonReportScreen.fxml", "#newSeasonButton");
