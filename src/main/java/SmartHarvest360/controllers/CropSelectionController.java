@@ -523,6 +523,9 @@ public class CropSelectionController {
         int count = farm.getCrops().size();
         plantedCountLabel.setText(count + (count == 1 ? " crop planted" : " crops planted"));
         startButton.setDisable(count == 0);
+        if (removePlantedButton != null) {
+            removePlantedButton.setDisable(count == 0);
+        }
     }
 
     private void commitTableEdits() {

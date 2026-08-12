@@ -201,13 +201,27 @@
 }
 
 .crop-side-panel {
-    -fx-min-width: 360;
-    -fx-pref-width: 380;
+    -fx-min-width: 280;
+    -fx-pref-width: 360;
     -fx-max-width: 420;
 }
 
+.crop-edit-panel {
+    -fx-min-width: 300;
+    -fx-pref-width: 340;
+    -fx-max-width: 380;
+}
+
 .advisor-panel {
-    -fx-min-height: 280;
+    -fx-min-height: 0;
+}
+
+.planted-panel {
+    -fx-min-height: 0;
+}
+
+.add-to-farm-button {
+    -fx-min-width: 190;
 }
 
 .advisor-metric {
@@ -347,11 +361,32 @@
     -fx-border-color: #dde6e1 transparent transparent transparent;
 }
 
+.footer-button {
+    -fx-min-width: 150;
+    -fx-min-height: 40;
+    -fx-wrap-text: true;
+    -fx-padding: 10 16 10 16;
+}
+
+.responsive-flow {
+    -fx-max-width: Infinity;
+}
+
+.step-flow {
+    -fx-max-width: Infinity;
+}
+
+.header-copy {
+    -fx-max-width: Infinity;
+}
+
 .button {
     -fx-cursor: hand;
     -fx-background-radius: 9;
     -fx-padding: 10 20 10 20;
     -fx-font-weight: 800;
+    -fx-min-height: 38;
+    -fx-wrap-text: true;
 }
 
 .primary-button {

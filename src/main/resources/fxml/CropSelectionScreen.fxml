@@ -13,40 +13,41 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane xmlns:fx="http://javafx.com/fxml"
+<!-- Left stack: Advisor -> Catalog -> Planted -> Add/Remove. Right: Edit Plant Crop. -->
+<BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="SmartHarvest360.controllers.CropSelectionController"
             stylesheets="@../style.css"
-            fitToWidth="true" fitToHeight="true" pannable="true"
-            hbarPolicy="AS_NEEDED" vbarPolicy="AS_NEEDED"
-            styleClass="app-scroll">
-    <content>
-        <BorderPane prefWidth="1180" prefHeight="760" minWidth="980" minHeight="700"
-                    styleClass="app-background">
-            <top>
-                <HBox alignment="CENTER_LEFT" spacing="12" styleClass="top-shell">
-                    <padding><Insets top="14" right="30" bottom="14" left="30"/></padding>
-                    <ImageView fx:id="appLogo" fitWidth="44" fitHeight="44" preserveRatio="true" smooth="true">
-                        <image><Image url="@../images/smartharvest-logo.png"/></image>
-                    </ImageView>
-                    <VBox spacing="1">
-                        <Label text="SmartHarvest 360" styleClass="brand-title"/>
-                        <Label text="Farm decision companion" styleClass="brand-caption"/>
-                    </VBox>
-                    <Region HBox.hgrow="ALWAYS"/>
-                    <Label text="CHOOSE CROPS" styleClass="screen-badge"/>
-                </HBox>
-            </top>
+            prefWidth="1180" prefHeight="760" minWidth="720" minHeight="520"
+            styleClass="app-background">
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="top-shell">
+            <padding><Insets top="10" right="20" bottom="10" left="20"/></padding>
+            <ImageView fx:id="appLogo" fitWidth="40" fitHeight="40" preserveRatio="true" smooth="true">
+                <image><Image url="@../images/smartharvest-logo.png"/></image>
+            </ImageView>
+            <VBox spacing="1" HBox.hgrow="ALWAYS" minWidth="0">
+                <Label text="SmartHarvest 360" styleClass="brand-title"/>
+                <Label text="Farm decision companion" styleClass="brand-caption"/>
+            </VBox>
+            <Label text="CHOOSE CROPS" styleClass="screen-badge" wrapText="true"/>
+        </HBox>
+    </top>
 
-            <center>
-                <VBox spacing="12" styleClass="content-wrap">
-                    <padding><Insets top="16" right="24" bottom="12" left="24"/></padding>
+    <center>
+        <ScrollPane fitToWidth="true" fitToHeight="false" pannable="true"
+                    hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                    styleClass="app-scroll">
+            <content>
+                <VBox spacing="12" styleClass="content-wrap" minWidth="0">
+                    <padding><Insets top="12" right="16" bottom="12" left="16"/></padding>
 
-                    <HBox alignment="CENTER" spacing="7">
+                    <FlowPane hgap="6" vgap="6" alignment="CENTER" styleClass="step-flow">
                         <Label text="1" styleClass="step-dot, step-dot-done"/>
                         <Label text="SETUP" styleClass="step-text"/>
                         <Region styleClass="step-line, step-line-done"/>
@@ -61,146 +62,26 @@
                         <Region styleClass="step-line"/>
                         <Label text="5" styleClass="step-dot"/>
                         <Label text="REPORT" styleClass="step-text"/>
-                    </HBox>
+                    </FlowPane>
 
-                    <HBox alignment="CENTER_LEFT" spacing="12">
-                        <VBox spacing="2" HBox.hgrow="ALWAYS">
+                    <FlowPane hgap="12" vgap="8" alignment="CENTER_LEFT">
+                        <VBox spacing="2" minWidth="220" styleClass="header-copy">
                             <Label text="Crop Selection" styleClass="page-title"/>
                             <Label fx:id="farmSummaryLabel"
                                    text="Browse the crop database and plant one or more crops."
-                                   wrapText="true" maxWidth="Infinity"
+                                   wrapText="true" maxWidth="560"
                                    styleClass="page-description"/>
                         </VBox>
                         <Label fx:id="statusLabel" text="Select a crop to review details."
-                               wrapText="true" maxWidth="280" styleClass="status-label"/>
-                    </HBox>
+                               wrapText="true" maxWidth="320" styleClass="status-label"/>
+                    </FlowPane>
 
-                    <HBox spacing="16" VBox.vgrow="ALWAYS" alignment="TOP_LEFT">
-                        <!-- Catalog -->
-                        <VBox spacing="10" styleClass="card" HBox.hgrow="ALWAYS" minWidth="560">
-                            <padding><Insets top="14" right="16" bottom="14" left="16"/></padding>
-                            <HBox alignment="CENTER_LEFT" spacing="10">
-                                <VBox spacing="1" HBox.hgrow="ALWAYS">
-                                    <Label text="Crop Catalog" styleClass="section-title"/>
-                                    <Label text="Edit rows below, then save to CSV and MySQL"
-                                           styleClass="section-caption"/>
-                                </VBox>
-                                <Label fx:id="dbStatusLabel" text="CSV / MySQL" styleClass="soft-badge"/>
-                            </HBox>
+                    <HBox spacing="14" alignment="TOP_LEFT">
+                        <!-- Left column order: Advisor -> Catalog -> Planted -> Add/Remove -->
+                        <VBox spacing="12" HBox.hgrow="ALWAYS" minWidth="0">
 
-                            <TableView fx:id="cropTable" VBox.vgrow="ALWAYS" editable="true"
-                                       styleClass="crop-table" prefHeight="280" minHeight="200">
-                                <columns>
-                                    <TableColumn fx:id="adviceCol" text="ML" prefWidth="44" sortable="false"/>
-                                    <TableColumn fx:id="nameCol" text="Name" prefWidth="100"/>
-                                    <TableColumn fx:id="typeCol" text="Type" prefWidth="90"/>
-                                    <TableColumn fx:id="growthCol" text="Days" prefWidth="58"/>
-                                    <TableColumn fx:id="waterCol" text="Water" prefWidth="70"/>
-                                    <TableColumn fx:id="fertCol" text="Fert" prefWidth="60"/>
-                                    <TableColumn fx:id="yieldCol" text="Yield" prefWidth="70"/>
-                                    <TableColumn fx:id="costCol" text="Cost/kg" prefWidth="72"/>
-                                    <TableColumn fx:id="priceCol" text="Price/kg" prefWidth="75"/>
-                                    <TableColumn fx:id="profitCol" text="Est. profit" prefWidth="95"/>
-                                </columns>
-                            </TableView>
-
-                            <VBox spacing="12" styleClass="crud-form">
+                            <VBox spacing="8" styleClass="card, advisor-panel">
                                 <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
-
-                                <HBox alignment="CENTER_LEFT" spacing="10">
-                                    <VBox spacing="1" HBox.hgrow="ALWAYS">
-                                        <Label text="Edit Selected Crop" styleClass="section-title"/>
-                                        <Label text="Select a row in the table, change values here, then update and save."
-                                               wrapText="true" maxWidth="Infinity" styleClass="section-caption"/>
-                                    </VBox>
-                                    <HBox spacing="8" alignment="CENTER_RIGHT">
-                                        <Button fx:id="updateRowButton" text="Update row"
-                                                onAction="#handleUpdateRow"
-                                                styleClass="secondary-button" minWidth="-Infinity"/>
-                                        <Button fx:id="saveCatalogButton" text="Save catalog"
-                                                onAction="#handleSaveCatalog"
-                                                styleClass="primary-button" minWidth="-Infinity"/>
-                                    </HBox>
-                                </HBox>
-
-                                <GridPane hgap="12" vgap="12">
-                                    <columnConstraints>
-                                        <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
-                                        <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
-                                    </columnConstraints>
-
-                                    <!-- Identity -->
-                                    <VBox spacing="8" styleClass="crud-group"
-                                          GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                        <Label text="IDENTITY" styleClass="crud-group-title"/>
-                                        <HBox spacing="10">
-                                            <VBox spacing="4" HBox.hgrow="ALWAYS">
-                                                <Label text="Crop name" styleClass="field-label"/>
-                                                <TextField fx:id="editNameField" promptText="e.g. Rice"
-                                                           styleClass="form-field" maxWidth="Infinity"/>
-                                            </VBox>
-                                            <VBox spacing="4" prefWidth="140" minWidth="120">
-                                                <Label text="Type" styleClass="field-label"/>
-                                                <ComboBox fx:id="editTypeCombo" maxWidth="Infinity"
-                                                          promptText="Select type" styleClass="form-field"/>
-                                            </VBox>
-                                        </HBox>
-                                    </VBox>
-
-                                    <!-- Growth needs -->
-                                    <VBox spacing="8" styleClass="crud-group"
-                                          GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                        <Label text="GROWTH NEEDS" styleClass="crud-group-title"/>
-                                        <HBox spacing="10">
-                                            <VBox spacing="4" HBox.hgrow="ALWAYS">
-                                                <Label text="Days" styleClass="field-label"/>
-                                                <TextField fx:id="editGrowthField" promptText="90"
-                                                           styleClass="form-field" maxWidth="Infinity"/>
-                                            </VBox>
-                                            <VBox spacing="4" HBox.hgrow="ALWAYS">
-                                                <Label text="Water (L)" styleClass="field-label"/>
-                                                <TextField fx:id="editWaterField" promptText="1200"
-                                                           styleClass="form-field" maxWidth="Infinity"/>
-                                            </VBox>
-                                            <VBox spacing="4" HBox.hgrow="ALWAYS">
-                                                <Label text="Fertilizer (kg)" styleClass="field-label"/>
-                                                <TextField fx:id="editFertField" promptText="40"
-                                                           styleClass="form-field" maxWidth="Infinity"/>
-                                            </VBox>
-                                        </HBox>
-                                    </VBox>
-
-                                    <!-- Market economics -->
-                                    <VBox spacing="8" styleClass="crud-group"
-                                          GridPane.columnIndex="0" GridPane.rowIndex="1"
-                                          GridPane.columnSpan="2">
-                                        <Label text="YIELD AND MARKET" styleClass="crud-group-title"/>
-                                        <HBox spacing="10">
-                                            <VBox spacing="4" HBox.hgrow="ALWAYS">
-                                                <Label text="Expected yield (kg)" styleClass="field-label"/>
-                                                <TextField fx:id="editYieldField" promptText="500"
-                                                           styleClass="form-field" maxWidth="Infinity"/>
-                                            </VBox>
-                                            <VBox spacing="4" HBox.hgrow="ALWAYS">
-                                                <Label text="Cost per kg (RM)" styleClass="field-label"/>
-                                                <TextField fx:id="editCostField" promptText="1.20"
-                                                           styleClass="form-field" maxWidth="Infinity"/>
-                                            </VBox>
-                                            <VBox spacing="4" HBox.hgrow="ALWAYS">
-                                                <Label text="Market price per kg (RM)" styleClass="field-label"/>
-                                                <TextField fx:id="editPriceField" promptText="2.50"
-                                                           styleClass="form-field" maxWidth="Infinity"/>
-                                            </VBox>
-                                        </HBox>
-                                    </VBox>
-                                </GridPane>
-                            </VBox>
-                        </VBox>
-
-                        <!-- Side panel: Advisor + Planted -->
-                        <VBox spacing="12" styleClass="crop-side-panel" minWidth="360" prefWidth="380" maxWidth="420">
-                            <VBox spacing="10" styleClass="card, advisor-panel">
-                                <padding><Insets top="14" right="14" bottom="14" left="14"/></padding>
 
                                 <HBox alignment="CENTER_LEFT" spacing="8">
                                     <Label text="ML Farm Advisor" styleClass="section-title"/>
@@ -211,86 +92,192 @@
                                        text="Malaysia farm advice from location, soil, and resources"
                                        wrapText="true" maxWidth="Infinity" styleClass="section-caption"/>
 
-                                <HBox spacing="8">
-                                    <VBox spacing="3" styleClass="advisor-metric" HBox.hgrow="ALWAYS">
-                                        <Label text="RECOMMENDED CROP" styleClass="metric-title"/>
+                                <HBox spacing="8" alignment="TOP_LEFT">
+                                    <VBox spacing="3" styleClass="advisor-metric" HBox.hgrow="ALWAYS" minWidth="0">
+                                        <Label text="RECOMMENDED" styleClass="metric-title"/>
                                         <Label fx:id="recommendedCropLabel" text="-"
                                                wrapText="true" maxWidth="Infinity" styleClass="metric-value"/>
                                     </VBox>
-                                    <VBox spacing="3" styleClass="advisor-metric-accent" prefWidth="92" minWidth="88">
+                                    <VBox spacing="3" styleClass="advisor-metric" HBox.hgrow="ALWAYS" minWidth="0">
+                                        <Label text="FERTILIZER PLAN" styleClass="metric-title"/>
+                                        <Label fx:id="fertilizerPlanLabel" text="-"
+                                               wrapText="true" maxWidth="Infinity" styleClass="value-label"/>
+                                    </VBox>
+                                    <VBox spacing="3" styleClass="advisor-metric-accent" prefWidth="96" minWidth="88">
                                         <Label text="GRADE" styleClass="metric-title"/>
                                         <Label fx:id="predictedGradeLabel" text="-"
                                                styleClass="metric-value"/>
                                     </VBox>
                                 </HBox>
 
-                                <VBox spacing="3" styleClass="advisor-metric">
-                                    <Label text="FERTILIZER PLAN" styleClass="metric-title"/>
-                                    <Label fx:id="fertilizerPlanLabel" text="-"
-                                           wrapText="true" maxWidth="Infinity" styleClass="value-label"/>
-                                </VBox>
-
                                 <Label fx:id="advisorRationaleLabel" text=""
                                        wrapText="true" maxWidth="Infinity" styleClass="section-caption"/>
 
-                                <VBox spacing="8">
+                                <FlowPane hgap="8" vgap="8">
                                     <Button fx:id="refreshAdviceButton" text="Refresh advice"
                                             onAction="#handleRefreshAdvice"
-                                            styleClass="secondary-button, full-width-button"
-                                            maxWidth="Infinity" wrapText="true"/>
+                                            wrapText="true"
+                                            styleClass="secondary-button, footer-button"/>
                                     <Button fx:id="applyAdviceButton" text="Apply advice and plant"
                                             onAction="#handleApplyAdvice"
-                                            styleClass="primary-button, full-width-button"
-                                            maxWidth="Infinity" wrapText="true"/>
-                                </VBox>
+                                            wrapText="true"
+                                            styleClass="primary-button, footer-button"/>
+                                </FlowPane>
                             </VBox>
 
-                            <VBox spacing="10" styleClass="card" VBox.vgrow="ALWAYS" minHeight="220">
-                                <padding><Insets top="14" right="14" bottom="14" left="14"/></padding>
+                            <VBox spacing="8" styleClass="card">
+                                <padding><Insets top="12" right="14" bottom="12" left="14"/></padding>
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <VBox spacing="1" HBox.hgrow="ALWAYS" minWidth="0">
+                                        <Label text="Crop Catalog" styleClass="section-title"/>
+                                        <Label text="Select a row to edit on the right, then save to CSV and MySQL"
+                                               wrapText="true" styleClass="section-caption"/>
+                                    </VBox>
+                                    <Label fx:id="dbStatusLabel" text="CSV / MySQL" styleClass="soft-badge"/>
+                                </HBox>
+
+                                <TableView fx:id="cropTable" editable="true"
+                                           styleClass="crop-table" prefHeight="180" minHeight="140" maxHeight="220">
+                                    <columns>
+                                        <TableColumn fx:id="adviceCol" text="ML" prefWidth="44" sortable="false"/>
+                                        <TableColumn fx:id="nameCol" text="Name" prefWidth="100"/>
+                                        <TableColumn fx:id="typeCol" text="Type" prefWidth="90"/>
+                                        <TableColumn fx:id="growthCol" text="Days" prefWidth="58"/>
+                                        <TableColumn fx:id="waterCol" text="Water" prefWidth="70"/>
+                                        <TableColumn fx:id="fertCol" text="Fert" prefWidth="60"/>
+                                        <TableColumn fx:id="yieldCol" text="Yield" prefWidth="70"/>
+                                        <TableColumn fx:id="costCol" text="Cost/kg" prefWidth="72"/>
+                                        <TableColumn fx:id="priceCol" text="Price/kg" prefWidth="75"/>
+                                        <TableColumn fx:id="profitCol" text="Est. profit" prefWidth="95"/>
+                                    </columns>
+                                </TableView>
+                            </VBox>
+
+                            <VBox spacing="8" styleClass="card, planted-panel">
+                                <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
 
                                 <VBox spacing="2">
                                     <Label text="Planted on Farm" styleClass="section-title"/>
-                                    <Label text="Select catalog rows (Ctrl-click for multiple), then add them here."
+                                    <Label text="Select catalog rows to add, or a planted item to remove."
                                            wrapText="true" maxWidth="Infinity" styleClass="section-caption"/>
                                 </VBox>
 
-                                <ListView fx:id="plantedList" VBox.vgrow="ALWAYS"
-                                          prefHeight="150" minHeight="110"/>
+                                <ListView fx:id="plantedList"
+                                          prefHeight="120" minHeight="90" maxHeight="160"/>
                                 <Label fx:id="plantedCountLabel" text="0 crops planted"
                                        styleClass="section-caption"/>
 
-                                <VBox spacing="8">
+                                <HBox spacing="10">
                                     <Button fx:id="addButton" text="Add selected to farm"
                                             onAction="#handleAddToFarm"
-                                            styleClass="primary-button, full-width-button"
-                                            maxWidth="Infinity" wrapText="true"/>
+                                            wrapText="true" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                            styleClass="primary-button, full-width-button, add-to-farm-button"/>
                                     <Button fx:id="removePlantedButton" text="Remove selected"
                                             onAction="#handleRemovePlanted"
-                                            styleClass="secondary-button, full-width-button"
-                                            maxWidth="Infinity" wrapText="true"/>
+                                            wrapText="true" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                            styleClass="secondary-button, full-width-button"/>
+                                </HBox>
+                            </VBox>
+                        </VBox>
+
+                        <!-- Right: Edit Plant Crop (unchanged place) -->
+                        <VBox spacing="10" styleClass="card, crop-edit-panel"
+                              prefWidth="340" minWidth="300" maxWidth="380">
+                            <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+
+                            <VBox spacing="2">
+                                <Label text="Edit Plant Crop" styleClass="section-title"/>
+                                <Label text="Change values, update the row, then save the catalog."
+                                       wrapText="true" maxWidth="Infinity" styleClass="section-caption"/>
+                            </VBox>
+
+                            <VBox spacing="8" styleClass="crud-form" VBox.vgrow="ALWAYS">
+                                <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+
+                                <VBox spacing="6" styleClass="crud-group">
+                                    <Label text="IDENTITY" styleClass="crud-group-title"/>
+                                    <Label text="Crop name" styleClass="field-label"/>
+                                    <TextField fx:id="editNameField" promptText="e.g. Rice"
+                                               styleClass="form-field" maxWidth="Infinity"/>
+                                    <Label text="Type" styleClass="field-label"/>
+                                    <ComboBox fx:id="editTypeCombo" maxWidth="Infinity"
+                                              promptText="Select type" styleClass="form-field"/>
                                 </VBox>
+
+                                <VBox spacing="6" styleClass="crud-group">
+                                    <Label text="GROWTH NEEDS" styleClass="crud-group-title"/>
+                                    <GridPane hgap="8" vgap="8">
+                                        <columnConstraints>
+                                            <ColumnConstraints percentWidth="33" hgrow="ALWAYS" minWidth="70"/>
+                                            <ColumnConstraints percentWidth="34" hgrow="ALWAYS" minWidth="70"/>
+                                            <ColumnConstraints percentWidth="33" hgrow="ALWAYS" minWidth="70"/>
+                                        </columnConstraints>
+                                        <VBox spacing="3" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                            <Label text="Days" styleClass="field-label"/>
+                                            <TextField fx:id="editGrowthField" promptText="90"
+                                                       styleClass="form-field" maxWidth="Infinity"/>
+                                        </VBox>
+                                        <VBox spacing="3" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                            <Label text="Water (L)" styleClass="field-label"/>
+                                            <TextField fx:id="editWaterField" promptText="1200"
+                                                       styleClass="form-field" maxWidth="Infinity"/>
+                                        </VBox>
+                                        <VBox spacing="3" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                                            <Label text="Fert (kg)" styleClass="field-label"/>
+                                            <TextField fx:id="editFertField" promptText="40"
+                                                       styleClass="form-field" maxWidth="Infinity"/>
+                                        </VBox>
+                                    </GridPane>
+                                </VBox>
+
+                                <VBox spacing="6" styleClass="crud-group">
+                                    <Label text="YIELD AND MARKET" styleClass="crud-group-title"/>
+                                    <Label text="Expected yield (kg)" styleClass="field-label"/>
+                                    <TextField fx:id="editYieldField" promptText="500"
+                                               styleClass="form-field" maxWidth="Infinity"/>
+                                    <Label text="Cost per kg (RM)" styleClass="field-label"/>
+                                    <TextField fx:id="editCostField" promptText="1.20"
+                                               styleClass="form-field" maxWidth="Infinity"/>
+                                    <Label text="Market price per kg (RM)" styleClass="field-label"/>
+                                    <TextField fx:id="editPriceField" promptText="2.50"
+                                               styleClass="form-field" maxWidth="Infinity"/>
+                                </VBox>
+                            </VBox>
+
+                            <VBox spacing="8">
+                                <Button fx:id="updateRowButton" text="Update row"
+                                        onAction="#handleUpdateRow"
+                                        maxWidth="Infinity" wrapText="true"
+                                        styleClass="secondary-button, full-width-button"/>
+                                <Button fx:id="saveCatalogButton" text="Save catalog"
+                                        onAction="#handleSaveCatalog"
+                                        maxWidth="Infinity" wrapText="true"
+                                        styleClass="primary-button, full-width-button"/>
                             </VBox>
                         </VBox>
                     </HBox>
                 </VBox>
-            </center>
+            </content>
+        </ScrollPane>
+    </center>
 
-            <bottom>
-                <HBox spacing="12" alignment="CENTER_LEFT" styleClass="footer-bar">
-                    <padding><Insets top="12" right="24" bottom="12" left="24"/></padding>
-                    <Button fx:id="backButton" text="Back to Farm Setup"
-                            onAction="#handleBackToSetup"
-                            styleClass="secondary-button"
-                            minWidth="-Infinity" prefHeight="42"/>
-                    <Label text="Change farm inputs anytime, then refresh ML advice."
-                           wrapText="true" maxWidth="Infinity" HBox.hgrow="ALWAYS"
-                           styleClass="section-caption"/>
-                    <Button fx:id="startButton" text="Start Simulation"
-                            onAction="#handleStartSimulation"
-                            disable="true" styleClass="primary-button"
-                            minWidth="-Infinity" prefHeight="42"/>
-                </HBox>
-            </bottom>
-        </BorderPane>
-    </content>
-</ScrollPane>
+    <bottom>
+        <VBox spacing="8" styleClass="footer-bar">
+            <padding><Insets top="10" right="16" bottom="10" left="16"/></padding>
+            <Label text="When crops are planted, continue to the day-by-day simulation."
+                   wrapText="true" maxWidth="Infinity" styleClass="section-caption"/>
+            <FlowPane hgap="10" vgap="8" alignment="CENTER_LEFT">
+                <Button fx:id="backButton" text="Back to Farm Setup"
+                        onAction="#handleBackToSetup"
+                        wrapText="true"
+                        styleClass="secondary-button, footer-button"/>
+                <Region minWidth="12" prefWidth="24" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="startButton" text="Start Simulation"
+                        onAction="#handleStartSimulation"
+                        disable="true"
+                        wrapText="true"
+                        styleClass="primary-button, footer-button"/>
+            </FlowPane>
+        </VBox>
+    </bottom>
+</BorderPane>
