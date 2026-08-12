@@ -3,31 +3,28 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane xmlns:fx="http://javafx.com/fxml"
+<BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="SmartHarvest360.controllers.HarvestMarketController"
             stylesheets="@../style.css"
-            fitToWidth="true" fitToHeight="true" pannable="true"
-            hbarPolicy="AS_NEEDED" vbarPolicy="AS_NEEDED"
-            styleClass="app-scroll">
-    <content>
-<BorderPane prefWidth="960" prefHeight="680" minWidth="720" minHeight="640"
+            prefWidth="1180" prefHeight="720" minWidth="960" minHeight="620"
             styleClass="app-background">
     <top>
         <HBox alignment="CENTER_LEFT" spacing="12" styleClass="top-shell">
-            <padding><Insets top="14" right="30" bottom="14" left="30"/></padding>
-            <ImageView fx:id="appLogo" fitWidth="44" fitHeight="44" preserveRatio="true" smooth="true">
+            <padding><Insets top="10" right="24" bottom="10" left="24"/></padding>
+            <ImageView fx:id="appLogo" fitWidth="40" fitHeight="40" preserveRatio="true" smooth="true">
                 <image><Image url="@../images/smartharvest-logo.png"/></image>
             </ImageView>
             <VBox spacing="1">
@@ -40,111 +37,175 @@
     </top>
 
     <center>
-        <VBox spacing="14" styleClass="content-wrap">
-            <padding><Insets top="18" right="30" bottom="18" left="30"/></padding>
+        <ScrollPane fitToWidth="true" fitToHeight="false" pannable="true"
+                    hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                    styleClass="app-scroll">
+            <content>
+                <VBox spacing="10" styleClass="content-wrap">
+                    <padding><Insets top="10" right="20" bottom="10" left="20"/></padding>
 
-            <HBox alignment="CENTER" spacing="7">
-                <Label text="1" styleClass="step-dot, step-dot-done"/>
-                <Label text="SETUP" styleClass="step-text"/>
-                <Region styleClass="step-line, step-line-done"/>
-                <Label text="2" styleClass="step-dot, step-dot-done"/>
-                <Label text="CROPS" styleClass="step-text"/>
-                <Region styleClass="step-line, step-line-done"/>
-                <Label text="3" styleClass="step-dot, step-dot-done"/>
-                <Label text="SIM" styleClass="step-text"/>
-                <Region styleClass="step-line, step-line-done"/>
-                <Label text="4" styleClass="step-dot, step-dot-active"/>
-                <Label text="MARKET" styleClass="step-text, step-text-active"/>
-                <Region styleClass="step-line"/>
-                <Label text="5" styleClass="step-dot"/>
-                <Label text="REPORT" styleClass="step-text"/>
-            </HBox>
-
-            <HBox alignment="CENTER_LEFT">
-                <VBox spacing="2">
-                    <Label text="Harvest &amp; Market" styleClass="page-title"/>
-                    <Label text="Compare available buyers and confirm the best sale for your crop."
-                           styleClass="page-description"/>
-                </VBox>
-                <Region HBox.hgrow="ALWAYS"/>
-                <VBox alignment="CENTER_RIGHT" spacing="2">
-                    <Label text="HARVESTED CROP" styleClass="metric-title"/>
-                    <Label fx:id="cropLabel" text="Tomato" styleClass="metric-value"/>
-                </VBox>
-            </HBox>
-
-            <HBox spacing="18" VBox.vgrow="ALWAYS">
-                <VBox spacing="13" styleClass="card" HBox.hgrow="ALWAYS">
-                    <padding><Insets top="18" right="20" bottom="18" left="20"/></padding>
-                    <HBox alignment="CENTER_LEFT">
-                        <VBox spacing="1">
-                            <Label text="Buyer Comparison" styleClass="section-title"/>
-                            <Label text="Markets are ranked by their offered price per kilogram."
-                                   styleClass="section-caption"/>
-                        </VBox>
-                        <Region HBox.hgrow="ALWAYS"/>
-                        <Label text="BEST PRICE FOUND" styleClass="soft-badge"/>
+                    <HBox alignment="CENTER" spacing="7">
+                        <Label text="1" styleClass="step-dot, step-dot-done"/>
+                        <Label text="SETUP" styleClass="step-text"/>
+                        <Region styleClass="step-line, step-line-done"/>
+                        <Label text="2" styleClass="step-dot, step-dot-done"/>
+                        <Label text="CROPS" styleClass="step-text"/>
+                        <Region styleClass="step-line, step-line-done"/>
+                        <Label text="3" styleClass="step-dot, step-dot-done"/>
+                        <Label text="SIM" styleClass="step-text"/>
+                        <Region styleClass="step-line, step-line-done"/>
+                        <Label text="4" styleClass="step-dot, step-dot-active"/>
+                        <Label text="MARKET" styleClass="step-text, step-text-active"/>
+                        <Region styleClass="step-line"/>
+                        <Label text="5" styleClass="step-dot"/>
+                        <Label text="REPORT" styleClass="step-text"/>
                     </HBox>
-                    <ListView fx:id="marketList" prefHeight="210" VBox.vgrow="ALWAYS"/>
 
-                    <HBox spacing="14">
-                        <VBox spacing="5" styleClass="accent-card" HBox.hgrow="ALWAYS">
-                            <padding><Insets top="12" right="14" bottom="12" left="14"/></padding>
-                            <Label text="RECOMMENDED BUYER" styleClass="metric-title"/>
-                            <Label fx:id="bestMarketLabel" text="Local Market" styleClass="metric-value"/>
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <VBox spacing="1" HBox.hgrow="ALWAYS">
+                            <Label text="Harvest &amp; Market" styleClass="page-title"/>
+                            <Label text="Pick a buyer, set quantity, and confirm the sale."
+                                   wrapText="true" styleClass="page-description"/>
                         </VBox>
-                        <VBox spacing="5" styleClass="warm-card" HBox.hgrow="ALWAYS">
+                        <HBox spacing="8">
+                            <VBox spacing="2" styleClass="metric-card">
+                                <Label text="CROP" styleClass="metric-title"/>
+                                <Label fx:id="cropLabel" text="-" styleClass="metric-value"/>
+                            </VBox>
+                            <VBox spacing="2" styleClass="metric-card">
+                                <Label text="AVAILABLE" styleClass="metric-title"/>
+                                <Label fx:id="availableYieldLabel" text="0 kg" styleClass="metric-value"/>
+                            </VBox>
+                        </HBox>
+                    </HBox>
+
+                    <HBox spacing="12" VBox.vgrow="ALWAYS">
+                        <VBox spacing="8" styleClass="card" HBox.hgrow="ALWAYS">
                             <padding><Insets top="12" right="14" bottom="12" left="14"/></padding>
-                            <Label text="BEST UNIT PRICE" styleClass="metric-title"/>
-                            <Label fx:id="bestPriceLabel" text="RM 5.50 / kg" styleClass="metric-value"/>
+                            <VBox spacing="1">
+                                <Label text="Buyer Comparison" styleClass="section-title"/>
+                                <Label text="Score blends unit price (70%) and demand (30%). Click a row to sell there."
+                                       styleClass="section-caption"/>
+                            </VBox>
+
+                            <TableView fx:id="marketTable" VBox.vgrow="ALWAYS"
+                                       prefHeight="180" minHeight="140" maxHeight="220"
+                                       styleClass="crop-table">
+                                <columns>
+                                    <TableColumn fx:id="marketNameCol" text="Market" prefWidth="170"/>
+                                    <TableColumn fx:id="priceCol" text="Price / kg" prefWidth="120"/>
+                                    <TableColumn fx:id="demandCol" text="Demand" prefWidth="100"/>
+                                    <TableColumn fx:id="scoreCol" text="Score" prefWidth="100"/>
+                                </columns>
+                            </TableView>
+
+                            <VBox spacing="3" styleClass="accent-card">
+                                <padding><Insets top="10" right="12" bottom="10" left="12"/></padding>
+                                <Label text="RECOMMENDED" styleClass="metric-title"/>
+                                <Label fx:id="bestMarketLabel" text="-" styleClass="metric-value"/>
+                                <Label fx:id="recommendationLabel" text=""
+                                       wrapText="true" maxWidth="Infinity" styleClass="section-caption"/>
+                            </VBox>
+                        </VBox>
+
+                        <VBox spacing="8" prefWidth="360" minWidth="320" styleClass="card, sale-overview">
+                            <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+
+                            <VBox spacing="1">
+                                <Label text="Sale Overview" styleClass="section-title"/>
+                                <Label text="Live totals update when you change quantity or buyer."
+                                       wrapText="true" styleClass="section-caption"/>
+                            </VBox>
+
+                            <VBox spacing="2" styleClass="sale-buyer-card">
+                                <Label text="SELLING TO" styleClass="metric-title"/>
+                                <Label fx:id="selectedBuyerLabel" text="-" styleClass="sale-buyer-name"/>
+                                <Label fx:id="bestPriceLabel" text="RM 0.00 / kg" styleClass="value-label"/>
+                                <Label fx:id="selectedDemandLabel" text="Demand: -"
+                                       wrapText="true" maxWidth="Infinity" styleClass="section-caption"/>
+                            </VBox>
+
+                            <VBox spacing="4" styleClass="sale-input-block">
+                                <Label text="Quantity to sell (kg)" styleClass="field-label"/>
+                                <TextField fx:id="quantityField" promptText="e.g. 30.00"
+                                           styleClass="form-field"/>
+                                <Label fx:id="quantityHintLabel" text=""
+                                       wrapText="true" maxWidth="Infinity" styleClass="section-caption"/>
+                                <Label fx:id="unitBreakdownLabel" text=""
+                                       wrapText="true" maxWidth="Infinity" styleClass="section-caption"/>
+                            </VBox>
+
+                            <GridPane hgap="8" vgap="8">
+                                <columnConstraints>
+                                    <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+                                    <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+                                </columnConstraints>
+
+                                <VBox spacing="2" styleClass="sale-stat" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                    <Label text="REVENUE" styleClass="metric-title"/>
+                                    <Label fx:id="revenueLabel" text="RM 0.00" styleClass="sale-stat-value"/>
+                                </VBox>
+                                <VBox spacing="2" styleClass="sale-stat" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                    <Label text="COST" styleClass="metric-title"/>
+                                    <Label fx:id="costLabel" text="RM 0.00" styleClass="sale-stat-value-muted"/>
+                                </VBox>
+                                <VBox spacing="2" styleClass="sale-stat-profit" GridPane.columnIndex="0"
+                                      GridPane.rowIndex="1" GridPane.columnSpan="2">
+                                    <Label text="EXPECTED PROFIT" styleClass="metric-title"/>
+                                    <Label fx:id="profitLabel" text="RM 0.00" styleClass="sale-profit-value"/>
+                                    <Label fx:id="marginLabel" text="Margin -"
+                                           styleClass="section-caption"/>
+                                </VBox>
+                            </GridPane>
+
+                            <VBox spacing="6" styleClass="sale-report-card">
+                                <HBox alignment="CENTER_LEFT">
+                                    <Label text="Season sales snapshot" styleClass="field-label" HBox.hgrow="ALWAYS"/>
+                                    <Label fx:id="reportPreviewBadge" text="PREVIEW" styleClass="soft-badge"/>
+                                </HBox>
+                                <GridPane hgap="8" vgap="6">
+                                    <columnConstraints>
+                                        <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+                                        <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+                                    </columnConstraints>
+                                    <VBox spacing="1" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                        <Label text="SOLD" styleClass="metric-title"/>
+                                        <Label fx:id="reportQtyLabel" text="0 kg" styleClass="value-label"/>
+                                    </VBox>
+                                    <VBox spacing="1" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <Label text="REVENUE" styleClass="metric-title"/>
+                                        <Label fx:id="reportRevenueLabel" text="RM 0.00" styleClass="value-label"/>
+                                    </VBox>
+                                    <VBox spacing="1" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                        <Label text="PROFIT" styleClass="metric-title"/>
+                                        <Label fx:id="reportProfitLabel" text="RM 0.00" styleClass="value-label"/>
+                                    </VBox>
+                                    <VBox spacing="1" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                        <Label text="TOP MARKET" styleClass="metric-title"/>
+                                        <Label fx:id="reportBestMarketLabel" text="-"
+                                               wrapText="true" maxWidth="Infinity" styleClass="value-label"/>
+                                    </VBox>
+                                </GridPane>
+                                <Label fx:id="reportNoteLabel"
+                                       text="Includes this sale as a preview until you confirm."
+                                       wrapText="true" maxWidth="Infinity" styleClass="section-caption"/>
+                            </VBox>
                         </VBox>
                     </HBox>
                 </VBox>
-
-                <VBox spacing="14" prefWidth="330" styleClass="card">
-                    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
-                    <Label text="Sale Summary" styleClass="section-title"/>
-                    <Label text="Review the final numbers before recording this transaction."
-                           wrapText="true" styleClass="section-caption"/>
-
-                    <VBox spacing="6">
-                        <Label text="QUANTITY TO SELL (KG)" styleClass="metric-title"/>
-                        <TextField fx:id="quantityField" promptText="Enter harvested quantity"/>
-                    </VBox>
-
-                    <Separator/>
-                    <GridPane hgap="16" vgap="12">
-                        <Label text="Expected revenue" styleClass="section-caption"
-                               GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                        <Label fx:id="revenueLabel" text="RM 0.00" styleClass="money-label"
-                               GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-                        <Label text="Estimated cost" styleClass="section-caption"
-                               GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                        <Label fx:id="costLabel" text="RM 0.00" styleClass="value-label"
-                               GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-                        <Label text="Expected profit" styleClass="section-caption"
-                               GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                        <Label fx:id="profitLabel" text="RM 0.00" styleClass="profit-label"
-                               GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                    </GridPane>
-
-                    <Region VBox.vgrow="ALWAYS"/>
-                    <Label fx:id="statusLabel" text="Ready to complete the sale."
-                           wrapText="true" maxWidth="Infinity" styleClass="status-label"/>
-                    <Button fx:id="sellButton" text="Confirm &amp; Record Sale" onAction="#handleSell"
-                            maxWidth="Infinity" styleClass="primary-button"/>
-                </VBox>
-            </HBox>
-        </VBox>
+            </content>
+        </ScrollPane>
     </center>
 
     <bottom>
-        <HBox alignment="CENTER_LEFT" styleClass="footer-bar">
-            <padding><Insets top="12" right="30" bottom="12" left="30"/></padding>
-            <Label text="The confirmed transaction will be saved to the harvest log."
-                   styleClass="section-caption"/>
+        <HBox spacing="12" alignment="CENTER_LEFT" styleClass="footer-bar">
+            <padding><Insets top="10" right="20" bottom="10" left="20"/></padding>
+            <Label fx:id="statusLabel" text="Select a buyer or keep the recommendation."
+                   wrapText="true" maxWidth="420" styleClass="status-label"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="sellButton" text="Confirm &amp; Record Sale"
+                    onAction="#handleSell"
+                    styleClass="primary-button"/>
         </HBox>
     </bottom>
 </BorderPane>
-    </content>
-</ScrollPane>

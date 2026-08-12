@@ -265,6 +265,74 @@
     -fx-text-fill: #148157;
 }
 
+.sale-overview {
+    -fx-spacing: 8;
+}
+
+.sale-buyer-card {
+    -fx-background-color: #eaf5ef;
+    -fx-background-radius: 10;
+    -fx-border-color: #c9e3d6;
+    -fx-border-radius: 10;
+    -fx-padding: 8 12 8 12;
+}
+
+.sale-buyer-name {
+    -fx-font-size: 18px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #183f32;
+}
+
+.sale-input-block {
+    -fx-background-color: #f7faf8;
+    -fx-background-radius: 10;
+    -fx-border-color: #e0e8e3;
+    -fx-border-radius: 10;
+    -fx-padding: 8 10 8 10;
+}
+
+.sale-stat {
+    -fx-background-color: #f6faf7;
+    -fx-background-radius: 10;
+    -fx-border-color: #e0e8e3;
+    -fx-border-radius: 10;
+    -fx-padding: 8 10 8 10;
+}
+
+.sale-stat-profit {
+    -fx-background-color: #eaf5ef;
+    -fx-background-radius: 10;
+    -fx-border-color: #c9e3d6;
+    -fx-border-radius: 10;
+    -fx-padding: 8 12 8 12;
+}
+
+.sale-stat-value {
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #1d7553;
+}
+
+.sale-stat-value-muted {
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #3d5a4d;
+}
+
+.sale-profit-value {
+    -fx-font-size: 22px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #148157;
+}
+
+.sale-report-card {
+    -fx-background-color: #fffaf2;
+    -fx-background-radius: 10;
+    -fx-border-color: #f0e0c4;
+    -fx-border-radius: 10;
+    -fx-padding: 8 10 8 10;
+}
+
 .status-label {
     -fx-background-color: #e8f4ee;
     -fx-background-radius: 8;

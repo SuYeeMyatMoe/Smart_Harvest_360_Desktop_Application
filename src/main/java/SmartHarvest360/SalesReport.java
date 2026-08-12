@@ -1,6 +1,9 @@
 package SmartHarvest360;
 
+import SmartHarvest360.model.SaleRecord;
+
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Generates a summary report from completed sales.
@@ -11,13 +14,10 @@ public class SalesReport {
      * Calculates the total quantity that has been sold.
      */
     public double getTotalQuantity(List<SaleRecord> sales) {
-
         double total = 0;
-
         for (SaleRecord sale : sales) {
-            total += sale.getQuantity();
+            total += sale.quantity();
         }
-
         return total;
     }
 
@@ -25,13 +25,10 @@ public class SalesReport {
      * Calculates the total revenue from all sales.
      */
     public double getTotalRevenue(List<SaleRecord> sales) {
-
         double total = 0;
-
         for (SaleRecord sale : sales) {
-            total += sale.getRevenue();
+            total += sale.revenue();
         }
-
         return total;
     }
 
@@ -39,13 +36,10 @@ public class SalesReport {
      * Calculates the total cost from all sales.
      */
     public double getTotalCost(List<SaleRecord> sales) {
-
         double total = 0;
-
         for (SaleRecord sale : sales) {
-            total += sale.getCost();
+            total += sale.cost();
         }
-
         return total;
     }
 
@@ -53,13 +47,10 @@ public class SalesReport {
      * Calculates the total profit from all sales.
      */
     public double getTotalProfit(List<SaleRecord> sales) {
-
         double total = 0;
-
         for (SaleRecord sale : sales) {
-            total += sale.getProfit();
+            total += sale.profit();
         }
-
         return total;
     }
 
@@ -67,22 +58,19 @@ public class SalesReport {
      * Finds the market where the highest total revenue was generated.
      */
     public String getBestSellingMarket(List<SaleRecord> sales) {
-
         if (sales == null || sales.isEmpty()) {
             return "No sales recorded";
         }
 
-        String bestMarket = sales.get(0).getMarket();
+        String bestMarket = sales.get(0).market();
         double highestRevenue = 0;
 
         for (SaleRecord sale : sales) {
-
-            if (sale.getRevenue() > highestRevenue) {
-                highestRevenue = sale.getRevenue();
-                bestMarket = sale.getMarket();
+            if (sale.revenue() > highestRevenue) {
+                highestRevenue = sale.revenue();
+                bestMarket = sale.market();
             }
         }
-
         return bestMarket;
     }
 
@@ -90,7 +78,6 @@ public class SalesReport {
      * Creates a simple sales report as text.
      */
     public String generateReport(List<SaleRecord> sales) {
-
         if (sales == null || sales.isEmpty()) {
             return "No sales recorded.";
         }
@@ -102,13 +89,13 @@ public class SalesReport {
 
         return "========== SALES REPORT ==========\n"
                 + "Total Quantity Sold: "
-                + String.format("%.2f", quantity) + " kg\n"
+                + String.format(Locale.US, "%.2f", quantity) + " kg\n"
                 + "Total Revenue: RM"
-                + String.format("%.2f", revenue) + "\n"
+                + String.format(Locale.US, "%.2f", revenue) + "\n"
                 + "Total Cost: RM"
-                + String.format("%.2f", cost) + "\n"
+                + String.format(Locale.US, "%.2f", cost) + "\n"
                 + "Total Profit: RM"
-                + String.format("%.2f", profit) + "\n"
+                + String.format(Locale.US, "%.2f", profit) + "\n"
                 + "Best Selling Market: "
                 + getBestSellingMarket(sales) + "\n"
                 + "=================================";
