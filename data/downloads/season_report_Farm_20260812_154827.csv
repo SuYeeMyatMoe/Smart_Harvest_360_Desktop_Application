@@ -1,0 +1,44 @@
+﻿section,key,value
+summary,generatedAt,2026-08-12T15:48:27.5584571
+summary,farmName,Farm
+summary,location,Selangor
+summary,soil,Loam
+summary,activeCrop,Lettuce
+summary,careScore,100
+summary,totalRevenue,80.00
+summary,totalCost,24.00
+summary,totalProfit,56.00
+summary,roiPercent,233.33
+summary,predictedGrade,B
+summary,actualGrade,S
+advisor,fertilizerPlan,Low
+advisor,fertilizerTip,Apply about 0.5 kg early season (0.5× need).
+advisor,rationale,Selangor + Loam soil with your water/fertilizer/budget favors Lettuce; plan Low; expected grade B.
+
+sales_day,crop,quantity,market,unitPrice,revenue,cost,profit
+23,Lettuce,20.00,Local Market,4.00,80.00,24.00,56.00
+
+activity_day,weather,action,waterUsed,fertilizerUsed,status,growthPercent
+1,Sunny,Setup,0.00,0.00,Season started,2
+2,Heat,Irrigate,1.04,0.00,Growing,7
+3,Rain,Protect,0.21,0.15,Growing,11
+4,Cloudy,Irrigate,0.58,0.00,Growing,16
+5,Sunny,Irrigate,0.80,0.00,Growing,20
+6,Rain,Irrigate,0.35,0.00,Growing,24
+7,Storm,Irrigate,0.42,0.00,Growing,29
+8,Cloudy,Protect,0.35,0.15,Growing,33
+9,Rain,Irrigate,0.35,0.00,Growing,38
+10,Sunny,Irrigate,0.80,0.00,Growing,42
+11,Rain,Irrigate,0.35,0.00,Growing,47
+12,Sunny,Irrigate,0.80,0.00,Growing,51
+13,Rain,Irrigate,0.35,0.00,Growing,56
+14,Rain,Irrigate,0.35,0.00,Growing,60
+15,Cloudy,Irrigate,0.58,0.00,Growing,64
+16,Heat,Irrigate,1.04,0.00,Growing,69
+17,Cloudy,Protect,0.35,0.15,Growing,73
+18,Heat,Irrigate,1.04,0.00,Growing,78
+19,Cloudy,Protect,0.35,0.15,Growing,82
+20,Rain,Irrigate,0.35,0.00,Growing,87
+21,Storm,Irrigate,0.42,0.00,Growing,91
+22,Sunny,Protect,0.49,0.15,Growing,96
+23,Rain,Irrigate,0.35,0.00,Ready to harvest,100

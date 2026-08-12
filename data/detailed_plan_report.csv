@@ -1,0 +1,70 @@
+﻿section,key,value
+summary,farm,Kate
+summary,location,Pahang
+summary,soil,Sandy
+summary,crop,Tomato
+summary,careScore,100
+summary,plantGrade,A
+summary,liveGrade,S
+summary,fertilizerPlan,Medium
+summary,overview,Tomato on Pahang/Sandy finished care 100 with live grade path S (plant-time A). Review 22 field steps and 5 recommendations before market.
+
+stepNumber,action,weather,outcome,note
+1,Setup,Sunny,Season started at 1%,Baseline day - later actions move care and grade.
+2,Irrigate,Storm,Growing - growth 6%,Missed Protect on harsh weather - grade care usually drops.
+3,Protect,Storm,Growing - growth 10%,Good call - Protect matched harsh weather.
+4,Protect,Storm,Growing - growth 14%,Good call - Protect matched harsh weather.
+5,Protect,Storm,Growing - growth 19%,Good call - Protect matched harsh weather.
+6,Protect,Storm,Growing - growth 23%,Good call - Protect matched harsh weather.
+7,Protect,Heat,Growing - growth 28%,Good call - Protect matched harsh weather.
+8,Protect,Rain,Growing - growth 31%,Logged field decision.
+9,Fertilize,Heat,Growing - growth 37%,Missed Protect on harsh weather - grade care usually drops.
+10,Protect,Sunny,Growing - growth 40%,Logged field decision.
+11,Irrigate,Rain,Growing - growth 44%,Irrigation supports growth on dry/sunny days.
+12,Fertilize,Storm,Growing - growth 50%,Missed Protect on harsh weather - grade care usually drops.
+13,Protect,Rain,Growing - growth 53%,Logged field decision.
+14,Fertilize,Cloudy,Growing - growth 59%,Fertilizer day - keep stock aligned with the ML plan band.
+15,Fertilize,Cloudy,Growing - growth 64%,Fertilizer day - keep stock aligned with the ML plan band.
+16,Fertilize,Rain,Growing - growth 70%,Fertilizer day - keep stock aligned with the ML plan band.
+17,Fertilize,Sunny,Growing - growth 76%,Fertilizer day - keep stock aligned with the ML plan band.
+18,Irrigate,Cloudy,Growing - growth 80%,Irrigation supports growth on dry/sunny days.
+19,Fertilize,Sunny,Growing - growth 86%,Fertilizer day - keep stock aligned with the ML plan band.
+20,Irrigate,Heat,Growing - growth 91%,Missed Protect on harsh weather - grade care usually drops.
+21,Protect,Rain,Growing - growth 94%,Logged field decision.
+22,Fertilize,Rain,Ready to harvest - growth 100%,Fertilizer day - keep stock aligned with the ML plan band.
+
+priority,topic,advice
+High,Next action habit,On Storm/Heat days always choose Protect first - that is the fastest grade saver.
+High,Fertilizer plan,Follow Medium plan: Apply about 2.0 kg split early/mid season (1.0× need).
+Medium,Keep momentum,Care 100 supports live grade S. Keep following coach tips through harvest.
+Low,Grade upside,You improved the path to S from A. Sell promptly at the best market to lock results.
+Medium,Market next,"Continue to Harvest & Market, sell at the best buyer, then download the season CSV on Report."
+
+itemCategory,title,detail
+STEP,Day step 1: Setup,Sunny - Season started at 1% - Baseline day - later actions move care and grade.
+STEP,Day step 2: Irrigate,Storm - Growing - growth 6% - Missed Protect on harsh weather - grade care usually drops.
+STEP,Day step 3: Protect,Storm - Growing - growth 10% - Good call - Protect matched harsh weather.
+STEP,Day step 4: Protect,Storm - Growing - growth 14% - Good call - Protect matched harsh weather.
+STEP,Day step 5: Protect,Storm - Growing - growth 19% - Good call - Protect matched harsh weather.
+STEP,Day step 6: Protect,Storm - Growing - growth 23% - Good call - Protect matched harsh weather.
+STEP,Day step 7: Protect,Heat - Growing - growth 28% - Good call - Protect matched harsh weather.
+STEP,Day step 8: Protect,Rain - Growing - growth 31% - Logged field decision.
+STEP,Day step 9: Fertilize,Heat - Growing - growth 37% - Missed Protect on harsh weather - grade care usually drops.
+STEP,Day step 10: Protect,Sunny - Growing - growth 40% - Logged field decision.
+STEP,Day step 11: Irrigate,Rain - Growing - growth 44% - Irrigation supports growth on dry/sunny days.
+STEP,Day step 12: Fertilize,Storm - Growing - growth 50% - Missed Protect on harsh weather - grade care usually drops.
+STEP,Day step 13: Protect,Rain - Growing - growth 53% - Logged field decision.
+STEP,Day step 14: Fertilize,Cloudy - Growing - growth 59% - Fertilizer day - keep stock aligned with the ML plan band.
+STEP,Day step 15: Fertilize,Cloudy - Growing - growth 64% - Fertilizer day - keep stock aligned with the ML plan band.
+STEP,Day step 16: Fertilize,Rain - Growing - growth 70% - Fertilizer day - keep stock aligned with the ML plan band.
+STEP,Day step 17: Fertilize,Sunny - Growing - growth 76% - Fertilizer day - keep stock aligned with the ML plan band.
+STEP,Day step 18: Irrigate,Cloudy - Growing - growth 80% - Irrigation supports growth on dry/sunny days.
+STEP,Day step 19: Fertilize,Sunny - Growing - growth 86% - Fertilizer day - keep stock aligned with the ML plan band.
+STEP,Day step 20: Irrigate,Heat - Growing - growth 91% - Missed Protect on harsh weather - grade care usually drops.
+STEP,Day step 21: Protect,Rain - Growing - growth 94% - Logged field decision.
+STEP,Day step 22: Fertilize,Rain - Ready to harvest - growth 100% - Fertilizer day - keep stock aligned with the ML plan band.
+RECOMMEND,[High] Next action habit,On Storm/Heat days always choose Protect first - that is the fastest grade saver.
+RECOMMEND,[High] Fertilizer plan,Follow Medium plan: Apply about 2.0 kg split early/mid season (1.0× need).
+RECOMMEND,[Medium] Keep momentum,Care 100 supports live grade S. Keep following coach tips through harvest.
+RECOMMEND,[Low] Grade upside,You improved the path to S from A. Sell promptly at the best market to lock results.
+RECOMMEND,[Medium] Market next,"Continue to Harvest & Market, sell at the best buyer, then download the season CSV on Report."

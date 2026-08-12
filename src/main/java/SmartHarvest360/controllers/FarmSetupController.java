@@ -4,10 +4,13 @@ import SmartHarvest360.Farm;
 import SmartHarvest360.Resource;
 import SmartHarvest360.db.Database;
 import SmartHarvest360.db.FarmRepository;
+import SmartHarvest360.ml.FarmProfile;
 import SmartHarvest360.navigation.SceneNavigator;
 import SmartHarvest360.session.AppSession;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
@@ -19,11 +22,15 @@ public class FarmSetupController {
     @FXML private TextField waterField;
     @FXML private TextField fertilizerField;
     @FXML private TextField landField;
+    @FXML private ComboBox<String> locationCombo;
+    @FXML private ComboBox<String> soilCombo;
     @FXML private Label farmNameError;
     @FXML private Label budgetError;
     @FXML private Label waterError;
     @FXML private Label fertilizerError;
     @FXML private Label landError;
+    @FXML private Label locationError;
+    @FXML private Label soilError;
     @FXML private Label statusLabel;
     @FXML private Label connectionStatusLabel;
     @FXML private Button nextButton;
@@ -31,8 +38,18 @@ public class FarmSetupController {
     @FXML
     public void initialize() {
         connectionStatusLabel.setText("CSV ready · " + Database.statusLabel());
-        if (AppSession.getInstance().getFarmName() != null) {
-            farmNameField.setText(AppSession.getInstance().getFarmName());
+        locationCombo.setItems(FXCollections.observableArrayList(FarmProfile.MALAYSIA_STATES));
+        soilCombo.setItems(FXCollections.observableArrayList(FarmProfile.SOIL_TYPES));
+        locationCombo.getSelectionModel().select("Selangor");
+        soilCombo.getSelectionModel().select("Loam");
+
+        AppSession session = AppSession.getInstance();
+        if (session.getFarmName() != null) {
+            farmNameField.setText(session.getFarmName());
+        }
+        if (session.getFarmProfile() != null) {
+            locationCombo.getSelectionModel().select(session.getFarmProfile().getLocation());
+            soilCombo.getSelectionModel().select(session.getFarmProfile().getSoilType());
         }
     }
 
@@ -45,6 +62,8 @@ public class FarmSetupController {
         Double water = parsePositive(waterField, waterError, "Enter water greater than zero.");
         Double fertilizer = parsePositive(fertilizerField, fertilizerError, "Enter fertilizer greater than zero.");
         Double land = parsePositive(landField, landError, "Enter land greater than zero.");
+        String location = locationCombo.getSelectionModel().getSelectedItem();
+        String soil = soilCombo.getSelectionModel().getSelectedItem();
 
         boolean valid = true;
         if (farmName.isEmpty()) {
@@ -52,6 +71,14 @@ public class FarmSetupController {
             valid = false;
         }
         if (budget == null || water == null || fertilizer == null || land == null) {
+            valid = false;
+        }
+        if (location == null || location.isBlank()) {
+            locationError.setText("Select a Malaysia state.");
+            valid = false;
+        }
+        if (soil == null || soil.isBlank()) {
+            soilError.setText("Select a soil type.");
             valid = false;
         }
         if (!valid) {
@@ -63,6 +90,7 @@ public class FarmSetupController {
         Farm farm = new Farm(resource);
         AppSession session = AppSession.getInstance();
         session.prepareFarm(farmName, farm);
+        session.setFarmProfile(new FarmProfile(location, soil));
 
         FarmRepository.insert(farmName, farm).ifPresent(session::setFarmId);
 
@@ -91,5 +119,7 @@ public class FarmSetupController {
         waterError.setText("");
         fertilizerError.setText("");
         landError.setText("");
+        locationError.setText("");
+        soilError.setText("");
     }
 }

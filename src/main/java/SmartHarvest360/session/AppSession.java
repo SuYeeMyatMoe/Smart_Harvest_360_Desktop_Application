@@ -4,7 +4,11 @@ import SmartHarvest360.Crop;
 import SmartHarvest360.Farm;
 import SmartHarvest360.Resource;
 import SmartHarvest360.VegetableCrop;
+import SmartHarvest360.ml.AdvisorResult;
+import SmartHarvest360.ml.FarmProfile;
 import SmartHarvest360.model.SaleRecord;
+import SmartHarvest360.model.SimDayLog;
+import SmartHarvest360.plan.DetailedPlanReport;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +22,15 @@ public final class AppSession {
     private String farmName;
     private Long farmId;
     private Farm farm;
+    private FarmProfile farmProfile;
+    private AdvisorResult advisorResult;
+    private DetailedPlanReport detailedPlanReport;
     private Crop activeCrop;
     private int currentDay;
     private int completedGrowthDays;
+    private int careScore;
     private final List<String> simulationLog = new ArrayList<>();
+    private final List<SimDayLog> dayLogs = new ArrayList<>();
     private final List<SaleRecord> sales = new ArrayList<>();
 
     private AppSession() {
@@ -42,10 +51,38 @@ public final class AppSession {
         farm = selectedFarm;
         farmId = null;
         activeCrop = null;
+        advisorResult = null;
+        detailedPlanReport = null;
         currentDay = 0;
         completedGrowthDays = 0;
+        careScore = 50;
         simulationLog.clear();
+        dayLogs.clear();
         sales.clear();
+    }
+
+    public void setFarmProfile(FarmProfile profile) {
+        farmProfile = profile;
+    }
+
+    public FarmProfile getFarmProfile() {
+        return farmProfile;
+    }
+
+    public void setAdvisorResult(AdvisorResult result) {
+        advisorResult = result;
+    }
+
+    public AdvisorResult getAdvisorResult() {
+        return advisorResult;
+    }
+
+    public void setDetailedPlanReport(DetailedPlanReport report) {
+        detailedPlanReport = report;
+    }
+
+    public DetailedPlanReport getDetailedPlanReport() {
+        return detailedPlanReport;
     }
 
     public void ensureDemoData() {
@@ -72,7 +109,10 @@ public final class AppSession {
         activeCrop = selectedCrop;
         currentDay = 1;
         completedGrowthDays = 1;
+        careScore = 50;
         simulationLog.clear();
+        dayLogs.clear();
+        detailedPlanReport = null;
     }
 
     /** Clears season state and returns the user to Farm Setup (no demo injection). */
@@ -80,10 +120,15 @@ public final class AppSession {
         farmName = null;
         farmId = null;
         farm = null;
+        farmProfile = null;
+        advisorResult = null;
+        detailedPlanReport = null;
         activeCrop = null;
         currentDay = 0;
         completedGrowthDays = 0;
+        careScore = 50;
         simulationLog.clear();
+        dayLogs.clear();
         sales.clear();
     }
 
@@ -134,6 +179,28 @@ public final class AppSession {
 
     public List<String> getSimulationLog() {
         return simulationLog;
+    }
+
+    public List<SimDayLog> getDayLogs() {
+        return dayLogs;
+    }
+
+    public void addDayLog(SimDayLog log) {
+        dayLogs.add(log);
+        simulationLog.add(String.format(
+                java.util.Locale.US,
+                "Day %d | %s | %s | Water %.2fL | Fert %.2fkg | %s | Growth %d%%",
+                log.getDay(), log.getWeather(), log.getAction(),
+                log.getWaterUsed(), log.getFertilizerUsed(), log.getStatus(), log.getGrowthPercent()
+        ));
+    }
+
+    public int getCareScore() {
+        return careScore;
+    }
+
+    public void adjustCareScore(int delta) {
+        careScore = Math.max(0, Math.min(100, careScore + delta));
     }
 
     public List<SaleRecord> getSales() {

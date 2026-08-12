@@ -1,0 +1,23 @@
+﻿day,weather,action,waterUsed,fertilizerUsed,status,growthPercent
+1,Sunny,Setup,0.00,0.00,Season started,1
+2,Storm,Irrigate,0.35,0.00,Growing,6
+3,Storm,Protect,0.21,0.15,Growing,10
+4,Storm,Protect,0.21,0.15,Growing,14
+5,Storm,Protect,0.21,0.15,Growing,19
+6,Storm,Protect,0.21,0.15,Growing,23
+7,Heat,Protect,0.53,0.15,Growing,28
+8,Rain,Protect,0.18,0.15,Growing,31
+9,Heat,Fertilize,0.75,0.40,Growing,37
+10,Sunny,Protect,0.41,0.15,Growing,40
+11,Rain,Irrigate,0.29,0.00,Growing,44
+12,Storm,Fertilize,0.31,0.40,Growing,50
+13,Rain,Protect,0.18,0.15,Growing,53
+14,Cloudy,Fertilize,0.42,0.40,Growing,59
+15,Cloudy,Fertilize,0.42,0.40,Growing,64
+16,Rain,Fertilize,0.25,0.40,Growing,70
+17,Sunny,Fertilize,0.58,0.40,Growing,76
+18,Cloudy,Irrigate,0.48,0.00,Growing,80
+19,Sunny,Fertilize,0.58,0.40,Growing,86
+20,Heat,Irrigate,0.86,0.00,Growing,91
+21,Rain,Protect,0.18,0.15,Growing,94
+22,Rain,Fertilize,0.25,0.40,Ready to harvest,100

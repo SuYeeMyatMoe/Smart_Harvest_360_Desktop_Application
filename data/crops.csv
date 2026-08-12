@@ -1,5 +1,8 @@
 name,type,growthDays,waterNeed,fertilizerNeed,yieldAmount,costPerKg,marketPrice
-Tomato,Vegetable,90,50,2,30,2.00,5.50
-Lettuce,Vegetable,45,30,1,20,1.20,4.00
-Chili,Fruit,120,70,3,25,2.50,8.00
-Corn,Fruit,100,80,4,50,1.80,4.50
+Tomato,Vegetable,90,50.00,2.00,30.00,2.00,5.50
+Lettuce,Vegetable,45,30.00,1.00,20.00,1.20,4.00
+Green Chili,Fruit,120,70.00,3.00,25.00,2.50,8.00
+Corn,Fruit,100,80.00,4.00,50.00,1.80,4.50
+Paddy,Vegetable,120,200.00,5.00,80.00,1.50,3.20
+Papaya,Fruit,150,90.00,3.50,40.00,2.20,6.50
+Durian,Fruit,180,110.00,6.00,35.00,8.00,22.00

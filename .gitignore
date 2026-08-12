@@ -41,3 +41,6 @@ build/
 # Runtime-generated application data
 /data/harvest_log.csv
 /data/season_report.csv
+
+# Local secrets
+.env

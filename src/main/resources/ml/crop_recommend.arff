@@ -1,0 +1,852 @@
+@relation crop_recommend
+
+@attribute location {Johor,Kedah,Kelantan,Melaka,'Negeri Sembilan',Pahang,Perak,Perlis,'Pulau Pinang',Sabah,Sarawak,Selangor,Terengganu,'Wilayah Persekutuan'}
+@attribute soil {Clay,Loam,Sandy,Silty}
+@attribute water numeric
+@attribute fertilizerStock numeric
+@attribute budget numeric
+@attribute land numeric
+@attribute npkBand numeric
+@attribute crop {Tomato,Lettuce,Chili,Corn,Paddy,Papaya,Durian}
+
+@data
+Melaka,Silty,102.0,15.7,3354.0,2.2,1,Lettuce
+Pahang,Loam,131.3,16.2,16504.4,5.7,2,Durian
+Kedah,Clay,294.4,15.9,14709.2,5.2,1,Paddy
+Pahang,Clay,188.1,24.9,8345.1,12.9,2,Corn
+'Pulau Pinang',Loam,179.6,23.3,8106.9,5.7,1,Tomato
+Kedah,Clay,167.0,29.2,8079.0,8.7,1,Corn
+Kedah,Loam,328.8,24.9,11518.9,11.2,1,Paddy
+Perlis,Sandy,117.4,22.1,13586.3,3.7,0,Chili
+Terengganu,Loam,139.7,34.4,19491.2,7.4,2,Durian
+Johor,Sandy,132.4,22.7,8051.8,6.3,2,Chili
+'Pulau Pinang',Clay,157.8,19.0,7734.5,4.7,1,Tomato
+Terengganu,Clay,228.7,22.8,15289.3,11.7,2,Paddy
+Kedah,Loam,230.7,27.4,14018.5,5.7,1,Paddy
+Selangor,Loam,180.0,16.0,9000.0,5.0,1,Tomato
+Kelantan,Silty,80.3,14.1,6879.5,2.7,2,Lettuce
+Kedah,Loam,167.3,22.5,10117.4,6.8,1,Corn
+Kelantan,Sandy,146.8,15.1,5720.6,5.1,2,Chili
+Perlis,Clay,258.9,19.4,11956.2,4.5,0,Paddy
+Selangor,Loam,169.9,20.0,10326.4,7.6,1,Corn
+Sarawak,Loam,115.6,10.9,9417.6,5.7,2,Papaya
+Terengganu,Loam,112.4,31.2,17044.0,7.7,2,Durian
+Kedah,Clay,300.4,16.0,9234.4,11.3,1,Paddy
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Sabah,Loam,113.2,11.9,4056.7,1.6,2,Lettuce
+Selangor,Loam,177.0,16.7,9349.0,4.4,1,Tomato
+Selangor,Sandy,108.1,14.0,10770.6,6.0,1,Chili
+Kelantan,Loam,179.4,21.2,9080.2,5.2,2,Papaya
+Pahang,Clay,122.8,30.1,20183.7,7.1,2,Durian
+Johor,Sandy,167.5,14.4,13147.8,3.1,2,Chili
+Kelantan,Loam,164.9,14.1,7857.4,5.3,2,Papaya
+Sarawak,Loam,131.5,19.4,10761.7,4.1,2,Papaya
+Pahang,Loam,147.4,20.7,13383.6,8.4,2,Durian
+'Wilayah Persekutuan',Silty,99.4,5.2,8353.3,3.1,1,Lettuce
+Kedah,Clay,325.9,29.1,7013.2,9.3,1,Paddy
+Sarawak,Clay,202.1,20.0,9211.6,8.3,2,Corn
+Pahang,Loam,126.1,33.4,20710.3,7.3,2,Durian
+Perak,Clay,208.6,20.8,10432.4,9.7,2,Corn
+'Negeri Sembilan',Clay,160.1,14.2,7577.5,5.1,1,Tomato
+Perlis,Loam,271.3,23.1,13127.3,7.2,0,Paddy
+Selangor,Clay,176.6,31.4,11382.8,10.7,1,Corn
+Terengganu,Loam,140.0,20.3,6656.0,5.6,2,Papaya
+Perlis,Silty,91.5,6.4,6728.1,2.0,0,Lettuce
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Terengganu,Sandy,158.4,21.4,9950.0,3.7,2,Chili
+Sarawak,Loam,166.2,22.1,8325.7,10.4,2,Corn
+Selangor,Loam,185.1,22.8,10703.2,10.3,1,Corn
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Selangor,Loam,180.0,16.0,9000.0,5.0,1,Tomato
+Johor,Loam,120.6,20.8,19566.8,8.7,2,Durian
+Terengganu,Clay,130.4,30.7,17306.6,8.7,2,Durian
+Pahang,Clay,141.0,18.9,19822.6,6.2,2,Durian
+Melaka,Loam,145.4,23.6,7735.5,4.0,1,Tomato
+Selangor,Clay,195.8,22.1,10728.5,5.6,1,Tomato
+Kedah,Clay,193.6,28.9,10975.4,11.7,1,Corn
+Sarawak,Loam,208.6,31.5,9731.5,8.6,2,Corn
+Kelantan,Clay,154.5,27.0,19854.8,7.0,2,Durian
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Perak,Loam,200.0,14.8,8033.4,4.9,2,Tomato
+Perlis,Clay,250.9,15.7,12864.3,8.1,0,Paddy
+Kelantan,Loam,120.5,17.1,8196.5,4.8,2,Papaya
+'Wilayah Persekutuan',Silty,111.2,5.0,9085.6,2.4,1,Lettuce
+Johor,Sandy,110.0,16.6,9180.0,3.9,2,Chili
+Sarawak,Loam,178.5,26.3,9983.4,12.0,2,Corn
+'Negeri Sembilan',Loam,135.0,32.3,14362.6,9.0,1,Durian
+Kedah,Loam,236.7,26.3,8093.1,4.5,1,Paddy
+Perlis,Clay,334.5,27.4,12003.6,8.4,0,Paddy
+Perlis,Sandy,115.3,23.2,7440.2,4.7,0,Chili
+Johor,Sandy,142.3,20.0,7607.0,6.3,2,Chili
+'Wilayah Persekutuan',Silty,113.7,9.8,6681.7,2.4,1,Lettuce
+Perak,Loam,267.0,24.3,13864.5,11.6,2,Paddy
+Pahang,Loam,136.0,18.2,12568.3,8.3,2,Durian
+Perak,Loam,191.5,18.7,11134.0,4.5,2,Tomato
+Perak,Clay,199.9,22.6,9867.8,8.8,2,Corn
+Perak,Loam,189.9,13.9,9836.7,5.0,2,Tomato
+Terengganu,Loam,117.2,26.1,16769.1,9.1,2,Durian
+Johor,Clay,153.3,24.7,16876.8,7.9,2,Durian
+Selangor,Silty,117.3,9.6,8195.9,1.8,1,Lettuce
+Perak,Loam,199.0,34.6,9620.5,11.2,2,Corn
+Kelantan,Sandy,164.5,20.4,11467.4,2.6,2,Chili
+'Pulau Pinang',Clay,201.5,16.0,9868.4,5.8,1,Tomato
+Kedah,Clay,279.5,14.4,8558.8,10.4,1,Paddy
+Melaka,Clay,151.9,14.6,9712.9,4.5,1,Tomato
+Terengganu,Sandy,169.9,15.5,11596.5,5.0,2,Chili
+Selangor,Sandy,141.5,19.0,9274.0,2.6,1,Chili
+'Negeri Sembilan',Loam,119.8,25.3,13097.2,6.8,1,Durian
+Kedah,Clay,292.5,28.5,13969.3,10.8,1,Paddy
+Perak,Loam,196.8,15.2,9770.1,8.9,2,Corn
+Sabah,Loam,194.6,14.8,10526.6,4.1,2,Papaya
+'Negeri Sembilan',Silty,97.0,9.8,7186.3,3.3,1,Lettuce
+Kelantan,Clay,258.5,26.1,13656.2,5.9,2,Paddy
+Kelantan,Loam,124.3,26.6,18624.1,6.7,2,Durian
+Pahang,Clay,169.8,15.1,9078.9,8.8,2,Corn
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Melaka,Clay,161.6,21.8,10540.8,5.2,1,Tomato
+Pahang,Loam,196.6,17.7,8511.9,8.6,2,Corn
+Selangor,Clay,201.7,20.3,9389.1,8.9,1,Corn
+Kelantan,Sandy,148.3,26.0,9305.3,4.0,2,Chili
+Terengganu,Loam,304.4,12.9,11277.0,6.1,2,Paddy
+'Pulau Pinang',Loam,111.0,8.1,5089.9,2.7,1,Lettuce
+Pahang,Loam,146.1,17.2,10024.8,5.4,2,Papaya
+Kelantan,Silty,105.4,5.9,6912.5,2.8,2,Lettuce
+Kedah,Loam,206.8,29.8,9806.0,10.1,1,Corn
+Perak,Loam,165.8,19.4,8982.3,5.0,2,Tomato
+'Pulau Pinang',Clay,178.7,14.7,11280.2,5.5,1,Tomato
+'Pulau Pinang',Clay,146.7,25.8,8227.4,4.3,1,Tomato
+Kelantan,Silty,115.5,8.6,5908.5,1.9,2,Lettuce
+Perak,Silty,75.0,10.4,5856.8,3.4,2,Lettuce
+Sarawak,Clay,190.4,34.8,8790.5,10.9,2,Corn
+Kelantan,Sandy,162.8,22.9,9674.0,3.1,2,Chili
+Kedah,Clay,207.8,24.7,8682.9,9.0,1,Corn
+Selangor,Sandy,96.1,20.5,11234.9,2.7,1,Chili
+Kedah,Clay,330.9,29.5,8398.4,6.6,1,Paddy
+Perlis,Silty,77.2,7.1,7195.6,3.0,0,Lettuce
+Selangor,Sandy,149.9,21.5,10251.7,3.2,1,Chili
+'Negeri Sembilan',Clay,154.3,27.4,8846.4,4.0,1,Tomato
+Selangor,Loam,180.0,16.0,9000.0,5.0,1,Tomato
+Kelantan,Sandy,115.8,12.1,6378.7,5.5,2,Chili
+Melaka,Loam,169.5,23.3,9379.6,3.9,1,Tomato
+Terengganu,Loam,309.2,29.4,14961.0,7.9,2,Paddy
+'Pulau Pinang',Loam,150.0,19.4,10967.4,4.2,1,Tomato
+Sarawak,Loam,193.5,32.6,8325.8,9.9,2,Corn
+'Negeri Sembilan',Clay,147.3,18.3,19797.4,6.2,1,Durian
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Terengganu,Loam,123.5,22.6,8563.6,5.8,2,Papaya
+Kelantan,Loam,328.0,27.3,11131.0,5.7,2,Paddy
+Kedah,Silty,75.7,12.2,9143.9,2.6,1,Lettuce
+Kedah,Loam,191.7,25.4,9557.7,6.6,1,Corn
+Pahang,Loam,120.4,31.4,19342.4,7.4,2,Durian
+Kedah,Loam,315.3,20.5,15053.9,6.1,1,Paddy
+Terengganu,Sandy,175.9,21.4,13345.9,5.1,2,Chili
+Kedah,Loam,202.4,29.6,9219.2,8.7,1,Corn
+Selangor,Clay,149.3,16.6,10175.9,4.3,1,Tomato
+Sarawak,Loam,161.0,13.2,7441.5,4.2,2,Papaya
+Perak,Clay,228.3,15.5,14496.4,10.7,2,Paddy
+Terengganu,Sandy,106.8,15.9,13005.4,5.5,2,Chili
+Kedah,Clay,298.5,28.0,11019.7,6.1,1,Paddy
+Terengganu,Loam,130.5,30.2,20834.3,7.2,2,Durian
+Selangor,Silty,90.9,6.3,3146.0,2.1,1,Lettuce
+Selangor,Loam,166.9,14.0,10157.0,4.6,1,Tomato
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Sarawak,Loam,118.9,23.1,10226.3,4.6,2,Papaya
+Terengganu,Clay,257.9,24.8,13904.0,7.4,2,Paddy
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Pahang,Clay,115.2,17.3,18519.8,10.0,2,Durian
+Kelantan,Loam,187.0,19.2,7266.8,3.6,2,Papaya
+Pahang,Loam,163.5,14.5,10430.7,4.3,2,Papaya
+Perlis,Silty,118.2,5.7,6352.9,2.3,0,Lettuce
+Perlis,Sandy,151.7,10.3,9638.4,3.5,0,Chili
+Johor,Clay,151.7,24.3,13108.8,6.1,2,Durian
+Kedah,Silty,91.8,9.4,3550.5,3.2,1,Lettuce
+Selangor,Loam,180.0,16.0,9000.0,5.0,1,Tomato
+Kelantan,Sandy,122.2,23.8,5430.2,5.1,2,Chili
+Melaka,Clay,159.6,20.1,9128.2,4.0,1,Tomato
+Pahang,Loam,133.4,24.6,14089.5,9.3,2,Durian
+Perak,Loam,188.1,16.1,10037.0,4.4,2,Tomato
+Pahang,Clay,141.8,26.6,17656.0,7.5,2,Durian
+Terengganu,Loam,127.8,32.9,19919.3,9.7,2,Durian
+Kelantan,Loam,111.8,28.3,13480.6,9.8,2,Durian
+Selangor,Sandy,120.1,13.4,10149.2,5.0,1,Chili
+Sarawak,Clay,191.4,22.0,10959.3,10.5,2,Corn
+Johor,Loam,123.3,22.8,8516.8,4.9,2,Papaya
+Pahang,Loam,178.4,15.3,9273.5,5.7,2,Papaya
+Perlis,Loam,90.4,8.5,3732.2,1.8,0,Lettuce
+Perak,Clay,331.4,21.7,12945.4,6.4,2,Paddy
+Kelantan,Sandy,113.9,18.1,9500.7,2.7,2,Chili
+Pahang,Clay,175.7,32.5,11449.9,9.9,2,Corn
+Sabah,Loam,141.5,11.2,6460.5,5.7,2,Papaya
+Perak,Clay,199.8,30.1,8466.0,13.0,2,Corn
+Kelantan,Sandy,127.9,25.1,13054.3,5.9,2,Chili
+Melaka,Silty,72.2,13.6,9068.9,2.5,1,Lettuce
+'Negeri Sembilan',Loam,188.2,17.5,8737.1,4.8,1,Tomato
+Kelantan,Sandy,167.4,20.9,10362.3,5.6,2,Chili
+'Negeri Sembilan',Clay,125.9,23.5,18067.8,7.6,1,Durian
+Pahang,Silty,98.9,7.3,7597.2,1.9,2,Lettuce
+Sarawak,Loam,170.1,18.7,8277.7,5.5,2,Papaya
+Kelantan,Loam,110.3,32.8,16679.0,6.1,2,Durian
+Kelantan,Clay,253.5,23.6,9233.5,8.8,2,Paddy
+Pahang,Loam,184.3,16.8,8333.1,7.9,2,Corn
+Johor,Loam,183.2,19.3,7018.5,4.1,2,Papaya
+'Negeri Sembilan',Loam,129.1,22.9,15117.8,8.4,1,Durian
+Kelantan,Sandy,138.7,18.5,9916.5,5.2,2,Chili
+Pahang,Loam,120.6,20.6,15021.4,6.1,2,Durian
+Pahang,Clay,129.8,19.8,18740.4,9.0,2,Durian
+Pahang,Loam,134.0,22.0,17122.9,6.3,2,Durian
+Kedah,Loam,92.4,9.0,7155.7,2.4,1,Lettuce
+Kedah,Silty,88.4,14.9,7513.8,1.6,1,Lettuce
+Terengganu,Loam,138.7,32.7,19415.8,9.1,2,Durian
+Sarawak,Silty,94.5,15.0,3514.4,1.7,2,Lettuce
+Perak,Clay,185.5,34.8,9497.3,13.0,2,Corn
+'Negeri Sembilan',Silty,70.7,9.5,4572.9,3.2,1,Lettuce
+Kelantan,Sandy,111.3,20.0,13118.0,3.9,2,Chili
+Pahang,Clay,187.2,16.3,9521.4,9.2,2,Corn
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+'Pulau Pinang',Clay,170.4,20.0,10416.3,5.4,1,Tomato
+Perak,Clay,193.6,28.9,10258.4,13.0,2,Corn
+'Wilayah Persekutuan',Silty,73.6,6.8,5153.3,3.0,1,Lettuce
+Selangor,Sandy,106.2,22.4,11336.3,3.4,1,Chili
+Kedah,Clay,206.1,28.9,10463.2,9.1,1,Corn
+Perlis,Clay,276.0,14.3,15145.7,10.6,0,Paddy
+Kelantan,Loam,118.7,29.1,15902.6,5.7,2,Durian
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+'Pulau Pinang',Clay,180.8,20.0,8505.7,5.1,1,Tomato
+Terengganu,Sandy,108.0,19.9,10281.5,3.5,2,Chili
+Selangor,Loam,190.8,20.4,9900.9,12.9,1,Corn
+Melaka,Clay,168.4,24.5,11284.2,3.8,1,Tomato
+Terengganu,Clay,266.1,22.5,9094.9,5.3,2,Paddy
+Pahang,Loam,123.2,34.0,20128.0,9.8,2,Durian
+Pahang,Loam,120.3,22.0,21576.7,7.6,2,Durian
+Perlis,Clay,277.5,28.5,13341.7,6.2,0,Paddy
+Terengganu,Sandy,178.3,10.1,10111.7,2.9,2,Chili
+Sarawak,Silty,89.0,8.5,8031.0,3.0,2,Lettuce
+Perlis,Clay,233.6,29.0,15802.4,6.7,0,Paddy
+Pahang,Clay,123.9,23.8,13979.3,5.1,2,Durian
+Terengganu,Sandy,114.2,22.7,12972.1,3.8,2,Chili
+Kedah,Clay,225.3,27.5,7110.6,4.4,1,Paddy
+Perak,Clay,312.8,23.7,12788.4,6.5,2,Paddy
+Perlis,Sandy,125.1,15.6,13403.3,5.7,0,Chili
+Johor,Loam,87.9,9.7,4709.4,2.3,2,Lettuce
+'Negeri Sembilan',Silty,118.4,15.4,8769.3,1.7,1,Lettuce
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Pahang,Silty,109.5,5.2,6756.0,2.4,2,Lettuce
+Pahang,Loam,127.0,18.5,12657.3,7.6,2,Durian
+Selangor,Sandy,168.6,16.1,12395.0,3.5,1,Chili
+Sabah,Silty,102.4,12.0,6249.9,2.9,2,Lettuce
+'Negeri Sembilan',Clay,124.6,25.7,19860.1,7.2,1,Durian
+Terengganu,Clay,270.6,28.6,13130.6,5.9,2,Paddy
+Terengganu,Clay,142.0,27.4,21484.3,9.1,2,Durian
+Kelantan,Sandy,134.2,13.3,9516.4,4.9,2,Chili
+Terengganu,Sandy,159.4,19.1,8965.4,5.6,2,Chili
+Terengganu,Sandy,143.3,11.9,6808.8,3.1,2,Chili
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Sarawak,Clay,196.3,23.2,9049.6,7.7,2,Corn
+Melaka,Loam,115.6,6.6,6228.0,2.0,1,Lettuce
+Selangor,Sandy,109.6,17.2,8338.7,4.3,1,Chili
+Terengganu,Sandy,155.7,22.7,5516.2,5.2,2,Chili
+Pahang,Loam,111.7,23.3,21852.3,8.1,2,Durian
+Kedah,Loam,239.6,25.1,15539.1,11.6,1,Paddy
+Sarawak,Clay,209.7,22.6,11043.7,12.4,2,Corn
+Kedah,Clay,311.5,22.6,10456.3,11.7,1,Paddy
+'Negeri Sembilan',Loam,167.2,16.1,8567.9,6.0,1,Tomato
+'Negeri Sembilan',Loam,184.0,24.7,10107.0,5.6,1,Tomato
+'Wilayah Persekutuan',Loam,110.2,10.2,3527.1,3.0,1,Lettuce
+Kedah,Clay,289.7,13.8,9574.8,8.3,1,Paddy
+'Pulau Pinang',Clay,200.6,24.8,8641.0,5.5,1,Tomato
+Perak,Loam,185.1,21.3,11227.0,4.0,2,Tomato
+Terengganu,Clay,261.5,24.7,12057.8,11.1,2,Paddy
+Melaka,Loam,195.1,21.7,8092.4,4.1,1,Tomato
+Kelantan,Sandy,129.4,14.6,8477.1,4.3,2,Chili
+Kelantan,Sandy,122.7,10.0,8175.3,4.8,2,Chili
+Melaka,Silty,89.1,14.4,5875.4,2.1,1,Lettuce
+Kedah,Loam,197.3,24.8,11146.1,9.4,1,Corn
+Kelantan,Sandy,175.6,20.8,8943.6,3.0,2,Chili
+Melaka,Clay,158.5,16.0,7597.7,4.4,1,Tomato
+Sarawak,Loam,184.7,20.8,10424.9,11.8,2,Corn
+Kedah,Loam,235.1,26.8,12625.8,7.8,1,Paddy
+Kelantan,Sandy,175.9,17.5,6735.3,3.0,2,Chili
+'Pulau Pinang',Clay,193.6,13.1,10723.3,5.5,1,Tomato
+Pahang,Loam,206.6,28.7,8981.3,10.0,2,Corn
+Selangor,Loam,190.3,27.9,10263.6,12.8,1,Corn
+Pahang,Loam,135.8,19.1,18480.6,5.2,2,Durian
+Perlis,Sandy,106.6,17.2,6267.9,2.7,0,Chili
+Perlis,Sandy,153.0,22.0,12054.2,3.4,0,Chili
+Melaka,Loam,160.1,25.9,7956.3,4.0,1,Tomato
+Sabah,Loam,92.0,10.2,5128.6,2.3,2,Lettuce
+Sabah,Loam,140.3,20.0,9938.9,4.6,2,Papaya
+Perak,Loam,178.7,23.7,10305.3,4.8,2,Tomato
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Pahang,Clay,137.6,30.5,17644.0,5.2,2,Durian
+Pahang,Clay,129.9,18.4,17504.1,5.9,2,Durian
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Johor,Loam,74.4,7.8,3811.5,3.0,2,Lettuce
+Perak,Loam,180.4,13.5,7874.8,4.4,2,Tomato
+Pahang,Loam,118.8,15.3,8199.5,5.7,2,Papaya
+Terengganu,Loam,128.9,18.8,13414.8,7.4,2,Durian
+Pahang,Loam,130.2,34.9,20739.4,5.9,2,Durian
+Selangor,Sandy,108.3,24.9,7866.8,4.1,1,Chili
+'Negeri Sembilan',Loam,101.2,9.4,3562.2,2.2,1,Lettuce
+Pahang,Silty,93.8,6.7,3433.1,1.7,2,Lettuce
+Terengganu,Clay,339.7,23.3,14507.0,6.1,2,Paddy
+Perak,Silty,82.5,14.3,4394.5,2.3,2,Lettuce
+Pahang,Loam,126.4,12.6,9161.0,3.7,2,Papaya
+Perak,Loam,187.8,19.0,10186.7,4.7,2,Tomato
+Pahang,Loam,171.0,18.7,9571.0,10.1,2,Corn
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Terengganu,Sandy,183.7,21.5,6708.5,3.1,2,Chili
+Selangor,Loam,180.0,16.0,9000.0,5.0,1,Tomato
+Kedah,Silty,81.7,5.3,9189.6,2.6,1,Lettuce
+Johor,Loam,126.0,30.8,13638.8,5.4,2,Durian
+Kedah,Loam,282.1,18.9,10840.0,6.8,1,Paddy
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Johor,Sandy,149.5,18.5,8582.3,5.1,2,Chili
+'Wilayah Persekutuan',Silty,91.5,14.8,5896.7,3.2,1,Lettuce
+Pahang,Loam,134.0,33.3,17075.7,6.1,2,Durian
+Kedah,Clay,250.9,20.1,14192.8,4.3,1,Paddy
+Pahang,Loam,126.0,18.9,17595.4,5.5,2,Durian
+Kedah,Clay,334.5,23.7,8695.2,8.1,1,Paddy
+Melaka,Clay,159.3,18.9,10186.8,4.5,1,Tomato
+Johor,Silty,83.3,6.4,5946.7,1.7,2,Lettuce
+Kedah,Clay,292.4,28.5,7674.9,12.0,1,Paddy
+Melaka,Clay,154.6,23.5,9030.2,3.9,1,Tomato
+Pahang,Loam,132.9,30.9,20108.1,8.1,2,Durian
+Kedah,Clay,306.8,13.7,15291.5,11.2,1,Paddy
+Perlis,Clay,252.2,17.7,13642.9,6.9,0,Paddy
+Kelantan,Loam,255.5,14.2,8418.5,9.5,2,Paddy
+Perak,Silty,94.8,12.3,5803.2,3.0,2,Lettuce
+Perlis,Sandy,104.6,22.3,5046.6,4.7,0,Chili
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Sarawak,Clay,171.3,21.1,8884.4,7.5,2,Corn
+Perlis,Sandy,118.3,22.9,8654.8,4.3,0,Chili
+Sabah,Loam,126.1,18.4,10454.9,4.7,2,Papaya
+Kelantan,Clay,130.9,31.0,15637.4,9.2,2,Durian
+Selangor,Clay,169.1,14.0,11152.5,5.2,1,Tomato
+Selangor,Loam,119.5,10.8,7268.6,2.2,1,Lettuce
+Terengganu,Silty,113.8,9.0,6512.6,2.0,2,Lettuce
+Johor,Loam,131.0,15.2,6267.6,4.0,2,Papaya
+Pahang,Clay,147.6,21.0,17671.3,5.9,2,Durian
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Kelantan,Sandy,169.0,15.9,8445.7,4.8,2,Chili
+Perak,Clay,227.3,20.6,9985.6,8.9,2,Paddy
+Pahang,Loam,153.6,16.8,10460.5,4.4,2,Papaya
+Terengganu,Loam,125.5,24.9,12579.0,9.6,2,Durian
+Selangor,Sandy,135.2,22.4,7138.8,3.0,1,Chili
+Melaka,Clay,162.1,19.6,9672.9,4.5,1,Tomato
+Pahang,Loam,131.4,19.6,6244.7,4.4,2,Papaya
+'Pulau Pinang',Silty,102.3,9.7,5532.8,2.2,1,Lettuce
+Terengganu,Clay,125.5,23.8,15835.4,8.4,2,Durian
+Johor,Loam,168.7,17.9,6461.1,5.6,2,Papaya
+Perak,Clay,152.3,16.4,8852.3,5.2,2,Tomato
+Terengganu,Loam,271.7,21.6,15681.7,5.7,2,Paddy
+Melaka,Silty,74.5,15.8,8322.6,2.9,1,Lettuce
+Perlis,Clay,301.8,13.5,10094.1,8.3,0,Paddy
+'Pulau Pinang',Loam,195.4,26.8,11422.9,5.1,1,Tomato
+'Negeri Sembilan',Clay,118.2,30.5,17355.8,7.0,1,Durian
+Selangor,Silty,90.5,12.2,4080.5,2.4,1,Lettuce
+Pahang,Loam,172.7,19.2,10987.9,3.8,2,Papaya
+Johor,Clay,127.7,32.9,18101.2,9.3,2,Durian
+'Negeri Sembilan',Loam,92.6,5.6,8821.9,1.7,1,Lettuce
+Johor,Loam,122.7,23.8,15559.2,5.5,2,Durian
+Sarawak,Loam,163.3,20.9,10828.6,3.9,2,Papaya
+Perak,Loam,160.9,26.1,9192.6,4.3,2,Tomato
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Terengganu,Loam,122.6,18.9,13994.9,8.0,2,Durian
+Sarawak,Clay,172.6,30.9,8592.4,11.2,2,Corn
+Pahang,Loam,188.0,23.4,8482.5,9.0,2,Corn
+'Negeri Sembilan',Loam,175.5,14.6,10001.2,5.8,1,Tomato
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Perlis,Sandy,99.0,23.9,8173.0,6.5,0,Chili
+Kelantan,Sandy,173.9,21.0,13827.4,4.4,2,Chili
+Sabah,Silty,108.2,6.9,6632.7,2.4,2,Lettuce
+Kedah,Clay,180.5,16.3,11479.4,12.6,1,Corn
+Selangor,Silty,118.2,11.6,4052.6,1.7,1,Lettuce
+'Negeri Sembilan',Loam,90.4,8.7,7185.2,3.1,1,Lettuce
+Kelantan,Clay,263.9,26.3,9798.5,10.7,2,Paddy
+Terengganu,Clay,298.7,21.7,8374.1,4.7,2,Paddy
+Pahang,Clay,137.6,24.8,21587.6,9.3,2,Durian
+Kedah,Loam,289.6,22.7,9544.1,9.5,1,Paddy
+Kedah,Clay,203.9,17.3,10841.6,7.9,1,Corn
+Terengganu,Sandy,137.4,21.5,6499.8,4.3,2,Chili
+Kelantan,Sandy,124.7,21.5,11607.8,5.9,2,Chili
+Terengganu,Sandy,156.0,17.2,11121.0,3.9,2,Chili
+Kedah,Clay,171.9,29.2,10218.7,11.3,1,Corn
+Kelantan,Clay,284.5,26.8,9333.2,7.0,2,Paddy
+Pahang,Loam,140.1,10.8,8369.9,3.6,2,Papaya
+Terengganu,Clay,127.7,29.0,14160.6,9.9,2,Durian
+Kelantan,Loam,114.3,30.1,14967.8,6.8,2,Durian
+Selangor,Loam,180.0,16.0,9000.0,5.0,1,Tomato
+Johor,Silty,77.9,11.8,7717.8,2.0,2,Lettuce
+Perak,Loam,188.9,15.2,10275.1,9.4,2,Corn
+'Negeri Sembilan',Silty,119.8,9.8,8699.7,3.4,1,Lettuce
+Sarawak,Silty,115.8,8.4,7592.4,2.8,2,Lettuce
+Kelantan,Loam,115.7,15.4,9771.7,2.1,2,Lettuce
+Sarawak,Loam,176.0,13.8,10825.2,6.4,2,Papaya
+Perlis,Sandy,103.7,24.6,12350.3,6.0,0,Chili
+Terengganu,Loam,314.0,17.6,7777.5,7.7,2,Paddy
+Perlis,Silty,85.1,8.0,3393.2,2.5,0,Lettuce
+Perak,Loam,264.6,22.2,9894.4,6.2,2,Paddy
+Melaka,Clay,153.4,15.8,9350.5,5.9,1,Tomato
+Melaka,Clay,184.8,18.5,9713.9,4.6,1,Tomato
+Pahang,Clay,126.4,28.4,20437.0,7.6,2,Durian
+Johor,Sandy,157.0,13.7,11648.2,5.9,2,Chili
+Johor,Clay,141.5,23.1,20616.1,6.4,2,Durian
+Perak,Loam,330.5,12.2,13303.7,8.7,2,Paddy
+Selangor,Loam,180.5,15.5,8365.9,9.2,1,Corn
+Pahang,Loam,131.9,10.3,8622.2,3.3,2,Papaya
+Perak,Clay,179.6,23.6,7683.3,4.3,2,Tomato
+Kedah,Loam,91.5,8.1,7749.4,2.5,1,Lettuce
+Johor,Clay,132.6,17.7,15956.7,5.1,2,Durian
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Perak,Clay,172.9,25.4,9869.9,4.6,2,Tomato
+Perak,Clay,173.6,27.1,8694.5,4.7,2,Tomato
+Selangor,Loam,171.1,30.0,9440.6,6.9,1,Corn
+Kelantan,Sandy,163.5,10.7,8278.7,5.4,2,Chili
+Johor,Sandy,134.4,16.3,8365.7,4.0,2,Chili
+Kelantan,Clay,336.8,30.0,13983.0,9.9,2,Paddy
+Selangor,Loam,185.6,17.7,8023.7,9.1,1,Corn
+Selangor,Silty,100.0,8.0,5000.0,2.5,1,Lettuce
+Sarawak,Loam,143.6,21.0,7725.7,3.6,2,Papaya
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Selangor,Sandy,98.6,15.4,11896.8,3.0,1,Chili
+Pahang,Loam,209.5,23.4,8462.6,7.0,2,Corn
+Kelantan,Sandy,134.9,22.7,9114.0,2.9,2,Chili
+Pahang,Clay,128.4,18.0,16547.7,7.9,2,Durian
+Kelantan,Sandy,124.4,22.9,9221.1,5.8,2,Chili
+Sarawak,Loam,169.8,16.9,8521.1,7.7,2,Corn
+Kedah,Loam,293.7,12.5,14296.2,6.2,1,Paddy
+Kelantan,Clay,229.9,20.3,8511.9,8.6,2,Paddy
+Terengganu,Clay,118.2,30.2,21337.4,6.0,2,Durian
+Selangor,Clay,189.5,30.8,9258.4,12.3,1,Corn
+Kedah,Clay,281.9,14.0,11496.2,8.8,1,Paddy
+Selangor,Clay,208.6,21.5,10219.4,11.6,1,Corn
+Selangor,Clay,168.9,27.4,10793.2,11.1,1,Corn
+Perlis,Sandy,107.4,15.9,10054.9,3.8,0,Chili
+'Negeri Sembilan',Clay,187.2,19.8,10249.5,6.0,1,Tomato
+Selangor,Loam,190.7,18.4,9332.6,7.4,1,Corn
+Terengganu,Clay,134.7,18.6,21510.6,7.7,2,Durian
+Perlis,Sandy,143.0,25.5,6936.3,3.9,0,Chili
+'Negeri Sembilan',Silty,105.3,9.6,6377.5,2.4,1,Lettuce
+Selangor,Sandy,121.6,25.8,11123.6,3.0,1,Chili
+Pahang,Loam,187.4,19.0,8392.4,6.4,2,Papaya
+Terengganu,Loam,136.0,28.3,17615.2,9.9,2,Durian
+Pahang,Loam,126.8,23.8,17825.3,7.0,2,Durian
+Kedah,Loam,201.0,25.7,9280.3,7.8,1,Corn
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Perlis,Clay,290.0,28.9,8265.8,10.0,0,Paddy
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Kedah,Clay,189.1,20.7,9757.8,11.0,1,Corn
+Terengganu,Loam,283.7,13.0,14734.2,5.3,2,Paddy
+Sarawak,Loam,113.3,9.9,6390.4,2.2,2,Lettuce
+Perak,Clay,190.0,15.9,9205.5,10.7,2,Corn
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Sarawak,Loam,181.3,33.9,10523.1,9.7,2,Corn
+Sarawak,Loam,190.3,34.4,9950.5,7.4,2,Corn
+Sarawak,Loam,170.3,12.4,10113.2,3.2,2,Papaya
+'Negeri Sembilan',Silty,70.5,13.9,9308.5,2.9,1,Lettuce
+Sarawak,Loam,72.3,9.3,7195.3,1.5,2,Lettuce
+'Negeri Sembilan',Silty,108.4,13.4,5026.1,1.7,1,Lettuce
+Sarawak,Silty,72.0,13.7,3233.6,2.2,2,Lettuce
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Kedah,Clay,250.7,21.3,7413.4,7.2,1,Paddy
+Kedah,Loam,201.4,23.4,10681.2,12.2,1,Corn
+Pahang,Clay,136.9,26.3,14949.1,5.0,2,Durian
+Sarawak,Clay,168.3,34.8,9677.3,9.1,2,Corn
+Perak,Clay,242.3,28.8,7215.2,8.3,2,Paddy
+Pahang,Loam,113.1,17.7,15202.7,9.1,2,Durian
+Melaka,Loam,146.4,15.9,8813.0,5.9,1,Tomato
+Kelantan,Clay,268.0,29.0,10560.4,4.8,2,Paddy
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Johor,Sandy,137.9,24.4,9006.0,2.9,2,Chili
+Selangor,Clay,193.5,25.8,7891.6,5.4,1,Tomato
+Sarawak,Silty,108.4,12.5,3957.5,1.7,2,Lettuce
+Kelantan,Clay,137.9,25.4,21860.9,9.5,2,Durian
+Perlis,Sandy,97.5,18.9,8320.2,5.7,0,Chili
+Perlis,Sandy,172.7,25.3,12241.5,3.7,0,Chili
+Selangor,Clay,158.1,25.1,10283.6,4.9,1,Tomato
+Pahang,Loam,130.7,29.1,12612.3,6.1,2,Durian
+Sarawak,Silty,81.8,6.6,4380.9,2.7,2,Lettuce
+Perak,Clay,172.9,19.6,8354.8,4.9,2,Tomato
+Johor,Loam,172.5,11.6,6747.3,3.2,2,Papaya
+Selangor,Loam,190.8,18.0,9148.4,9.9,1,Corn
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Pahang,Loam,144.9,23.3,8856.9,4.9,2,Papaya
+Perlis,Loam,257.2,27.9,7311.8,9.0,0,Paddy
+Sarawak,Clay,166.3,27.3,8690.6,10.3,2,Corn
+Johor,Loam,115.9,26.9,14671.4,5.5,2,Durian
+Johor,Loam,168.5,16.2,10541.6,5.1,2,Papaya
+Terengganu,Sandy,170.1,19.1,11815.5,3.2,2,Chili
+Pahang,Loam,181.7,33.1,8579.3,9.1,2,Corn
+Selangor,Sandy,145.7,18.0,6517.7,6.3,1,Chili
+Kedah,Loam,295.4,13.0,12994.7,9.3,1,Paddy
+Sarawak,Loam,181.1,21.1,10823.2,5.2,2,Papaya
+Perak,Clay,166.1,19.8,8726.5,4.4,2,Tomato
+'Pulau Pinang',Clay,178.3,15.9,10159.7,4.7,1,Tomato
+Terengganu,Loam,124.6,27.6,14967.2,7.7,2,Durian
+'Wilayah Persekutuan',Loam,119.1,5.9,7522.9,1.6,1,Lettuce
+Melaka,Silty,106.2,15.8,9770.9,3.1,1,Lettuce
+Terengganu,Clay,320.7,17.9,11074.8,5.9,2,Paddy
+Pahang,Clay,185.5,24.8,10036.8,12.1,2,Corn
+Sarawak,Loam,191.7,19.6,7740.5,6.2,2,Papaya
+Selangor,Loam,81.1,13.6,3534.7,2.8,1,Lettuce
+'Pulau Pinang',Clay,160.6,16.7,10050.6,5.6,1,Tomato
+Selangor,Sandy,155.8,12.9,13696.4,4.2,1,Chili
+Pahang,Loam,183.9,20.0,10690.5,5.1,2,Papaya
+Kelantan,Clay,110.4,24.2,15282.8,6.2,2,Durian
+Melaka,Loam,160.9,14.2,8459.5,5.1,1,Tomato
+Kelantan,Loam,120.8,30.5,21144.6,9.0,2,Durian
+Kedah,Clay,260.4,15.7,15848.0,7.4,1,Paddy
+Pahang,Loam,195.2,21.3,8835.0,7.3,2,Corn
+Terengganu,Sandy,167.6,15.9,8605.2,4.8,2,Chili
+Terengganu,Sandy,122.0,25.8,9889.7,4.5,2,Chili
+Kelantan,Sandy,172.1,11.0,11985.7,4.3,2,Chili
+Terengganu,Clay,263.7,17.0,9926.2,6.2,2,Paddy
+Kedah,Loam,174.3,17.0,8117.5,10.4,1,Corn
+Kedah,Loam,255.0,13.9,10076.3,11.1,1,Paddy
+Melaka,Loam,162.0,23.0,9977.0,4.0,1,Tomato
+Terengganu,Sandy,185.8,11.3,13316.1,5.1,2,Chili
+Selangor,Silty,100.0,8.0,5000.0,2.5,1,Lettuce
+Perak,Loam,201.2,26.4,9863.0,10.4,2,Corn
+Terengganu,Loam,287.8,13.8,11315.4,10.9,2,Paddy
+Selangor,Loam,180.0,16.0,9000.0,5.0,1,Tomato
+Kelantan,Loam,157.4,24.0,10153.7,6.4,2,Papaya
+Perlis,Silty,115.7,9.2,9918.9,3.1,0,Lettuce
+Perak,Clay,338.5,28.8,8187.8,10.9,2,Paddy
+Selangor,Sandy,122.1,24.7,9420.8,3.0,1,Chili
+Kelantan,Clay,284.5,21.2,13730.6,6.4,2,Paddy
+Perak,Clay,166.7,28.0,8053.3,5.0,2,Tomato
+Pahang,Clay,165.6,23.3,10727.1,11.2,2,Corn
+Selangor,Loam,199.2,23.8,8764.9,9.3,1,Corn
+Selangor,Silty,100.0,8.0,5000.0,2.5,1,Lettuce
+Selangor,Loam,187.0,17.8,9101.0,9.4,1,Corn
+Johor,Silty,95.9,11.8,6489.5,2.4,2,Lettuce
+Selangor,Sandy,165.2,14.8,8027.4,5.8,1,Chili
+Selangor,Loam,180.8,18.2,10645.7,4.8,1,Tomato
+Kelantan,Loam,161.4,23.3,7914.3,5.3,2,Papaya
+Johor,Loam,124.3,16.2,6793.3,3.7,2,Papaya
+Perlis,Sandy,109.7,12.9,11235.6,5.0,0,Chili
+Johor,Loam,122.0,23.5,17660.3,5.9,2,Durian
+Kedah,Clay,170.9,23.3,9973.7,10.1,1,Corn
+Pahang,Loam,135.9,24.1,14917.9,8.8,2,Durian
+Johor,Sandy,139.2,12.6,11174.7,6.2,2,Chili
+Kedah,Clay,269.6,18.7,10433.0,5.5,1,Paddy
+Sarawak,Silty,118.7,15.0,8216.2,3.2,2,Lettuce
+Sarawak,Loam,115.9,23.1,8626.7,4.5,2,Papaya
+Terengganu,Loam,154.2,25.0,18973.7,6.6,2,Durian
+Kelantan,Sandy,133.7,25.0,12905.6,4.4,2,Chili
+Kelantan,Loam,176.2,16.9,9865.1,3.1,2,Papaya
+Terengganu,Sandy,170.2,12.2,7581.9,5.8,2,Chili
+Perak,Loam,148.4,20.6,10905.4,4.0,2,Tomato
+Terengganu,Loam,167.8,19.7,6931.5,4.9,2,Papaya
+Pahang,Clay,189.6,17.6,10983.5,11.6,2,Corn
+Perak,Loam,305.6,18.7,15771.0,4.7,2,Paddy
+Kelantan,Loam,105.1,8.4,5378.8,1.5,2,Lettuce
+Sabah,Silty,73.3,8.0,7431.5,2.6,2,Lettuce
+Melaka,Loam,195.4,22.3,8454.2,4.9,1,Tomato
+Kedah,Loam,309.3,14.1,15099.1,6.7,1,Paddy
+Johor,Sandy,151.7,14.2,10900.3,6.4,2,Chili
+Kelantan,Loam,140.9,22.4,21711.7,8.8,2,Durian
+Kedah,Clay,336.4,19.1,7440.6,6.4,1,Paddy
+Sarawak,Clay,206.1,22.4,9448.8,10.2,2,Corn
+Johor,Clay,131.2,27.6,15976.3,7.5,2,Durian
+Kedah,Loam,207.5,28.4,10675.2,9.2,1,Corn
+Selangor,Sandy,98.9,23.8,5731.0,6.3,1,Chili
+Selangor,Clay,171.1,19.8,11315.3,5.9,1,Tomato
+'Pulau Pinang',Loam,197.4,21.6,9377.6,4.9,1,Tomato
+Kelantan,Loam,133.2,22.7,20743.3,7.4,2,Durian
+Perak,Clay,288.7,27.1,14365.6,7.3,2,Paddy
+'Negeri Sembilan',Clay,138.7,19.8,20931.4,9.3,1,Durian
+Pahang,Loam,146.9,19.6,18990.6,8.8,2,Durian
+'Negeri Sembilan',Loam,196.3,26.0,9020.5,4.9,1,Tomato
+Sarawak,Loam,197.9,17.0,9096.7,12.2,2,Corn
+'Negeri Sembilan',Clay,198.9,24.9,10942.8,6.0,1,Tomato
+Perlis,Sandy,129.5,22.8,11114.7,6.3,0,Chili
+Johor,Silty,107.3,7.4,5938.8,2.2,2,Lettuce
+Selangor,Sandy,107.3,24.1,5591.7,4.1,1,Chili
+'Negeri Sembilan',Clay,183.5,19.0,11424.6,5.1,1,Tomato
+Kedah,Silty,81.7,10.9,5720.5,2.2,1,Lettuce
+Selangor,Sandy,146.7,22.6,9568.6,2.6,1,Chili
+Pahang,Loam,148.6,30.7,14768.5,8.6,2,Durian
+Perlis,Loam,287.3,15.2,7341.7,4.4,0,Paddy
+Perak,Clay,178.6,33.2,8741.3,7.7,2,Corn
+Selangor,Loam,185.9,21.1,8567.3,5.3,1,Tomato
+Sarawak,Silty,94.8,5.4,6516.0,2.7,2,Lettuce
+Sarawak,Loam,176.9,18.8,10247.1,3.9,2,Papaya
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Selangor,Sandy,164.8,15.3,5399.0,4.7,1,Chili
+Perlis,Clay,252.7,21.6,14121.1,9.9,0,Paddy
+Terengganu,Clay,231.2,18.0,15769.6,7.3,2,Paddy
+Sarawak,Loam,94.3,9.9,4912.2,3.0,2,Lettuce
+Terengganu,Silty,93.0,12.6,5533.0,2.4,2,Lettuce
+Perlis,Loam,338.0,15.0,14967.9,4.7,0,Paddy
+Selangor,Silty,100.0,8.0,5000.0,2.5,1,Lettuce
+Selangor,Sandy,116.4,13.7,5901.8,3.8,1,Chili
+'Negeri Sembilan',Loam,148.5,26.2,11287.8,4.0,1,Tomato
+Kedah,Clay,257.8,28.9,7241.4,10.8,1,Paddy
+Perak,Clay,209.1,20.9,10004.6,12.7,2,Corn
+Perlis,Loam,295.0,29.0,13414.7,9.7,0,Paddy
+'Negeri Sembilan',Loam,204.6,14.8,10557.8,5.3,1,Tomato
+Perlis,Sandy,173.6,18.2,5780.6,5.2,0,Chili
+'Negeri Sembilan',Loam,159.8,21.4,8551.0,5.2,1,Tomato
+Johor,Sandy,174.0,18.3,7737.1,3.1,2,Chili
+Sabah,Loam,136.5,20.3,7988.6,4.1,2,Papaya
+Johor,Loam,140.8,30.4,13833.5,5.8,2,Durian
+Sabah,Loam,189.1,21.7,9026.3,5.7,2,Papaya
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Johor,Loam,156.6,18.7,9563.5,4.3,2,Papaya
+Pahang,Loam,164.5,20.6,9010.9,5.4,2,Papaya
+Perak,Clay,174.2,27.9,11227.8,12.0,2,Corn
+'Wilayah Persekutuan',Silty,98.3,9.4,3993.1,2.8,1,Lettuce
+Kelantan,Silty,84.8,13.7,6553.8,2.6,2,Lettuce
+Perak,Loam,175.4,15.0,8896.0,4.0,2,Tomato
+Selangor,Clay,183.4,24.8,10485.5,9.4,1,Corn
+'Wilayah Persekutuan',Silty,71.8,5.8,7418.1,3.3,1,Lettuce
+Perak,Loam,190.4,30.9,8771.9,6.7,2,Corn
+Selangor,Sandy,130.5,21.2,13215.2,5.5,1,Chili
+Sarawak,Loam,75.8,5.5,3260.5,3.5,2,Lettuce
+Sabah,Loam,151.6,20.9,9640.6,3.2,2,Papaya
+'Pulau Pinang',Loam,203.7,21.0,8003.0,5.4,1,Tomato
+Kelantan,Sandy,188.3,17.6,13422.4,2.5,2,Chili
+Perlis,Sandy,177.9,21.8,5560.5,3.1,0,Chili
+Kelantan,Silty,116.1,5.7,8822.4,1.7,2,Lettuce
+Pahang,Loam,175.9,17.9,8997.5,6.3,2,Papaya
+Kedah,Loam,198.3,23.0,8820.2,7.9,1,Corn
+Pahang,Clay,169.8,17.0,8777.0,11.4,2,Corn
+Selangor,Loam,178.5,27.1,10433.5,9.6,1,Corn
+Selangor,Loam,180.0,16.0,9000.0,5.0,1,Tomato
+Selangor,Loam,172.9,16.8,8975.6,5.3,1,Tomato
+Pahang,Loam,172.9,13.1,10787.7,6.0,2,Papaya
+Kelantan,Loam,116.4,27.1,19791.2,8.1,2,Durian
+Terengganu,Clay,117.5,29.0,21262.3,8.0,2,Durian
+Pahang,Clay,129.0,27.6,16345.3,9.5,2,Durian
+'Pulau Pinang',Clay,169.0,15.2,10250.5,5.9,1,Tomato
+Selangor,Sandy,183.8,21.4,9643.2,3.0,1,Chili
+Johor,Sandy,130.6,10.5,13377.4,5.9,2,Chili
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Kedah,Clay,235.0,22.0,11968.5,10.9,1,Paddy
+Kedah,Loam,112.3,9.0,8338.2,2.6,1,Lettuce
+Pahang,Loam,125.5,22.0,18703.6,8.6,2,Durian
+Kedah,Loam,175.3,33.0,10423.0,10.2,1,Corn
+'Negeri Sembilan',Loam,111.5,27.4,17400.2,6.2,1,Durian
+Sarawak,Silty,71.3,15.2,8806.2,2.0,2,Lettuce
+Perlis,Clay,318.0,14.3,10810.4,11.9,0,Paddy
+Terengganu,Clay,334.6,16.3,9200.3,11.4,2,Paddy
+Pahang,Loam,144.7,26.0,21962.1,5.5,2,Durian
+Perlis,Silty,71.4,11.9,8595.2,2.9,0,Lettuce
+Pahang,Loam,193.0,12.5,8804.0,5.2,2,Papaya
+Kedah,Clay,240.4,26.8,7673.5,8.5,1,Paddy
+Kelantan,Loam,131.0,13.7,8711.1,3.5,2,Papaya
+'Negeri Sembilan',Clay,164.6,19.8,8850.0,5.9,1,Tomato
+Terengganu,Sandy,144.0,25.8,9887.3,3.5,2,Chili
+Selangor,Clay,182.3,29.8,10766.7,11.0,1,Corn
+Kedah,Clay,270.2,21.9,11418.5,4.4,1,Paddy
+Pahang,Loam,153.8,21.4,13687.9,7.2,2,Durian
+Johor,Loam,115.4,18.4,8778.3,6.3,2,Papaya
+Kedah,Clay,292.5,12.2,8941.7,11.4,1,Paddy
+'Pulau Pinang',Loam,174.3,17.1,9442.6,4.7,1,Tomato
+Johor,Sandy,181.8,12.8,12940.2,3.2,2,Chili
+Kedah,Loam,117.4,12.1,4077.8,3.4,1,Lettuce
+Kedah,Loam,78.3,8.3,3202.6,2.1,1,Lettuce
+Kedah,Loam,168.7,31.9,10257.2,8.7,1,Corn
+Terengganu,Sandy,113.6,25.3,7470.1,5.0,2,Chili
+Sarawak,Loam,196.7,19.1,10633.1,11.8,2,Corn
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Selangor,Loam,202.9,14.6,7602.7,4.5,1,Tomato
+Johor,Loam,115.4,20.4,19939.5,9.7,2,Durian
+Terengganu,Clay,276.3,29.3,11271.2,8.4,2,Paddy
+Sabah,Loam,187.9,19.9,9308.6,5.6,2,Papaya
+Perak,Clay,204.4,15.6,8919.9,12.1,2,Corn
+Kedah,Loam,169.2,22.6,9934.5,6.9,1,Corn
+'Negeri Sembilan',Loam,145.2,24.6,10048.5,4.4,1,Tomato
+Kelantan,Silty,92.1,8.8,7113.0,2.8,2,Lettuce
+Pahang,Loam,116.1,18.1,16825.8,7.3,2,Durian
+Terengganu,Clay,335.9,16.3,9348.9,6.5,2,Paddy
+Terengganu,Sandy,122.3,19.2,9888.7,6.1,2,Chili
+Sarawak,Silty,78.5,5.9,9095.9,2.7,2,Lettuce
+Kelantan,Loam,255.4,23.8,12148.2,7.8,2,Paddy
+Perlis,Clay,232.8,16.6,7972.3,4.0,0,Paddy
+Selangor,Sandy,185.1,11.8,5170.4,3.8,1,Chili
+Selangor,Loam,170.2,21.8,9591.1,6.0,1,Tomato
+Perlis,Clay,322.3,26.4,10193.2,10.7,0,Paddy
+Terengganu,Sandy,146.0,23.6,8878.3,6.0,2,Chili
+Melaka,Loam,185.0,18.3,9739.5,5.9,1,Tomato
+Pahang,Loam,173.8,19.6,9994.3,8.1,2,Corn
+Sabah,Loam,121.0,16.9,7356.3,6.4,2,Papaya
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Perak,Loam,186.1,25.6,10604.0,4.3,2,Tomato
+Sarawak,Loam,116.4,10.1,9721.3,3.6,2,Papaya
+Sarawak,Loam,73.3,6.0,7748.7,2.1,2,Lettuce
+Selangor,Loam,100.2,5.3,4602.5,2.8,1,Lettuce
+Selangor,Loam,191.7,25.9,10386.0,10.1,1,Corn
+Kedah,Clay,195.2,24.8,11380.7,8.5,1,Corn
+Terengganu,Sandy,160.6,20.2,13465.7,4.0,2,Chili
+Kelantan,Sandy,166.8,14.6,7568.7,2.7,2,Chili
+Melaka,Clay,146.5,24.0,8828.7,6.0,1,Tomato
+'Negeri Sembilan',Clay,164.2,21.1,8053.5,4.4,1,Tomato
+Perak,Loam,165.7,26.1,10044.1,11.2,2,Corn
+Kelantan,Loam,121.0,23.5,9728.4,3.2,2,Papaya
+Sabah,Loam,157.7,11.9,8076.8,5.8,2,Papaya
+Terengganu,Loam,179.2,16.2,6410.5,6.1,2,Papaya
+Johor,Loam,120.6,24.2,12643.1,9.0,2,Durian
+Sabah,Loam,155.0,22.1,8032.0,3.9,2,Papaya
+'Pulau Pinang',Loam,171.1,24.0,11361.9,4.4,1,Tomato
+Kelantan,Clay,135.9,21.0,16367.8,5.5,2,Durian
+Perlis,Loam,313.9,28.1,13067.1,4.9,0,Paddy
+Johor,Silty,88.5,9.9,9653.9,3.2,2,Lettuce
+Perlis,Clay,226.5,14.5,7102.2,8.0,0,Paddy
+Kelantan,Loam,115.9,27.5,20361.5,9.5,2,Durian
+Terengganu,Loam,127.9,29.1,13070.3,9.1,2,Durian
+Sabah,Silty,92.4,15.2,6951.4,2.8,2,Lettuce
+Kedah,Clay,236.3,27.6,8209.5,11.8,1,Paddy
+Kedah,Clay,167.4,23.7,10935.4,8.7,1,Corn
+Kelantan,Loam,137.8,11.0,7128.8,4.6,2,Papaya
+Melaka,Loam,186.8,17.5,10237.0,5.7,1,Tomato
+Pahang,Loam,121.6,13.9,10166.9,6.1,2,Papaya
+Pahang,Loam,114.1,16.3,14563.3,7.1,2,Durian
+Kelantan,Silty,87.1,13.4,4344.0,3.5,2,Lettuce
+Johor,Sandy,119.3,23.4,9939.2,5.4,2,Chili
+Kelantan,Clay,284.9,23.2,12260.4,4.1,2,Paddy
+Pahang,Loam,132.1,22.1,13945.4,9.8,2,Durian
+Perlis,Sandy,127.2,13.0,11228.6,4.0,0,Chili
+Terengganu,Silty,88.9,15.3,9087.2,3.5,2,Lettuce
+'Negeri Sembilan',Silty,118.9,12.2,4921.4,2.6,1,Lettuce
+Pahang,Loam,182.8,31.3,10610.3,10.3,2,Corn
+Perak,Clay,172.2,33.7,8959.1,10.8,2,Corn
+Perak,Clay,154.3,17.5,11374.8,5.2,2,Tomato
+'Negeri Sembilan',Loam,196.0,25.3,7922.2,6.1,1,Tomato
+Perlis,Silty,81.9,11.3,7023.7,3.5,0,Lettuce
+Perak,Clay,232.5,24.8,10630.5,10.2,2,Paddy
+Terengganu,Loam,127.8,20.6,21703.9,7.9,2,Durian
+Perak,Clay,324.7,20.5,14934.9,7.8,2,Paddy
+Perlis,Clay,247.8,19.2,13176.6,11.5,0,Paddy
+Kedah,Loam,275.6,16.7,14533.7,8.5,1,Paddy
+Kelantan,Sandy,186.2,10.4,6674.4,4.6,2,Chili
+Terengganu,Loam,174.9,22.6,7850.5,4.3,2,Papaya
+Perak,Loam,180.9,20.3,7947.5,4.7,2,Tomato
+Kelantan,Loam,152.2,25.2,19802.4,6.8,2,Durian
+Kelantan,Clay,119.5,19.1,20417.0,5.1,2,Durian
+Terengganu,Silty,114.8,9.9,8668.7,2.8,2,Lettuce
+Perlis,Sandy,177.1,16.7,13664.2,6.1,0,Chili
+Selangor,Loam,180.0,16.0,9000.0,5.0,1,Tomato
+Selangor,Sandy,139.3,24.1,9476.3,2.9,1,Chili
+Kelantan,Silty,83.8,13.7,5904.6,3.4,2,Lettuce
+Kelantan,Loam,240.8,15.6,14961.9,8.2,2,Paddy
+Selangor,Loam,154.2,15.4,10221.9,5.2,1,Tomato
+Johor,Loam,126.0,12.8,8164.1,4.9,2,Papaya
+Perlis,Sandy,144.9,22.3,12410.1,2.8,0,Chili
+Perak,Loam,203.1,26.9,10894.8,4.2,2,Tomato
+Selangor,Loam,189.5,16.7,8058.2,4.0,1,Tomato
+Kedah,Loam,206.8,21.3,11365.1,10.3,1,Corn
+Selangor,Clay,203.7,27.2,9498.6,10.5,1,Corn
+Perak,Clay,187.0,26.5,8940.5,9.2,2,Corn
+Sarawak,Loam,195.7,28.2,9887.6,10.7,2,Corn
+Kelantan,Sandy,158.1,11.4,13771.9,2.8,2,Chili
+Pahang,Loam,129.4,24.0,20810.8,8.5,2,Durian
+Kedah,Loam,201.2,26.8,10350.1,7.9,1,Corn
+'Pulau Pinang',Silty,79.7,13.5,5457.7,3.4,1,Lettuce
+Perak,Loam,306.0,19.8,12882.7,8.9,2,Paddy
+Terengganu,Clay,272.7,14.7,12291.4,10.1,2,Paddy
+Perlis,Sandy,142.8,16.7,6458.5,3.3,0,Chili
+Sarawak,Loam,162.5,10.7,6718.9,5.9,2,Papaya
+Terengganu,Sandy,153.0,13.1,7218.7,4.7,2,Chili
+Pahang,Clay,208.1,19.6,9417.7,7.7,2,Corn
+Johor,Loam,132.8,19.0,8135.7,3.7,2,Papaya
+Selangor,Clay,201.2,21.6,9171.6,11.8,1,Corn
+Selangor,Clay,175.8,19.5,11001.4,7.4,1,Corn
+Kelantan,Sandy,184.4,25.7,11940.6,5.3,2,Chili
+Pahang,Loam,112.3,23.4,18540.8,9.0,2,Durian
+Terengganu,Sandy,159.0,25.7,10253.3,5.7,2,Chili
+Selangor,Clay,188.8,22.2,11210.4,7.2,1,Corn
+Perak,Clay,172.6,24.1,10598.8,11.5,2,Corn
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Perak,Loam,250.7,22.6,8578.2,6.5,2,Paddy
+'Negeri Sembilan',Silty,100.4,8.9,7456.3,2.7,1,Lettuce
+'Negeri Sembilan',Loam,138.3,16.8,21405.5,7.6,1,Durian
+Johor,Sandy,189.7,16.4,9458.5,6.2,2,Chili
+Perlis,Clay,314.7,22.5,8398.7,5.3,0,Paddy
+Sarawak,Clay,175.3,26.1,9314.0,7.7,2,Corn
+Kedah,Clay,248.8,23.5,15793.5,7.8,1,Paddy
+'Wilayah Persekutuan',Silty,76.6,8.9,8519.0,2.7,1,Lettuce
+Sarawak,Silty,103.6,11.4,8756.9,3.4,2,Lettuce
+Melaka,Clay,152.2,21.0,10548.8,4.2,1,Tomato
+Perak,Clay,180.7,17.0,10527.0,9.4,2,Corn
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Johor,Loam,135.8,22.5,8790.5,5.2,2,Papaya
+Kedah,Loam,169.5,30.7,9608.5,7.3,1,Corn
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Kedah,Clay,166.4,23.2,10691.4,11.5,1,Corn
+Kelantan,Clay,321.3,16.7,14477.8,4.7,2,Paddy
+Johor,Loam,182.5,14.6,9883.6,5.0,2,Papaya
+Selangor,Loam,162.8,18.4,8709.1,5.5,1,Tomato
+Terengganu,Clay,125.6,31.5,14649.8,9.8,2,Durian
+Johor,Loam,127.9,17.8,21399.5,7.4,2,Durian
+'Negeri Sembilan',Loam,135.0,19.4,15481.8,6.1,1,Durian
+Terengganu,Loam,121.3,24.4,16082.3,7.4,2,Durian
+Terengganu,Loam,113.8,33.7,16203.5,6.1,2,Durian
+'Wilayah Persekutuan',Silty,119.4,10.9,8589.6,1.7,1,Lettuce
+Sabah,Loam,163.9,20.9,9134.5,6.0,2,Papaya
+Terengganu,Loam,256.0,19.5,12810.0,5.5,2,Paddy
+Kelantan,Sandy,167.1,17.5,10538.1,6.1,2,Chili
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Kelantan,Loam,143.2,16.6,16877.9,8.9,2,Durian
+'Pulau Pinang',Silty,86.5,6.3,5475.2,2.8,1,Lettuce
+Perak,Loam,106.5,8.4,5187.7,2.0,2,Lettuce
+Sarawak,Loam,206.3,25.8,10246.3,6.9,2,Corn
+Kelantan,Loam,240.7,14.8,15538.2,10.3,2,Paddy
+Pahang,Silty,103.5,14.1,8171.4,2.9,2,Lettuce
+Terengganu,Loam,111.8,30.9,17281.6,5.6,2,Durian
+'Pulau Pinang',Clay,171.9,13.3,8676.9,4.8,1,Tomato
+Melaka,Loam,161.7,19.8,10501.9,5.2,1,Tomato
+Kedah,Clay,316.4,29.8,14037.2,6.9,1,Paddy
+Terengganu,Silty,73.8,15.5,7395.6,2.4,2,Lettuce
+Perak,Clay,182.6,17.1,7809.9,4.5,2,Tomato
+Johor,Sandy,121.7,19.6,12585.6,5.2,2,Chili
+Johor,Loam,143.2,23.4,16094.4,6.3,2,Durian
+Johor,Clay,134.8,26.6,14197.8,7.8,2,Durian
+Selangor,Loam,169.2,27.1,9778.7,5.2,1,Tomato
+Perlis,Loam,307.4,28.5,14598.6,6.6,0,Paddy
+Selangor,Sandy,120.3,11.3,8820.5,4.2,1,Chili
+Sarawak,Loam,154.5,23.3,9941.7,3.1,2,Papaya
+'Pulau Pinang',Loam,157.0,26.8,8898.6,5.8,1,Tomato
+Pahang,Loam,119.3,33.2,15931.9,7.3,2,Durian
+Sarawak,Clay,177.4,26.1,10070.8,11.3,2,Corn
+Selangor,Loam,179.7,20.6,10750.5,8.9,1,Corn
+Johor,Loam,111.6,20.5,12502.7,5.8,2,Durian
+Perak,Clay,338.0,14.7,15543.3,7.6,2,Paddy
+Pahang,Loam,173.0,25.7,9850.9,11.2,2,Corn
+Selangor,Loam,197.6,16.9,9822.4,6.2,1,Tomato
+Pahang,Loam,144.1,16.3,6667.7,5.2,2,Papaya
+Perak,Loam,206.4,27.3,9548.3,7.9,2,Corn
+Melaka,Loam,148.9,19.1,9670.4,4.8,1,Tomato
+Kelantan,Loam,320.0,22.3,8074.6,9.4,2,Paddy
+Sabah,Loam,156.8,10.4,6897.6,5.3,2,Papaya
+'Pulau Pinang',Silty,110.3,5.8,9032.4,1.6,1,Lettuce
+'Negeri Sembilan',Loam,184.3,18.9,11158.2,4.9,1,Tomato
+'Pulau Pinang',Loam,172.3,26.3,9802.7,5.5,1,Tomato
+Terengganu,Loam,112.5,20.9,14210.4,9.8,2,Durian
+Kelantan,Loam,190.8,22.9,8136.3,3.6,2,Papaya
+'Wilayah Persekutuan',Silty,100.8,10.6,6239.0,2.6,1,Lettuce
+Kedah,Loam,187.7,20.8,10855.3,11.3,1,Corn
+'Pulau Pinang',Clay,199.3,25.7,7869.2,4.8,1,Tomato
+Perlis,Sandy,99.1,16.2,8359.7,5.5,0,Chili
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Sarawak,Loam,117.5,18.1,8144.6,5.0,2,Papaya
+Johor,Loam,150.0,14.0,8000.0,4.0,2,Papaya
+Perak,Clay,305.9,18.3,12108.9,5.1,2,Paddy
+Kelantan,Loam,330.8,15.2,15643.1,4.3,2,Paddy
+Johor,Loam,177.7,12.9,8797.6,4.1,2,Papaya
+Selangor,Clay,194.7,15.3,9862.7,9.2,1,Corn
+Pahang,Loam,147.7,13.6,7140.4,3.2,2,Papaya
+Perlis,Loam,310.2,25.7,14804.7,10.6,0,Paddy
+Terengganu,Loam,134.5,22.1,16949.7,9.3,2,Durian
+'Negeri Sembilan',Clay,161.8,21.9,11020.4,5.1,1,Tomato
+Kedah,Silty,106.9,13.9,6894.6,2.7,1,Lettuce
+Terengganu,Loam,285.2,16.7,15775.5,9.0,2,Paddy
+Melaka,Clay,147.7,13.8,8668.5,6.1,1,Tomato
+Pahang,Loam,106.1,13.5,6973.2,1.7,2,Lettuce
+Selangor,Loam,169.2,18.1,10946.7,4.4,1,Tomato
+'Wilayah Persekutuan',Silty,86.4,6.6,9303.7,1.5,1,Lettuce
+Johor,Silty,83.4,6.4,5016.2,3.3,2,Lettuce
+'Negeri Sembilan',Loam,145.6,22.3,9752.0,4.0,1,Tomato
+Melaka,Clay,169.4,25.5,8715.5,4.3,1,Tomato
+Sabah,Loam,164.3,19.5,8897.0,3.6,2,Papaya

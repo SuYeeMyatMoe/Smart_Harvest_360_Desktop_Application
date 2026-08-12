@@ -1,7 +1,7 @@
 # SmartHarvest 360
 
-SmartHarvest 360 is a JavaFX desktop application that simulates crop growth, compares market
-prices, records harvest sales, and displays a final season report.
+SmartHarvest 360 is a JavaFX desktop application that simulates crop growth with ML farm advice,
+compares market prices, records harvest sales, and shows a final season report with charts and CSV export.
 
 ## Run in VS Code
 
@@ -12,29 +12,84 @@ prices, records harvest sales, and displays a final season report.
 Use `Launcher` in VS Code. Running the JavaFX `SmartHarvestApp` class directly can trigger the
 JDK's "JavaFX runtime components are missing" launcher check.
 
-See [`report.md`](report.md) for MySQL setup, the full 5-screen walkthrough, and CSV locations.
+## Application flow
 
-## Application screens
+1. **Farm Setup** – farm name, Malaysia state, soil, budget, water, fertilizer, land
+2. **Crop Selection** – browse/edit `data/crops.csv`, Weka ML advisor, plant crops (Back returns to setup)
+3. **Simulation** – day-by-day field actions, grade coach, activity log
+4. **Detailed Plan** – steps and recommendations from the season so far
+5. **Harvest & Market** – sell the crop
+6. **Season Report** – revenue/cost/profit/ROI, two charts, one full CSV download
 
-1. `FarmSetupScreen.fxml` / `FarmSetupController.java`
-2. `CropSelectionScreen.fxml` / `CropSelectionController.java`
-3. `SimulationScreen.fxml` / `SimulationController.java`
-4. `HarvestMarketScreen.fxml` / `HarvestMarketController.java`
-5. `SeasonReportScreen.fxml` / `SeasonReportController.java`
+## MySQL (optional)
+
+The app is **CSV-first**. It runs fully without a database. MySQL only mirrors farms, crops, and sales when available.
+
+1. Install MySQL and create an empty database:
+
+```sql
+CREATE DATABASE smartharvest;
+```
+
+2. Copy the env template and set your password in the project root:
+
+```bash
+copy .env.example .env
+```
+
+Edit `.env`:
+
+```properties
+DB_URL=jdbc:mysql://localhost:3306/smartharvest?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+DB_USER=root
+DB_PASSWORD=YOUR_PASSWORD
+```
+
+`src/main/resources/db.properties` holds non-secret defaults. The real password comes from `.env` (gitignored).
+
+3. Restart the app. Farm Setup / Crop Selection show **MySQL connected** or **MySQL offline**.
+
+If MySQL is offline, crop catalog saves and reports still work through CSV under `data/`.
+
+Schema tables are created automatically on first successful connection (`SmartHarvest360.db` package).
+
+## ML farm advisor (Weka J48)
+
+- Models train from ARFF under `src/main/resources/ml/` and cache under `data/ml/`.
+- Recommendations change with location, soil, water, fertilizer, land, and budget.
+- Crop catalog includes Tomato, Lettuce, Green Chili, Corn, **Paddy**, **Papaya**, and **Durian**.
+- Regenerate training data (after changing the script):
+
+```bash
+python scripts/generate_ml_arff.py
+```
+
+Then delete `data/ml/*.model` (and `*.meta`) so models retrain on next launch.
+
+## CSV / data files
+
+| Path | Purpose |
+|---|---|
+| `data/crops.csv` | Editable crop catalog |
+| `data/harvest_log.csv` | Sale history |
+| `data/season_report.csv` | Auto-saved season summary + sales + activity |
+| `data/activity_log.csv` | Simulation day log |
+| `data/detailed_plan_report.csv` | Post-sim plan export |
+| `data/ml/` | Cached Weka models |
+| `data/downloads/` | Optional download folder |
 
 ## Supporting components
 
-- `AppSession` shares the selected farm, crop, simulation progress, and sales between screens.
-- `SceneNavigator` centralizes JavaFX scene navigation.
-- `CSVFileHandler` loads `data/crops.csv`.
-- `CsvDataStore` writes `harvest_log.csv` and `season_report.csv`.
-- `SmartHarvest360.db` optionally mirrors farms, crops, and sales in MySQL.
-- `SaleRecord` stores the details of a completed sale.
+- `AppSession` – shared farm, crop, simulation, sales, advisor result
+- `SceneNavigator` – JavaFX screen switching (keeps window size)
+- `CSVFileHandler` – load/save `data/crops.csv`
+- `CsvDataStore` – harvest / season / activity CSV export
+- `SmartHarvest360.db` – optional MySQL mirror
+- `SmartHarvest360.ml` – Weka crop / fertilizer / grade advice
+- `SmartHarvest360.plan` – detailed plan report after simulation
 
 Farm Setup prepares the session; Crop Selection starts the simulation with:
 
 ```java
 AppSession.getInstance().startSimulation(farm, selectedCrop);
 ```
-
-Runtime CSV files are created in the project's `data` directory.

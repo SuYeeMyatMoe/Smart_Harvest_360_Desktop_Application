@@ -12,9 +12,9 @@ public class SmartHarvestApp extends Application {
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("/fxml/FarmSetupScreen.fxml"));
         stage.setTitle("SmartHarvest 360");
-        stage.setScene(new Scene(root, 960, 680));
-        stage.setMinWidth(640);
-        stage.setMinHeight(480);
+        stage.setScene(new Scene(root, 1180, 760));
+        stage.setMinWidth(980);
+        stage.setMinHeight(700);
         stage.show();
     }
 
