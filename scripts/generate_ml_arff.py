@@ -1,15 +1,29 @@
-"""Generate Malaysia-informed Weka ARFF datasets under src/main/resources/ml/.
+"""Generate Weka ARFF from Malaysia Crop Area & Production by State (DOSM/DOA, 2017–2022).
 
-Crop labels use clear exclusive rules (synced with CropFeatureScorer.java)
-including Tomato, Lettuce, Chili, Corn, Paddy, Papaya, Durian.
+Source CSV: src/main/resources/ml/crops_state_dataset.csv
+Columns: state, date, crop_type, planted_area (Ha), production (Mt)
+
+crop_type is mapped onto the app catalog:
+  paddy        -> Paddy
+  vegetables   -> Tomato, Lettuce, Chili
+  fruits       -> Durian, Papaya
+  cash_crops   -> Corn
+
+Farm features (soil/water/fertilizer/budget/land) are sampled so J48 learns
+state production priors + resource fit (classification, not fixed rules only).
 """
 from __future__ import annotations
 
+import csv
 import random
-from collections import Counter
+from collections import Counter, defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1] / "src" / "main" / "resources" / "ml"
+DATASET = ROOT / "crops_state_dataset.csv"
+# Fallback if the renamed file is missing
+DATASET_FALLBACK = ROOT / "crops_state.csv"
+
 STATES = [
     "Johor", "Kedah", "Kelantan", "Melaka", "Negeri Sembilan", "Pahang",
     "Perak", "Perlis", "Pulau Pinang", "Sabah", "Sarawak", "Selangor",
@@ -17,6 +31,20 @@ STATES = [
 ]
 SOILS = ["Clay", "Loam", "Sandy", "Silty"]
 CROPS = ["Tomato", "Lettuce", "Chili", "Corn", "Paddy", "Papaya", "Durian"]
+
+# Official crop_type -> catalog crops with share of that type's production.
+TYPE_MAP: dict[str, list[tuple[str, float]]] = {
+    "paddy": [("Paddy", 1.0)],
+    "vegetables": [("Tomato", 0.40), ("Lettuce", 0.35), ("Chili", 0.25)],
+    "fruits": [("Durian", 0.55), ("Papaya", 0.45)],
+    "cash_crops": [("Corn", 1.0)],
+}
+
+RAIN = {
+    "Johor": 2, "Kedah": 1, "Kelantan": 2, "Melaka": 1, "Negeri Sembilan": 1,
+    "Pahang": 2, "Perak": 2, "Perlis": 0, "Pulau Pinang": 1, "Sabah": 2,
+    "Sarawak": 2, "Selangor": 1, "Terengganu": 2, "Wilayah Persekutuan": 1,
+}
 
 
 def q(value: str) -> str:
@@ -29,137 +57,276 @@ def write_arff(path: Path, relation: str, attrs: list[str], rows: list[str]) -> 
     print(path.name, len(rows))
 
 
-def label_crop(soil: str, water: float, fertilizer: float, budget: float, land: float, state: str) -> str:
-    """Exclusive priority rules — keep in sync with CropFeatureScorer.ruleLabel()."""
-    if water >= 220 and land >= 4.0 and soil in ("Clay", "Loam"):
-        return "Paddy"
-    if land >= 6.5 and 160 <= water < 220 and fertilizer >= 14:
-        return "Corn"
-    if budget >= 12000 and land >= 5.0 and fertilizer >= 15 and 100 <= water < 160 and soil in ("Loam", "Clay"):
-        return "Durian"
-    if soil == "Sandy" and budget >= 4500 and water >= 85 and water < 210:
-        return "Chili"
-    if state in ("Johor", "Kelantan", "Terengganu", "Sabah", "Sarawak", "Pahang") and 110 <= water <= 200 and budget >= 6000 and 2.5 <= land <= 7.5 and soil != "Silty":
-        return "Papaya"
-    if soil == "Silty" or water < 125:
-        return "Lettuce"
-    if land <= 3.5 and water <= 180:
-        return "Lettuce"
-    if state in ("Kelantan", "Terengganu", "Johor", "Perlis") and 100 <= water <= 210 and budget >= 5000:
-        return "Chili"
-    if state in ("Kedah", "Perak", "Pahang", "Sarawak") and land >= 5.5 and water >= 140 and water < 220:
-        return "Corn"
-    if soil in ("Loam", "Clay") and water >= 140 and fertilizer >= 12:
-        return "Tomato"
-    if budget >= 9000 and water >= 150 and water < 220:
-        return "Tomato"
-    if fertilizer < 10:
-        return "Lettuce"
-    return "Tomato"
+def norm_state(raw: str) -> str | None:
+    state = (raw or "").strip()
+    if state in ("Malaysia",):
+        return None
+    if state.startswith("W.P") or "Kuala Lumpur" in state or "Labuan" in state or "Putrajaya" in state:
+        return "Wilayah Persekutuan"
+    return state if state in STATES else None
 
 
-def force_features(target: str) -> tuple[str, str, float, float, float, float]:
-    """Return state, soil, water, fertilizer, budget, land that label as target."""
-    if target == "Paddy":
-        return "Kedah", "Clay", 250.0, 18.0, 10000.0, 6.0
-    if target == "Durian":
-        return "Pahang", "Loam", 140.0, 18.0, 15000.0, 6.0
-    if target == "Papaya":
-        return "Johor", "Loam", 150.0, 14.0, 8000.0, 4.0
-    if target == "Corn":
-        return "Kedah", "Loam", 180.0, 18.0, 10000.0, 8.0
-    if target == "Chili":
-        return "Johor", "Sandy", 140.0, 14.0, 7000.0, 4.0
-    if target == "Lettuce":
-        return "Selangor", "Silty", 100.0, 8.0, 5000.0, 2.5
-    return "Selangor", "Loam", 180.0, 16.0, 9000.0, 5.0
+def load_state_priors() -> dict[str, dict[str, float]]:
+    """state -> crop -> strength from production (Mt) + planted area (Ha)."""
+    path = DATASET if DATASET.is_file() else DATASET_FALLBACK
+    if not path.is_file():
+        raise FileNotFoundError(f"Missing dataset: {DATASET} or {DATASET_FALLBACK}")
+
+    # Aggregate across years so rare years don't wipe a state.
+    type_prod: dict[tuple[str, str], float] = defaultdict(float)
+    type_area: dict[tuple[str, str], float] = defaultdict(float)
+    with open(path, newline="", encoding="utf-8") as handle:
+        for row in csv.DictReader(handle):
+            state = norm_state(row["state"])
+            crop_type = (row.get("crop_type") or "").strip().lower()
+            if not state or crop_type not in TYPE_MAP:
+                continue
+            try:
+                production = float(row.get("production") or 0)
+                planted = float(row.get("planted_area") or 0)
+            except ValueError:
+                continue
+            # Flower units are not comparable Mt; already excluded by TYPE_MAP.
+            type_prod[(state, crop_type)] += max(0.0, production)
+            type_area[(state, crop_type)] += max(0.0, planted)
+
+    priors: dict[str, dict[str, float]] = {state: {crop: 0.0 for crop in CROPS} for state in STATES}
+    for state in STATES:
+        for crop_type, shares in TYPE_MAP.items():
+            # Blend production (primary) with planted area (scale differs; dampen area).
+            strength = type_prod[(state, crop_type)] + 0.15 * type_area[(state, crop_type)]
+            if strength <= 0:
+                continue
+            for crop, share in shares:
+                priors[state][crop] += strength * share
+
+        # Floor so every catalog crop can appear somewhere.
+        for crop in CROPS:
+            if priors[state][crop] <= 0:
+                priors[state][crop] = 1.0
+
+        # Dampen extreme types (paddy often >80%) so J48 still learns vegetables/fruits/corn.
+        for crop in CROPS:
+            priors[state][crop] = priors[state][crop] ** 0.55
+
+        total = sum(priors[state].values())
+        for crop in CROPS:
+            priors[state][crop] /= total
+
+    return priors
 
 
-def sample_for_target(target: str) -> tuple[str, str, float, float, float, float]:
-    if target == "Paddy":
-        state = random.choice(["Kedah", "Perlis", "Kelantan", "Terengganu", "Perak", "Kedah"])
-        soil = random.choice(["Clay", "Loam", "Clay"])
-        water = round(random.uniform(225, 340), 1)
-        fertilizer = round(random.uniform(12, 30), 1)
-        budget = round(random.uniform(7000, 16000), 1)
-        land = round(random.uniform(4.0, 12.0), 1)
-    elif target == "Durian":
-        state = random.choice(["Pahang", "Johor", "Negeri Sembilan", "Kelantan", "Terengganu", "Pahang"])
-        soil = random.choice(["Loam", "Clay", "Loam"])
-        water = round(random.uniform(110, 155), 1)
-        fertilizer = round(random.uniform(16, 35), 1)
-        budget = round(random.uniform(12500, 22000), 1)
-        land = round(random.uniform(5.0, 10.0), 1)
-    elif target == "Papaya":
-        state = random.choice(["Johor", "Kelantan", "Terengganu", "Sabah", "Sarawak", "Pahang"])
-        soil = random.choice(["Loam", "Sandy", "Loam"])
-        water = round(random.uniform(115, 195), 1)
-        fertilizer = round(random.uniform(10, 24), 1)
-        budget = round(random.uniform(6200, 11000), 1)
-        land = round(random.uniform(2.8, 6.5), 1)
-    elif target == "Corn":
-        state = random.choice(["Kedah", "Perak", "Pahang", "Sarawak", "Selangor"])
-        soil = random.choice(["Loam", "Clay"])
-        water = round(random.uniform(165, 210), 1)
-        fertilizer = round(random.uniform(15, 35), 1)
-        budget = round(random.uniform(8000, 11500), 1)
-        land = round(random.uniform(6.5, 13.0), 1)
-    elif target == "Chili":
-        state = random.choice(["Johor", "Kelantan", "Terengganu", "Perlis", "Selangor"])
-        soil = "Sandy"
-        water = round(random.uniform(95, 190), 1)
-        fertilizer = round(random.uniform(10, 26), 1)
-        budget = round(random.uniform(5000, 14000), 1)
-        land = round(random.uniform(2.5, 6.5), 1)
-    elif target == "Lettuce":
-        state = random.choice(STATES)
-        soil = random.choice(["Silty", "Loam", "Silty"])
-        water = round(random.uniform(70, 120), 1)
-        fertilizer = round(random.uniform(5, 16), 1)
-        budget = round(random.uniform(3000, 10000), 1)
-        land = round(random.uniform(1.5, 3.5), 1)
+def resource_fit(crop: str, soil: str, water: float, fertilizer: float, budget: float, land: float) -> float:
+    """Mild multipliers so J48 also splits on farm resources."""
+    fit = 1.0
+    if crop == "Paddy":
+        fit *= 1.6 if water >= 200 and soil in ("Clay", "Loam") else 0.45
+        fit *= 1.2 if land >= 4 else 0.7
+    elif crop == "Durian":
+        fit *= 1.5 if budget >= 10000 and land >= 4.5 else 0.5
+        fit *= 1.2 if soil in ("Loam", "Clay") else 0.7
+        fit *= 1.1 if 90 <= water <= 180 else 0.8
+    elif crop == "Papaya":
+        fit *= 1.35 if 100 <= water <= 210 else 0.65
+        fit *= 1.2 if soil in ("Sandy", "Loam") else 0.85
+        fit *= 1.15 if 2.5 <= land <= 8 else 0.8
+    elif crop == "Corn":
+        fit *= 1.4 if land >= 5 and water >= 140 else 0.55
+        fit *= 1.15 if fertilizer >= 12 else 0.85
+    elif crop == "Chili":
+        fit *= 1.45 if soil == "Sandy" else 0.75
+        fit *= 1.2 if 90 <= water <= 210 else 0.8
+    elif crop == "Lettuce":
+        fit *= 1.5 if water < 140 or soil == "Silty" else 0.7
+        fit *= 1.2 if land <= 5 else 0.85
     else:  # Tomato
-        state = random.choice(["Selangor", "Melaka", "Negeri Sembilan", "Pulau Pinang", "Perak"])
-        soil = random.choice(["Loam", "Clay"])
-        water = round(random.uniform(145, 205), 1)
-        fertilizer = round(random.uniform(13, 28), 1)
-        budget = round(random.uniform(7500, 11500), 1)
-        land = round(random.uniform(3.8, 6.2), 1)
-    return state, soil, water, fertilizer, budget, land
+        fit *= 1.3 if soil in ("Loam", "Clay") and water >= 130 else 0.75
+        fit *= 1.15 if fertilizer >= 10 else 0.85
+    return max(0.2, fit)
+
+
+def sample_features() -> tuple[str, float, float, float, float]:
+    regime = random.randrange(5)
+    if regime == 0:  # paddy-like
+        return (
+            random.choice(["Clay", "Loam"]),
+            round(random.uniform(210, 340), 1),
+            round(random.uniform(10, 30), 1),
+            round(random.uniform(6000, 16000), 1),
+            round(random.uniform(4.0, 12.0), 1),
+        )
+    if regime == 1:  # orchard / durian-like
+        return (
+            random.choice(["Loam", "Clay"]),
+            round(random.uniform(100, 170), 1),
+            round(random.uniform(14, 35), 1),
+            round(random.uniform(11000, 22000), 1),
+            round(random.uniform(4.5, 11.0), 1),
+        )
+    if regime == 2:  # dry / leafy
+        return (
+            random.choice(["Silty", "Loam", "Sandy"]),
+            round(random.uniform(70, 130), 1),
+            round(random.uniform(5, 16), 1),
+            round(random.uniform(3000, 10000), 1),
+            round(random.uniform(1.5, 5.0), 1),
+        )
+    if regime == 3:  # sandy chili / papaya
+        return (
+            random.choice(["Sandy", "Loam"]),
+            round(random.uniform(100, 200), 1),
+            round(random.uniform(8, 24), 1),
+            round(random.uniform(5000, 14000), 1),
+            round(random.uniform(2.5, 7.5), 1),
+        )
+    # mid tomato / corn
+    return (
+        random.choice(["Loam", "Clay", "Silty"]),
+        round(random.uniform(140, 220), 1),
+        round(random.uniform(10, 28), 1),
+        round(random.uniform(7000, 15000), 1),
+        round(random.uniform(3.5, 9.0), 1),
+    )
+
+
+def choose_label(priors: dict[str, float], soil: str, water: float, fertilizer: float,
+                 budget: float, land: float) -> str:
+    scores = {
+        crop: max(1e-9, priors[crop] * resource_fit(crop, soil, water, fertilizer, budget, land)
+                  * random.uniform(0.92, 1.08))
+        for crop in CROPS
+    }
+    # Weighted draw (not pure argmax) so minority catalog crops still appear in ARFF.
+    total = sum(scores.values())
+    pick = random.random() * total
+    running = 0.0
+    for crop, score in scores.items():
+        running += score
+        if pick <= running:
+            return crop
+    return max(scores, key=scores.get)
+
+
+def top_states_for(priors: dict[str, dict[str, float]], crop: str, n: int = 5) -> list[str]:
+    ranked = sorted(STATES, key=lambda s: priors[s][crop], reverse=True)
+    return ranked[:n]
 
 
 def main() -> None:
-    rain = {
-        "Johor": 2, "Kedah": 1, "Kelantan": 2, "Melaka": 1, "Negeri Sembilan": 1,
-        "Pahang": 2, "Perak": 2, "Perlis": 0, "Pulau Pinang": 1, "Sabah": 2,
-        "Sarawak": 2, "Selangor": 1, "Terengganu": 2, "Wilayah Persekutuan": 1,
-    }
-
     random.seed(42)
+    priors = load_state_priors()
+    print("Loaded DOSM state priors from", DATASET.name if DATASET.is_file() else DATASET_FALLBACK.name)
+    print("Example Selangor prior:", {k: round(v, 3) for k, v in priors["Selangor"].items()})
+    print("Example Kedah prior:", {k: round(v, 3) for k, v in priors["Kedah"].items()})
+    print("Example Johor prior:", {k: round(v, 3) for k, v in priors["Johor"].items()})
+
     state_nom = "{" + ",".join(q(state) for state in STATES) + "}"
     soil_nom = "{" + ",".join(SOILS) + "}"
     crop_nom = "{" + ",".join(CROPS) + "}"
 
     crop_rows: list[str] = []
     quotas: Counter[str] = Counter()
-    per_crop = 120
-    for target in CROPS:
-        for _ in range(per_crop):
-            state, soil, water, fertilizer, budget, land = sample_for_target(target)
-            label = label_crop(soil, water, fertilizer, budget, land, state)
-            if label != target:
-                state, soil, water, fertilizer, budget, land = force_features(target)
-                label = label_crop(soil, water, fertilizer, budget, land, state)
+
+    # Phase 1: DOSM-informed natural samples per state.
+    samples_per_state = 36
+    for state in STATES:
+        for _ in range(samples_per_state):
+            soil, water, fertilizer, budget, land = sample_features()
+            label = choose_label(priors[state], soil, water, fertilizer, budget, land)
             quotas[label] += 1
-            npk = rain[state]
+            npk = RAIN[state]
             crop_rows.append(
                 f"{q(state)},{soil},{water},{fertilizer},{budget},{land},{npk},{label}"
             )
 
+    # Phase 2: balance classes so J48 can learn all catalog crops (still from top DOSM states).
+    per_crop_target = 130
+    for crop in CROPS:
+        need = max(0, per_crop_target - quotas[crop])
+        states = top_states_for(priors, crop)
+        for _ in range(need):
+            state = random.choice(states)
+            # Bias features toward this crop's fit profile.
+            if crop == "Paddy":
+                soil, water, fertilizer, budget, land = (
+                    random.choice(["Clay", "Loam"]),
+                    round(random.uniform(220, 340), 1),
+                    round(random.uniform(12, 28), 1),
+                    round(random.uniform(7000, 15000), 1),
+                    round(random.uniform(4.5, 12.0), 1),
+                )
+            elif crop == "Durian":
+                soil, water, fertilizer, budget, land = (
+                    random.choice(["Loam", "Clay"]),
+                    round(random.uniform(110, 165), 1),
+                    round(random.uniform(15, 32), 1),
+                    round(random.uniform(12000, 22000), 1),
+                    round(random.uniform(5.0, 11.0), 1),
+                )
+            elif crop == "Papaya":
+                soil, water, fertilizer, budget, land = (
+                    random.choice(["Loam", "Sandy"]),
+                    round(random.uniform(115, 195), 1),
+                    round(random.uniform(10, 24), 1),
+                    round(random.uniform(6500, 14000), 1),
+                    round(random.uniform(2.8, 7.0), 1),
+                )
+            elif crop == "Corn":
+                soil, water, fertilizer, budget, land = (
+                    random.choice(["Loam", "Clay"]),
+                    round(random.uniform(150, 210), 1),
+                    round(random.uniform(14, 30), 1),
+                    round(random.uniform(7500, 15000), 1),
+                    round(random.uniform(5.5, 12.0), 1),
+                )
+            elif crop == "Chili":
+                soil, water, fertilizer, budget, land = (
+                    "Sandy",
+                    round(random.uniform(100, 190), 1),
+                    round(random.uniform(10, 24), 1),
+                    round(random.uniform(5000, 12000), 1),
+                    round(random.uniform(2.5, 6.5), 1),
+                )
+            elif crop == "Lettuce":
+                soil, water, fertilizer, budget, land = (
+                    random.choice(["Silty", "Loam"]),
+                    round(random.uniform(70, 125), 1),
+                    round(random.uniform(6, 16), 1),
+                    round(random.uniform(3000, 10000), 1),
+                    round(random.uniform(1.5, 4.5), 1),
+                )
+            else:
+                soil, water, fertilizer, budget, land = (
+                    random.choice(["Loam", "Clay"]),
+                    round(random.uniform(140, 210), 1),
+                    round(random.uniform(12, 26), 1),
+                    round(random.uniform(7000, 13000), 1),
+                    round(random.uniform(3.5, 6.5), 1),
+                )
+            quotas[crop] += 1
+            npk = RAIN[state]
+            crop_rows.append(
+                f"{q(state)},{soil},{water},{fertilizer},{budget},{land},{npk},{crop}"
+            )
+
+    # Cap any class that still dominates after balancing (usually Paddy).
+    max_per_crop = int(per_crop_target * 1.15)
+    capped: list[str] = []
+    seen: Counter[str] = Counter()
+    random.shuffle(crop_rows)
+    for row in crop_rows:
+        label = row.rsplit(",", 1)[-1]
+        if seen[label] >= max_per_crop:
+            continue
+        seen[label] += 1
+        capped.append(row)
+    crop_rows = capped
+    quotas = seen
+
     random.shuffle(crop_rows)
     write_arff(
         ROOT / "crop_recommend.arff",
-        "crop_recommend",
+        "crop_recommend_dosm",
         [
             f"@attribute location {state_nom}",
             f"@attribute soil {soil_nom}",
@@ -173,14 +340,8 @@ def main() -> None:
         crop_rows,
     )
     print("crop class counts:", dict(quotas))
-    print("examples:")
-    print("  default Loam:", label_crop("Loam", 200, 20, 10000, 5, "Selangor"))
-    print("  high water Clay:", label_crop("Clay", 250, 18, 10000, 6, "Kedah"))
-    print("  rich orchard:", label_crop("Loam", 140, 18, 15000, 6, "Pahang"))
-    print("  warm papaya:", label_crop("Loam", 150, 14, 8000, 4, "Johor"))
-    print("  sandy chili:", label_crop("Sandy", 140, 14, 7000, 4, "Johor"))
-    print("  dry lettuce:", label_crop("Silty", 90, 8, 4000, 2, "Selangor"))
 
+    # Fertilizer / grade still trained as classifiers with the same crop vocabulary.
     plan_rows: list[str] = []
     plan_counts: Counter[str] = Counter()
     for state in STATES:
@@ -202,11 +363,11 @@ def main() -> None:
                         score += 2
                     if crop in ("Tomato", "Corn", "Chili", "Paddy", "Durian"):
                         score += 1
+                    if crop == "Paddy" and water < 200:
+                        score += 1
                     if crop == "Durian":
                         score += 1
                     if water < 110:
-                        score += 1
-                    if crop == "Paddy" and water < 200:
                         score += 1
                     plan = "Low" if score <= 1 else ("Medium" if score <= 3 else "High")
                     plan_counts[plan] += 1
@@ -244,7 +405,7 @@ def main() -> None:
                             resource_score * 0.50
                             + band_n / 2 * 0.30
                             + soil_n * 0.15
-                            + rain[state] * 0.04
+                            + RAIN[state] * 0.04
                             + random.uniform(-0.12, 0.12)
                         )
                         if score >= 1.05:
@@ -280,6 +441,7 @@ def main() -> None:
         grade_rows,
     )
     print("grade counts:", dict(grade_counts))
+    print("Done. Delete data/ml/*.model (+ *.meta) so J48 retrains on next app launch.")
 
 
 if __name__ == "__main__":

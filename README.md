@@ -53,18 +53,22 @@ If MySQL is offline, crop catalog saves and reports still work through CSV under
 
 Schema tables are created automatically on first successful connection (`SmartHarvest360.db` package).
 
-## ML farm advisor (Weka J48)
+## ML farm advisor (Weka J48 classification)
 
-- Models train from ARFF under `src/main/resources/ml/` and cache under `data/ml/`.
-- Recommendations change with location, soil, water, fertilizer, land, and budget.
-- Crop catalog includes Tomato, Lettuce, Green Chili, Corn, **Paddy**, **Papaya**, and **Durian**.
-- Regenerate training data (after changing the script):
+Full details (dataset, ARFF, models, runtime behavior, retrain steps): see [`ML.md`](ML.md).
+
+- **Model:** Weka **J48** decision-tree **classifier** (not regression).
+- **Training data:** Malaysia *Crop Area and Production by State* (DOSM/DOA, 2017–2022) in
+  `src/main/resources/ml/crops_state_dataset.csv`.
+- **Mapping:** `paddy`→Paddy, `vegetables`→Tomato/Lettuce/Chili, `fruits`→Durian/Papaya, `cash_crops`→Corn.
+- Models cache under `data/ml/`. Fertilizer plan and grade are also J48 classifiers.
+- Regenerate ARFF after dataset changes:
 
 ```bash
 python scripts/generate_ml_arff.py
 ```
 
-Then delete `data/ml/*.model` (and `*.meta`) so models retrain on next launch.
+Then delete `data/ml/*.model` and `data/ml/*.meta` so models retrain on next launch.
 
 ## CSV / data files
 

@@ -7,13 +7,17 @@ import weka.core.Instance;
 import weka.core.Instances;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
 /**
- * Crop recommender: feature scorer (responsive) + J48 confirmation from ARFF.
+ * J48 crop classifier trained on DOSM state production-informed ARFF.
+ * Falls back to {@link CropFeatureScorer} only when model confidence is very low.
  */
 public final class CropRecommender {
+    private static final double MIN_CONFIDENCE = 0.28;
+
     private final Classifier model;
     private final Instances template;
 
@@ -28,56 +32,39 @@ public final class CropRecommender {
     }
 
     public Recommendation recommendDetailed(FarmProfile profile, Resource resource) throws Exception {
-        // Primary: transparent feature rules so advice changes with Farm Setup inputs.
-        String scored = CropFeatureScorer.ruleLabel(profile, resource);
-        var ranked = CropFeatureScorer.rank(profile, resource);
+        Instance row = new DenseInstance(template.numAttributes());
+        row.setDataset(template);
+        row.setValue(template.attribute("location"), profile.getLocation());
+        row.setValue(template.attribute("soil"), profile.getSoilType());
+        row.setValue(template.attribute("water"), resource.getWater());
+        row.setValue(template.attribute("fertilizerStock"), resource.getFertilizer());
+        row.setValue(template.attribute("budget"), resource.getBudget());
+        row.setValue(template.attribute("land"), resource.getLand());
+        row.setValue(template.attribute("npkBand"), profile.npkBand());
 
-        double j48Confidence = 0;
-        String j48Crop = scored;
-        try {
-            Instance row = new DenseInstance(template.numAttributes());
-            row.setDataset(template);
-            row.setValue(template.attribute("location"), profile.getLocation());
-            row.setValue(template.attribute("soil"), profile.getSoilType());
-            row.setValue(template.attribute("water"), resource.getWater());
-            row.setValue(template.attribute("fertilizerStock"), resource.getFertilizer());
-            row.setValue(template.attribute("budget"), resource.getBudget());
-            row.setValue(template.attribute("land"), resource.getLand());
-            row.setValue(template.attribute("npkBand"), profile.npkBand());
-
-            double[] dist = model.distributionForInstance(row);
-            int bestIdx = 0;
-            for (int i = 1; i < dist.length; i++) {
-                if (dist[i] > dist[bestIdx]) {
-                    bestIdx = i;
-                }
-            }
-            j48Crop = template.classAttribute().value(bestIdx);
-            j48Confidence = dist[bestIdx];
-        } catch (Exception ignored) {
-            // Scorer still works if J48 row fails.
+        double[] dist = model.distributionForInstance(row);
+        List<Scored> ranked = new ArrayList<>();
+        for (int i = 0; i < dist.length; i++) {
+            ranked.add(new Scored(template.classAttribute().value(i), dist[i]));
         }
+        ranked.sort(Comparator.comparingDouble(Scored::score).reversed());
 
-        // Prefer feature rule (keeps UI responsive). Use J48 confidence when it agrees.
-        String crop = scored;
-        double confidence = j48Crop.equalsIgnoreCase(scored)
-                ? Math.max(0.55, j48Confidence)
-                : 0.70;
+        String crop = ranked.get(0).crop();
+        double confidence = ranked.get(0).score();
+
+        // Low-confidence leaf → blend with feature scorer (still classification-first).
+        if (confidence < MIN_CONFIDENCE) {
+            String scored = CropFeatureScorer.ruleLabel(profile, resource);
+            crop = scored;
+            confidence = Math.max(confidence, 0.45);
+        }
 
         List<String> alternatives = new ArrayList<>();
-        for (int i = 0; i < ranked.size(); i++) {
-            String name = ranked.get(i).crop();
-            if (!name.equalsIgnoreCase(crop)) {
-                alternatives.add(name);
-            }
-            if (alternatives.size() == 2) {
-                break;
-            }
-        }
-        if (!j48Crop.equalsIgnoreCase(crop)) {
-            alternatives.add(0, String.format(Locale.US, "J48:%s", j48Crop));
-            if (alternatives.size() > 2) {
-                alternatives = alternatives.subList(0, 2);
+        for (int i = 1; i < ranked.size() && alternatives.size() < 2; i++) {
+            Scored next = ranked.get(i);
+            if (next.score() >= 0.08 && !next.crop().equalsIgnoreCase(crop)) {
+                alternatives.add(String.format(Locale.US, "%s %.0f%%",
+                        next.crop(), next.score() * 100.0));
             }
         }
 
@@ -85,5 +72,8 @@ public final class CropRecommender {
     }
 
     public record Recommendation(String crop, double confidence, List<String> alternatives) {
+    }
+
+    private record Scored(String crop, double score) {
     }
 }

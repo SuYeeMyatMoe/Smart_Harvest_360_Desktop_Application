@@ -39,7 +39,7 @@ public final class WekaAdvisorService {
             gradePredictor = new GradePredictor(
                     gradeModel, ModelTrainer.loadArff("grade_predict.arff"));
             ready = true;
-            statusMessage = "Weka J48 · responds to location, soil, water, fertilizer, land, budget";
+            statusMessage = "Weka J48 classification · DOSM crop area/production by state (2017-2022)";
         } catch (Exception exception) {
             ready = false;
             statusMessage = "Heuristic fallback · " + shortMsg(exception);
@@ -104,7 +104,7 @@ public final class WekaAdvisorService {
                     : String.join(", ", pick.alternatives());
             String drivers = CropFeatureScorer.explain(safeProfile, safeResource, crop);
             String rationale = String.format(Locale.US,
-                    "%s (%.0f%%). %s Try changing soil/water/land to switch crops. Next options: %s. Plan %s; band %s → grade %s.",
+                    "J48 classifies %s (%.0f%%) from DOSM state production priors + your farm inputs. %s Next: %s. Plan %s; band %s → grade %s.",
                     crop, pick.confidence() * 100.0, drivers, alts, plan, band, grade);
             return new AdvisorResult(crop, plan, tip, grade, rationale, true);
         } catch (Exception exception) {
