@@ -1,31 +1,38 @@
 package SmartHarvest360;
 
 /**
- * Represents a market option displayed to the farmer.
+ * Represents a physical buyer/shop available near a farm.
  */
-public class MarketOption {
+public class MarketLocation {
 
+    private final String location;
     private final String marketName;
     private final String buyerType;
-    private final double pricePerKg;
-    private final String demand;
     private final double distanceKm;
+    private final double priceMultiplier;
+    private final String demand;
     private final String logoPath;
 
-    public MarketOption(
+    public MarketLocation(
+            String location,
             String marketName,
             String buyerType,
-            double pricePerKg,
-            String demand,
             double distanceKm,
+            double priceMultiplier,
+            String demand,
             String logoPath) {
 
+        this.location = location;
         this.marketName = marketName;
         this.buyerType = buyerType;
-        this.pricePerKg = pricePerKg;
-        this.demand = demand;
         this.distanceKm = distanceKm;
+        this.priceMultiplier = priceMultiplier;
+        this.demand = demand;
         this.logoPath = logoPath;
+    }
+
+    public String getLocation() {
+        return location;
     }
 
     public String getMarketName() {
@@ -36,16 +43,16 @@ public class MarketOption {
         return buyerType;
     }
 
-    public double getPricePerKg() {
-        return pricePerKg;
+    public double getDistanceKm() {
+        return distanceKm;
+    }
+
+    public double getPriceMultiplier() {
+        return priceMultiplier;
     }
 
     public String getDemand() {
         return demand;
-    }
-
-    public double getDistanceKm() {
-        return distanceKm;
     }
 
     public String getLogoPath() {
@@ -57,12 +64,8 @@ public class MarketOption {
         return marketName
                 + " | "
                 + buyerType
-                + " | RM"
-                + String.format("%.2f", pricePerKg)
-                + "/kg"
-                + " | Demand: "
-                + demand
                 + " | "
-                + String.format("%.1f km", distanceKm);
+                + distanceKm
+                + " km";
     }
 }
