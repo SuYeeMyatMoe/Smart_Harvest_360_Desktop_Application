@@ -716,7 +716,7 @@ public class SimulationController {
             return;
         }
 
-        double progress = Math.min(1.0, growthPctFraction() * 1.052632);
+        double progress = Math.min(1.0, growthPctFraction() / 0.95);
 
         positionVideoAtGrowth(
                 progress
