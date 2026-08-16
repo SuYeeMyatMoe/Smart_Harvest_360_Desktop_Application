@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="SmartHarvest360.controllers.SimulationController"
+      spacing="0">
+    <HBox fx:id="navBarSlot" alignment="CENTER_LEFT" spacing="8" styleClass="nav-bar">
+        <padding><Insets top="4" right="30" bottom="8" left="30"/></padding>
+    </HBox>
+    <ScrollPane fitToWidth="true" fitToHeight="false" pannable="true" minHeight="0.0"
+                hbarPolicy="AS_NEEDED" vbarPolicy="ALWAYS"
+                styleClass="app-scroll" VBox.vgrow="ALWAYS">
+    <content>
+<BorderPane prefWidth="960" prefHeight="680" minWidth="720" minHeight="640"
+            styleClass="app-background">
+    <top>
+        <VBox spacing="0">
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="top-shell">
+            <padding><Insets top="14" right="30" bottom="14" left="30"/></padding>
+            <ImageView fx:id="appLogo" fitWidth="44" fitHeight="44" preserveRatio="true" smooth="true">
+                <image><Image url="@../images/smartharvest-logo.png"/></image>
+            </ImageView>
+            <VBox spacing="1">
+                <Label text="SmartHarvest 360" styleClass="brand-title"/>
+                <Label text="Farm decision companion" styleClass="brand-caption"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="fieldsButton" text="&#9707; Fields" onAction="#handleOpenFields"
+                    styleClass="fields-nav-button"/>
+            <Label text="LIVE SEASON" styleClass="screen-badge"/>
+            <Button fx:id="themeButton" text="Dark Mode" onAction="#handleToggleTheme"
+                    styleClass="theme-button"/>
+        </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="14" styleClass="content-wrap">
+            <padding><Insets top="18" right="30" bottom="18" left="30"/></padding>
+
+            <HBox alignment="CENTER" spacing="7">
+                <Label text="1" styleClass="step-dot, step-dot-done"/>
+                <Label text="SETUP" styleClass="step-text"/>
+                <Region styleClass="step-line, step-line-done"/>
+                <Label text="2" styleClass="step-dot, step-dot-done"/>
+                <Label text="CROPS" styleClass="step-text"/>
+                <Region styleClass="step-line, step-line-done"/>
+                <Label text="3" styleClass="step-dot, step-dot-active"/>
+                <Label text="SIM" styleClass="step-text, step-text-active"/>
+                <Region styleClass="step-line"/>
+                <Label text="4" styleClass="step-dot"/>
+                <Label text="MARKET" styleClass="step-text"/>
+                <Region styleClass="step-line"/>
+                <Label text="5" styleClass="step-dot"/>
+                <Label text="REPORT" styleClass="step-text"/>
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT">
+                <VBox spacing="2">
+                    <Label text="Daily Simulation" styleClass="page-title"/>
+                    <Label text="Track growth, weather, and farm resources day by day."
+                           styleClass="page-description"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="statusLabel" text="Growing" styleClass="status-label"/>
+            </HBox>
+
+            <HBox spacing="12">
+                <VBox spacing="4" styleClass="metric-card" HBox.hgrow="ALWAYS">
+                    <Label text="CURRENT DAY" styleClass="metric-title"/>
+                    <Label fx:id="dayLabel" text="Day: 1" styleClass="metric-value"/>
+                </VBox>
+                <VBox spacing="4" styleClass="metric-card" HBox.hgrow="ALWAYS">
+                    <Label text="WEATHER" styleClass="metric-title"/>
+                    <Label fx:id="weatherLabel" text="&#8212;" styleClass="metric-value"/>
+                </VBox>
+                <VBox spacing="4" styleClass="metric-card" HBox.hgrow="ALWAYS">
+                    <Label text="WATER LEFT" styleClass="metric-title"/>
+                    <Label fx:id="waterLabel" text="Water: 200.00 L" styleClass="metric-value"/>
+                </VBox>
+                <VBox spacing="4" styleClass="metric-card" HBox.hgrow="ALWAYS">
+                    <Label text="FERTILIZER" styleClass="metric-title"/>
+                    <Label fx:id="fertilizerLabel" text="Fertilizer: 20.00 kg" styleClass="metric-value"/>
+                </VBox>
+            </HBox>
+
+            <HBox spacing="18" VBox.vgrow="ALWAYS">
+                <VBox spacing="8" styleClass="card" HBox.hgrow="ALWAYS">
+                    <padding><Insets top="16" right="18" bottom="16" left="18"/></padding>
+                    <HBox alignment="CENTER_LEFT">
+                        <VBox spacing="1">
+                            <Label text="Activity Log" styleClass="section-title"/>
+                            <Label text="Latest simulation events" styleClass="section-caption"/>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label text="AUTO SCROLL" styleClass="soft-badge"/>
+                    </HBox>
+                    <ListView fx:id="simulationLog" VBox.vgrow="ALWAYS"/>
+                </VBox>
+
+                <VBox spacing="14" prefWidth="275" styleClass="card">
+                    <padding><Insets top="18" right="18" bottom="18" left="18"/></padding>
+                    <Label text="Crop Overview" styleClass="section-title"/>
+                    <VBox spacing="5" styleClass="accent-card">
+                        <padding><Insets top="13" right="14" bottom="13" left="14"/></padding>
+                        <Label text="ACTIVE CROP" styleClass="metric-title"/>
+                        <Label fx:id="cropLabel" text="Tomato (Vegetable)" styleClass="metric-value"/>
+                    </VBox>
+                    <VBox spacing="7">
+                        <HBox>
+                            <Label text="Season growth" styleClass="section-caption"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="progressLabel" text="Growth: 0%" styleClass="value-label"/>
+                        </HBox>
+                        <ProgressBar fx:id="growthProgress" progress="0" maxWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="5" styleClass="warm-card">
+                        <padding><Insets top="12" right="14" bottom="12" left="14"/></padding>
+                        <Label text="NEXT ACTION" styleClass="metric-title"/>
+                        <Label text="Advance one day to update weather, resources, and crop growth."
+                               wrapText="true" maxWidth="Infinity" styleClass="section-caption"/>
+                    </VBox>
+                    <Region VBox.vgrow="ALWAYS"/>
+                    <Label text="Harvest unlocks automatically when growth reaches 100%."
+                           wrapText="true" maxWidth="Infinity" styleClass="section-caption"/>
+                </VBox>
+            </HBox>
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox spacing="12" alignment="CENTER_RIGHT" styleClass="footer-bar">
+            <padding><Insets top="13" right="30" bottom="13" left="30"/></padding>
+            <Label text="Simulation data is saved throughout this session." styleClass="section-caption"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="autoRunButton" text="Auto-run" onAction="#handleAutoRun"
+                    styleClass="secondary-button"/>
+            <Button fx:id="nextDayButton" text="Advance to Next Day" onAction="#handleNextDay"
+                    styleClass="secondary-button"/>
+            <Button fx:id="harvestButton" text="Continue to Market" onAction="#handleGoToHarvest"
+                    visible="false" managed="false" styleClass="primary-button"/>
+        </HBox>
+    </bottom>
+</BorderPane>
+    </content>
+    </ScrollPane>
+</VBox>

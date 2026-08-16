@@ -1,0 +1,742 @@
+.root {
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-font-size: 14px;
+    -fx-text-fill: #20372f;
+}
+
+.app-background {
+    -fx-background-color: #f4f7f2;
+}
+
+.app-scroll {
+    -fx-background-color: #f4f7f2;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.app-scroll > .viewport {
+    -fx-background-color: #f4f7f2;
+}
+
+.app-scroll > .corner {
+    -fx-background-color: #e7eee9;
+}
+
+.app-scroll .scroll-bar:vertical,
+.app-scroll .scroll-bar:horizontal {
+    -fx-background-color: #edf2ef;
+}
+
+.app-scroll .scroll-bar .thumb {
+    -fx-background-color: #9fb8ac;
+    -fx-background-radius: 8;
+}
+
+.top-shell {
+    -fx-background-color: #173f32;
+}
+
+.brand-mark {
+    -fx-background-color: #f2b765;
+    -fx-background-radius: 12;
+    -fx-text-fill: #173f32;
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
+    -fx-alignment: center;
+    -fx-min-width: 42;
+    -fx-min-height: 42;
+}
+
+.brand-title {
+    -fx-text-fill: white;
+    -fx-font-size: 17px;
+    -fx-font-weight: 800;
+}
+
+.brand-caption {
+    -fx-text-fill: #b9d0c6;
+    -fx-font-size: 11px;
+}
+
+.screen-badge {
+    -fx-background-color: rgba(255, 255, 255, 0.10);
+    -fx-background-radius: 20;
+    -fx-text-fill: #e7f1ed;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-padding: 7 14 7 14;
+}
+
+.soft-badge {
+    -fx-background-color: #e8f3ed;
+    -fx-background-radius: 20;
+    -fx-text-fill: #28664c;
+    -fx-font-size: 10px;
+    -fx-font-weight: 800;
+    -fx-padding: 6 11 6 11;
+}
+
+.step-line {
+    -fx-background-color: #c3d1ca;
+    -fx-min-height: 2;
+    -fx-pref-height: 2;
+    -fx-max-height: 2;
+    -fx-pref-width: 54;
+}
+
+.step-line-done {
+    -fx-background-color: #7dbb9e;
+}
+
+.step-dot {
+    -fx-background-color: #dce6e1;
+    -fx-background-radius: 50%;
+    -fx-text-fill: #62736c;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+    -fx-alignment: center;
+    -fx-min-width: 25;
+    -fx-min-height: 25;
+}
+
+.step-dot-active {
+    -fx-background-color: #f2b765;
+    -fx-text-fill: #173f32;
+}
+
+.step-dot-done {
+    -fx-background-color: #2b8a62;
+    -fx-text-fill: white;
+}
+
+.step-text {
+    -fx-text-fill: #84968e;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+}
+
+.step-text-active {
+    -fx-text-fill: #1c5f47;
+}
+
+.content-wrap {
+    -fx-background-color: #f4f7f2;
+}
+
+.page-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #183f32;
+}
+
+.page-description {
+    -fx-font-size: 13px;
+    -fx-text-fill: #718078;
+}
+
+.card {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-border-color: #e0e8e3;
+    -fx-border-radius: 14;
+    -fx-effect: dropshadow(gaussian, rgba(33, 66, 53, 0.08), 16, 0.08, 0, 4);
+}
+
+.card-flat {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-color: #e0e8e3;
+    -fx-border-radius: 12;
+}
+
+.section-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #193f33;
+}
+
+.section-caption {
+    -fx-font-size: 11px;
+    -fx-text-fill: #819087;
+}
+
+.metric-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-color: #e0e8e3;
+    -fx-border-radius: 12;
+    -fx-padding: 12 15 12 15;
+    -fx-min-width: 142;
+}
+
+.metric-title {
+    -fx-text-fill: #7b8a82;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+}
+
+.metric-value {
+    -fx-text-fill: #1e4336;
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+}
+
+.accent-card {
+    -fx-background-color: #eaf5ef;
+    -fx-background-radius: 12;
+    -fx-border-color: #c9e3d6;
+    -fx-border-radius: 12;
+}
+
+.warm-card {
+    -fx-background-color: #fff7eb;
+    -fx-background-radius: 12;
+    -fx-border-color: #f3dfbd;
+    -fx-border-radius: 12;
+}
+
+.value-label {
+    -fx-font-weight: 800;
+    -fx-text-fill: #23483b;
+}
+
+.money-label {
+    -fx-font-size: 24px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #1d7553;
+}
+
+.profit-label {
+    -fx-font-size: 19px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #148157;
+}
+
+.status-label {
+    -fx-background-color: #e8f4ee;
+    -fx-background-radius: 8;
+    -fx-text-fill: #246849;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-padding: 7 10 7 10;
+}
+
+.footer-bar {
+    -fx-background-color: white;
+    -fx-border-color: #dde6e1 transparent transparent transparent;
+}
+
+.button {
+    -fx-cursor: hand;
+    -fx-background-radius: 9;
+    -fx-padding: 10 20 10 20;
+    -fx-font-weight: 800;
+}
+
+.primary-button {
+    -fx-background-color: #1d7655;
+    -fx-text-fill: white;
+}
+
+.primary-button:hover {
+    -fx-background-color: #155f43;
+}
+
+.primary-button:pressed {
+    -fx-background-color: #104c36;
+}
+
+.primary-button:disabled {
+    -fx-opacity: 0.55;
+}
+
+.secondary-button {
+    -fx-background-color: #e8efeb;
+    -fx-text-fill: #254b3d;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #d9e5df;
+}
+
+.list-view {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-color: #dce6e1;
+    -fx-border-radius: 10;
+    -fx-padding: 4;
+}
+
+.list-view .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #334e43;
+    -fx-padding: 10 12 10 12;
+    -fx-background-radius: 7;
+}
+
+.list-view .list-cell:filled:selected {
+    -fx-background-color: #e4f2eb;
+    -fx-text-fill: #17583f;
+}
+
+.list-view .list-cell:filled:hover {
+    -fx-background-color: #f0f5f2;
+}
+
+.text-field {
+    -fx-background-color: #f8faf9;
+    -fx-background-radius: 8;
+    -fx-border-color: #d8e2dd;
+    -fx-border-radius: 8;
+    -fx-padding: 9 11 9 11;
+}
+
+.text-field:focused {
+    -fx-border-color: #3c9872;
+    -fx-background-color: white;
+}
+
+.form-field {
+    -fx-background-color: #f8faf9;
+    -fx-background-radius: 8;
+    -fx-border-color: #d8e2dd;
+    -fx-border-radius: 8;
+    -fx-padding: 10 12 10 12;
+    -fx-pref-height: 40;
+}
+
+.form-field:focused {
+    -fx-border-color: #3c9872;
+    -fx-background-color: white;
+}
+
+.field-label {
+    -fx-text-fill: #355649;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+}
+
+/* ---- Farm setup: season goal radio picker ---- */
+
+.goal-radio {
+    -fx-text-fill: #355649;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+    -fx-padding: 4 0 4 0;
+}
+
+.goal-radio:selected {
+    -fx-text-fill: #1d7655;
+    -fx-font-weight: 700;
+}
+
+.goal-radio:selected .radio .dot {
+    -fx-background-color: #2b8a62;
+}
+
+.validation-text {
+    -fx-text-fill: #b45309;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+    -fx-min-height: 14;
+}
+
+.crop-list .list-cell:filled:selected {
+    -fx-background-color: #dcefe5;
+    -fx-text-fill: #14553c;
+    -fx-font-weight: 700;
+}
+
+.progress-bar {
+    -fx-accent: #2b936a;
+}
+
+.progress-bar > .track {
+    -fx-background-color: #dce9e2;
+    -fx-background-radius: 8;
+}
+
+.progress-bar > .bar {
+    -fx-background-color: linear-gradient(to right, #43a47d, #1f7d59);
+    -fx-background-radius: 8;
+    -fx-background-insets: 0;
+}
+
+.chart-pie-label {
+    -fx-fill: #385449;
+    -fx-font-weight: 700;
+}
+
+.chart-legend {
+    -fx-background-color: transparent;
+}
+
+.default-color0.chart-pie { -fx-pie-color: #278762; }
+.default-color1.chart-pie { -fx-pie-color: #f0ae58; }
+.default-color2.chart-pie { -fx-pie-color: #6ca6a0; }
+.default-color3.chart-pie { -fx-pie-color: #a4bd75; }
+
+.theme-button {
+    -fx-background-color: rgba(255, 255, 255, 0.10);
+    -fx-background-radius: 20;
+    -fx-text-fill: #e7f1ed;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-padding: 7 14 7 14;
+    -fx-cursor: hand;
+}
+
+.theme-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.20);
+}
+
+.fields-nav-button {
+    -fx-background-color: rgba(242, 183, 101, 0.22);
+    -fx-background-radius: 20;
+    -fx-text-fill: #f7e7c9;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-padding: 7 14 7 14;
+    -fx-cursor: hand;
+}
+
+.fields-nav-button:hover {
+    -fx-background-color: rgba(242, 183, 101, 0.40);
+    -fx-text-fill: #ffffff;
+}
+
+/* ---- Crop selection: stat tiles & crop rows ---- */
+
+.stat-tile {
+    -fx-background-color: #f1f6f3;
+    -fx-background-radius: 12;
+    -fx-padding: 10 12 10 12;
+}
+
+.stat-tile-title {
+    -fx-text-fill: #6f877b;
+    -fx-font-size: 10px;
+    -fx-font-weight: 700;
+}
+
+.stat-tile-value {
+    -fx-text-fill: #173f32;
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+}
+
+.stat-tile-value-positive {
+    -fx-text-fill: #1f8a5b;
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+}
+
+.stat-tile-value-negative {
+    -fx-text-fill: #c0392b;
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+}
+
+.stat-tile-sub {
+    -fx-text-fill: #819a8e;
+    -fx-font-size: 10px;
+}
+
+.crop-list .list-cell {
+    -fx-padding: 4 2 4 2;
+}
+
+.crop-row {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12;
+    -fx-padding: 8 10 8 10;
+}
+
+.crop-row:hover {
+    -fx-background-color: #f6faf8;
+}
+
+.crop-icon {
+    -fx-background-radius: 10;
+    -fx-min-width: 38;
+    -fx-min-height: 38;
+    -fx-alignment: center;
+    -fx-font-size: 18px;
+}
+
+.crop-icon-vegetable { -fx-background-color: #e2f3e8; }
+.crop-icon-fruit { -fx-background-color: #fdeee1; }
+.crop-icon-grain { -fx-background-color: #f6ecd3; }
+.crop-icon-default { -fx-background-color: #e8eef3; }
+
+/* Font-independent vector glyphs (SVG paths, never emoji) */
+.icon-path {
+    -fx-fill: #5e8f7d;
+}
+.icon-path-vegetable { -fx-fill: #2f8a5f; }
+.icon-path-fruit { -fx-fill: #c96f2e; }
+.icon-path-grain { -fx-fill: #b08a3e; }
+.icon-path-default { -fx-fill: #5e8f7d; }
+.icon-path-warning { -fx-fill: #c0392b; }
+.icon-path-sun { -fx-fill: #e8a13a; }
+.icon-path-cloud { -fx-fill: #7fa3b8; }
+.icon-path-rain { -fx-fill: #4a86b8; }
+.icon-path-moon { -fx-fill: #7b93a8; }
+
+.crop-name {
+    -fx-text-fill: #173f32;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+}
+
+.crop-category {
+    -fx-background-color: #e8f3ed;
+    -fx-background-radius: 20;
+    -fx-text-fill: #28664c;
+    -fx-font-size: 10px;
+    -fx-font-weight: 800;
+    -fx-padding: 3 8 3 8;
+}
+
+.crop-price {
+    -fx-text-fill: #173f32;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+}
+
+.crop-price-sub {
+    -fx-text-fill: #819a8e;
+    -fx-font-size: 10px;
+}
+
+.recommendation-badge {
+    -fx-background-color: #f2b765;
+    -fx-background-radius: 20;
+    -fx-text-fill: #173f32;
+    -fx-font-size: 10px;
+    -fx-font-weight: 800;
+    -fx-padding: 3 8 3 8;
+}
+
+/* ---- Season report: bar chart ---- */
+
+.bar-chart .chart-bar {
+    -fx-bar-fill: #2f8a68;
+}
+
+.bar-chart .chart-title {
+    -fx-text-fill: #173f32;
+}
+
+.bar-chart .axis-label {
+    -fx-text-fill: #819a8e;
+}
+
+.bar-chart .chart-plot-background {
+    -fx-background-color: #fafcfa;
+}
+
+.bar-chart .chart-vertical-grid-lines {
+    -fx-stroke: transparent;
+}
+
+.bar-chart .chart-horizontal-grid-lines {
+    -fx-stroke: #e8efe9;
+}
+
+.chart-bar-label {
+    -fx-text-fill: #173f32;
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+}
+
+.chart-value-tooltip {
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
+}
+
+/* ---- Fields overview: tasks, calendar, field cards ---- */
+
+.task-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12;
+    -fx-padding: 10 12 10 12;
+}
+
+.task-icon {
+    -fx-font-size: 18px;
+    -fx-min-width: 30;
+    -fx-alignment: center;
+}
+
+.task-title {
+    -fx-text-fill: #173f32;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+}
+
+.task-subtitle {
+    -fx-text-fill: #819a8e;
+    -fx-font-size: 11px;
+}
+
+.pill {
+    -fx-background-color: #e8f3ed;
+    -fx-background-radius: 20;
+    -fx-text-fill: #28664c;
+    -fx-font-size: 10px;
+    -fx-font-weight: 800;
+    -fx-padding: 4 10 4 10;
+}
+
+.pill-ready {
+    -fx-background-color: #e8f3ed;
+    -fx-text-fill: #1f8a5b;
+}
+
+.pill-soon {
+    -fx-background-color: #fdf0dc;
+    -fx-text-fill: #b06a1e;
+}
+
+.pill-attention {
+    -fx-background-color: #fdeae6;
+    -fx-text-fill: #c0392b;
+}
+
+.calendar-day {
+    -fx-background-color: #f1f6f3;
+    -fx-background-radius: 8;
+    -fx-text-fill: #355649;
+    -fx-alignment: center;
+    -fx-min-width: 30;
+    -fx-min-height: 26;
+    -fx-padding: 2;
+}
+
+.calendar-day-label {
+    -fx-text-fill: #6f877b;
+    -fx-font-size: 10px;
+    -fx-font-weight: 700;
+    -fx-alignment: center;
+    -fx-min-width: 30;
+    -fx-padding: 2 0 4 0;
+}
+
+.calendar-today {
+    -fx-background-color: #2b8a62;
+    -fx-text-fill: white;
+    -fx-font-weight: 800;
+}
+
+.calendar-done {
+    -fx-background-color: #e2ede7;
+    -fx-text-fill: #4a7a5f;
+}
+
+.calendar-future {
+    -fx-background-color: #f6f9f7;
+    -fx-text-fill: #a0b8ab;
+}
+
+/* ---- Field card map-tile backgrounds ---- */
+
+.field-bg-vegetable {
+    -fx-background-color: #e8f5ec;
+}
+
+.field-bg-fruit {
+    -fx-background-color: #fdf0e3;
+}
+
+.field-bg-grain {
+    -fx-background-color: #f8f0db;
+}
+
+.field-bg-default {
+    -fx-background-color: #e8eef5;
+}
+
+.calendar-month-title {
+    -fx-text-fill: #173f32;
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
+}
+
+.field-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 14;
+    -fx-padding: 12 14 12 14;
+}
+
+.field-plot {
+    -fx-background-color: #f1f6f3;
+    -fx-background-radius: 10;
+}
+
+.road-lines-pane {
+    -fx-background-color: transparent;
+}
+
+.field-shape-vegetable { -fx-fill: #63b587; -fx-stroke: #3f8f67; -fx-stroke-width: 2; }
+.field-shape-fruit { -fx-fill: #efae62; -fx-stroke: #cf8b3d; -fx-stroke-width: 2; }
+.field-shape-grain { -fx-fill: #ddbe6d; -fx-stroke: #bfa04e; -fx-stroke-width: 2; }
+.field-shape-default { -fx-fill: #7fa3b8; -fx-stroke: #5e8398; -fx-stroke-width: 2; }
+
+.field-stat-badge {
+    -fx-background-color: rgba(255, 255, 255, 0.92);
+    -fx-background-radius: 12;
+    -fx-text-fill: #1f8a5b;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+    -fx-padding: 3 8 3 8;
+}
+
+.field-name {
+    -fx-text-fill: #173f32;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+}
+
+.field-type {
+    -fx-text-fill: #6f877b;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+}
+
+.field-stat {
+    -fx-text-fill: #355649;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+}
+
+.empty-state-icon {
+    -fx-font-size: 30px;
+}
+
+.empty-state-title {
+    -fx-text-fill: #173f32;
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
+}
+        .nav-bar {
+            -fx-background-color: linear-gradient(to bottom, #ffffff, #f2f7f4);
+            -fx-border-color: transparent transparent #dde7e0 transparent;
+            -fx-border-width: 0 0 1 0;
+        }
+        .back-button {
+            -fx-background-color: #2f6f56;
+            -fx-text-fill: #ffffff;
+            -fx-font-size: 13px;
+            -fx-font-weight: 700;
+            -fx-background-radius: 8;
+            -fx-padding: 6 14 6 14;
+            -fx-cursor: hand;
+        }
+        .back-button:hover { -fx-background-color: #397d61; }
+        .breadcrumb-bar { }
+        .crumb-sep { -fx-text-fill: #94a3b8; -fx-font-size: 12px; }
+        .crumb-current { -fx-text-fill: #1a2233; -fx-font-size: 13px; -fx-font-weight: 700; }
+        .crumb-link { -fx-text-fill: #2f6f56; -fx-font-size: 13px; -fx-cursor: hand; }
+        .crumb-link:hover { -fx-underline: true; }
+        .app-scroll { -fx-background-color: transparent; -fx-background-insets: 0; }

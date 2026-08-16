@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="SmartHarvest360.controllers.WelcomeController"
+            fitToWidth="true" fitToHeight="false" pannable="true"
+            hbarPolicy="AS_NEEDED" vbarPolicy="ALWAYS"
+            styleClass="app-scroll">
+    <content>
+        <BorderPane prefWidth="960" prefHeight="680" minWidth="720" minHeight="640"
+                    styleClass="app-background">
+            <top>
+                <HBox alignment="CENTER_LEFT" spacing="12" styleClass="top-shell">
+                    <padding><Insets top="14" right="30" bottom="14" left="30"/></padding>
+                    <ImageView fx:id="appLogo" fitWidth="44" fitHeight="44" preserveRatio="true" smooth="true">
+                        <image><Image url="@../images/smartharvest-logo.png"/></image>
+                    </ImageView>
+                    <VBox spacing="1">
+                        <Label text="SmartHarvest 360" styleClass="brand-title"/>
+                        <Label text="Farm decision companion" styleClass="brand-caption"/>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="WELCOME" styleClass="screen-badge"/>
+                    <Button fx:id="themeButton" text="Dark Mode" onAction="#handleToggleTheme"
+                            styleClass="theme-button"/>
+                </HBox>
+            </top>
+
+            <center>
+                <VBox spacing="16" styleClass="content-wrap" alignment="CENTER">
+                    <padding><Insets top="40" right="30" bottom="30" left="30"/></padding>
+
+                    <VBox spacing="18" styleClass="accent-card" maxWidth="480">
+                        <padding><Insets top="30" right="34" bottom="30" left="34"/></padding>
+                        <ImageView fitWidth="72" fitHeight="72" preserveRatio="true" smooth="true">
+                            <image><Image url="@../images/smartharvest-logo.png"/></image>
+                        </ImageView>
+                        <VBox spacing="4" alignment="CENTER">
+                            <Label text="Welcome to SmartHarvest 360" styleClass="page-title"/>
+                            <Label text="Plan your next growing season from seed to sale."
+                                   wrapText="true" maxWidth="Infinity" alignment="CENTER" styleClass="page-description"/>
+                        </VBox>
+                        <VBox spacing="6">
+                            <Label text="WHAT SHOULD WE CALL YOU?" styleClass="field-label"/>
+                            <TextField fx:id="farmerNameField" promptText="e.g. Mei Ling"
+                                       styleClass="form-field"/>
+                        </VBox>
+                        <Label fx:id="statusLabel" text="Tell us your name, then start planning."
+                               wrapText="true" maxWidth="Infinity" styleClass="status-label"/>
+                        <Button fx:id="startButton" text="START FARMING" maxWidth="Infinity"
+                                onAction="#handleStart" styleClass="primary-button"/>
+                    </VBox>
+                </VBox>
+            </center>
+
+            <bottom>
+                <HBox spacing="12" alignment="CENTER_RIGHT" styleClass="footer-bar">
+                    <padding><Insets top="14" right="30" bottom="14" left="30"/></padding>
+                    <Label text="A 5-step farm simulator: Setup · Crops · Simulation · Market · Report"
+                           styleClass="section-caption" HBox.hgrow="ALWAYS"/>
+                </HBox>
+            </bottom>
+        </BorderPane>
+    </content>
+</ScrollPane>

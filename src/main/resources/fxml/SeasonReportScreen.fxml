@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="SmartHarvest360.controllers.SeasonReportController"
+      spacing="0">
+    <HBox fx:id="navBarSlot" alignment="CENTER_LEFT" spacing="8" styleClass="nav-bar">
+        <padding><Insets top="4" right="30" bottom="8" left="30"/></padding>
+    </HBox>
+    <ScrollPane fitToWidth="true" fitToHeight="false" pannable="true" minHeight="0.0"
+                hbarPolicy="AS_NEEDED" vbarPolicy="ALWAYS"
+                styleClass="app-scroll" VBox.vgrow="ALWAYS">
+    <content>
+<BorderPane prefWidth="960" prefHeight="680" minWidth="720" minHeight="640"
+            styleClass="app-background">
+    <top>
+        <VBox spacing="0">
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="top-shell">
+            <padding><Insets top="14" right="30" bottom="14" left="30"/></padding>
+            <ImageView fx:id="appLogo" fitWidth="44" fitHeight="44" preserveRatio="true" smooth="true">
+                <image><Image url="@../images/smartharvest-logo.png"/></image>
+            </ImageView>
+            <VBox spacing="1">
+                <Label text="SmartHarvest 360" styleClass="brand-title"/>
+                <Label text="Farm decision companion" styleClass="brand-caption"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="fieldsButton" text="&#9707; Fields" onAction="#handleOpenFields"
+                    styleClass="fields-nav-button"/>
+            <Label text="SEASON COMPLETE" styleClass="screen-badge"/>
+            <Button fx:id="themeButton" text="Dark Mode" onAction="#handleToggleTheme"
+                    styleClass="theme-button"/>
+        </HBox>
+        </VBox>
+    </top>
+
+    <center>
+<VBox spacing="12" styleClass="content-wrap">
+                    <padding><Insets top="12" right="30" bottom="10" left="30"/></padding>
+
+            <HBox alignment="CENTER" spacing="7">
+                <Label text="1" styleClass="step-dot, step-dot-done"/>
+                <Label text="SETUP" styleClass="step-text"/>
+                <Region styleClass="step-line, step-line-done"/>
+                <Label text="2" styleClass="step-dot, step-dot-done"/>
+                <Label text="CROPS" styleClass="step-text"/>
+                <Region styleClass="step-line, step-line-done"/>
+                <Label text="3" styleClass="step-dot, step-dot-done"/>
+                <Label text="SIM" styleClass="step-text"/>
+                <Region styleClass="step-line, step-line-done"/>
+                <Label text="4" styleClass="step-dot, step-dot-done"/>
+                <Label text="MARKET" styleClass="step-text"/>
+                <Region styleClass="step-line, step-line-done"/>
+                <Label text="5" styleClass="step-dot, step-dot-active"/>
+                <Label text="REPORT" styleClass="step-text, step-text-active"/>
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT">
+                <VBox spacing="2">
+                    <Label text="Season Report" styleClass="page-title"/>
+                    <Label text="Review your financial outcome and revenue distribution."
+                           styleClass="page-description"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="SUCCESSFULLY RECORDED" styleClass="soft-badge"/>
+            </HBox>
+
+            <HBox spacing="12">
+                <VBox spacing="4" styleClass="metric-card" HBox.hgrow="ALWAYS">
+                    <Label text="TOTAL REVENUE" styleClass="metric-title"/>
+                    <Label fx:id="revenueLabel" text="RM 0.00" styleClass="metric-value"/>
+                </VBox>
+                <VBox spacing="4" styleClass="metric-card" HBox.hgrow="ALWAYS">
+                    <Label text="TOTAL COST" styleClass="metric-title"/>
+                    <Label fx:id="costLabel" text="RM 0.00" styleClass="metric-value"/>
+                </VBox>
+                <VBox spacing="4" styleClass="accent-card" HBox.hgrow="ALWAYS">
+                    <padding><Insets top="12" right="15" bottom="12" left="15"/></padding>
+                    <Label text="NET PROFIT" styleClass="metric-title"/>
+                    <Label fx:id="profitLabel" text="RM 0.00" styleClass="metric-value"/>
+                </VBox>
+                <VBox spacing="4" styleClass="warm-card" HBox.hgrow="ALWAYS">
+                    <padding><Insets top="12" right="15" bottom="12" left="15"/></padding>
+                    <Label text="RETURN ON INVESTMENT" styleClass="metric-title"/>
+                    <Label fx:id="roiLabel" text="0.00%" styleClass="metric-value"/>
+                </VBox>
+            </HBox>
+
+            <HBox spacing="18" VBox.vgrow="ALWAYS">
+                <VBox spacing="3" styleClass="card" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                    <padding><Insets top="12" right="18" bottom="10" left="18"/></padding>
+                    <Label text="Revenue by Crop" styleClass="section-title"/>
+                    <Label text="Bars show each crop's contribution to total season revenue."
+                           styleClass="section-caption"/>
+                    <BarChart fx:id="revenueChart" prefHeight="200" minHeight="90" animated="false"
+                              VBox.vgrow="ALWAYS" styleClass="bar-chart">
+                        <xAxis>
+                            <CategoryAxis side="BOTTOM" label="Crop"/>
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis side="LEFT" label="Revenue (RM)"/>
+                        </yAxis>
+                    </BarChart>
+                </VBox>
+
+                <VBox spacing="14" prefWidth="285" styleClass="card">
+                    <padding><Insets top="12" right="20" bottom="12" left="20"/></padding>
+                    <Label text="Season Summary" styleClass="section-title"/>
+                    <Label text="Your harvest was sold and all financial results were calculated successfully."
+                           wrapText="true" maxWidth="Infinity" styleClass="page-description"/>
+                    <Separator/>
+                    <VBox spacing="6" styleClass="accent-card">
+                        <padding><Insets top="10" right="14" bottom="10" left="14"/></padding>
+                        <Label text="REPORT STATUS" styleClass="metric-title"/>
+                        <Label fx:id="reportStatusLabel" text="Saving season report..."
+                               wrapText="true" maxWidth="Infinity" styleClass="value-label"/>
+                    </VBox>
+                    <VBox spacing="5" styleClass="warm-card">
+                        <padding><Insets top="10" right="14" bottom="10" left="14"/></padding>
+                        <Label text="WHAT IS ROI?" styleClass="metric-title"/>
+                        <Label text="ROI compares your net profit with the total production cost."
+                               wrapText="true" maxWidth="Infinity" styleClass="section-caption"/>
+                    </VBox>
+                    <Region VBox.vgrow="ALWAYS"/>
+                    <Label text="Start a new season to test another crop or resource strategy."
+                           wrapText="true" maxWidth="Infinity" styleClass="section-caption"/>
+                </VBox>
+            </HBox>
+
+            <VBox spacing="12" styleClass="card">
+                <padding><Insets top="14" right="20" bottom="14" left="20"/></padding>
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <VBox spacing="2">
+                        <Label text="How You Did" styleClass="section-title"/>
+                        <Label text="Graded against your season goal and compared with past seasons."
+                               styleClass="section-caption"/>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="goalBadge" text="MAXIMIZE ROI" styleClass="soft-badge"/>
+                </HBox>
+                <Label fx:id="gradeLabel" text="Grading your season..." wrapText="true" maxWidth="Infinity"
+                       styleClass="value-label"/>
+                <Label fx:id="comparisonLabel" text="Loading comparison..." wrapText="true" maxWidth="Infinity"
+                       styleClass="page-description"/>
+                <Label fx:id="narrativeLabel" text="Loading season events..." wrapText="true" maxWidth="Infinity"
+                       styleClass="section-caption"/>
+                <Label fx:id="suggestionLabel" text="Loading suggestions..." wrapText="true" maxWidth="Infinity"
+                       styleClass="section-caption"/>
+                <Label fx:id="efficiencyLabel" text="" wrapText="true" maxWidth="Infinity"
+                       styleClass="section-caption"/>
+            </VBox>
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox spacing="12" alignment="CENTER_RIGHT" styleClass="footer-bar">
+            <padding><Insets top="10" right="30" bottom="10" left="30"/></padding>
+            <Label text="Season data has been exported as CSV." styleClass="section-caption"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Exit Application" onAction="#handleExit" styleClass="secondary-button"/>
+            <Button fx:id="newSeasonButton" text="Start New Season" onAction="#handleNewSeason"
+                    styleClass="primary-button"/>
+        </HBox>
+    </bottom>
+</BorderPane>
+    </content>
+    </ScrollPane>
+</VBox>

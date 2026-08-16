@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="SmartHarvest360.controllers.FieldsOverviewController"
+      spacing="0">
+    <HBox fx:id="navBarSlot" alignment="CENTER_LEFT" spacing="8" styleClass="nav-bar">
+        <padding><Insets top="4" right="30" bottom="8" left="30"/></padding>
+    </HBox>
+    <ScrollPane fitToWidth="true" fitToHeight="false" pannable="true" minHeight="0.0"
+                hbarPolicy="AS_NEEDED" vbarPolicy="ALWAYS"
+                styleClass="app-scroll" VBox.vgrow="ALWAYS">
+    <content>
+<BorderPane prefWidth="960" prefHeight="680" minWidth="720" minHeight="640"
+            styleClass="app-background">
+    <top>
+        <VBox spacing="0">
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="top-shell">
+            <padding><Insets top="14" right="30" bottom="14" left="30"/></padding>
+            <ImageView fx:id="appLogo" fitWidth="44" fitHeight="44" preserveRatio="true" smooth="true">
+                <image><Image url="@../images/smartharvest-logo.png"/></image>
+            </ImageView>
+            <VBox spacing="1">
+                <Label text="SmartHarvest 360" styleClass="brand-title"/>
+                <Label text="Farm decision companion" styleClass="brand-caption"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="FIELD OVERVIEW" styleClass="screen-badge"/>
+            <Button fx:id="themeButton" text="Dark Mode" onAction="#handleToggleTheme"
+                    styleClass="theme-button"/>
+        </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="14" styleClass="content-wrap">
+            <padding><Insets top="18" right="30" bottom="16" left="30"/></padding>
+
+            <HBox alignment="CENTER_LEFT">
+                <VBox spacing="2">
+                    <Label text="Fields Overview" styleClass="page-title"/>
+                    <Label text="A live dashboard of your planted fields, upcoming milestones, and the season ahead."
+                           styleClass="page-description"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="DASHBOARD" styleClass="soft-badge"/>
+            </HBox>
+
+            <HBox spacing="18">
+                <VBox spacing="10" styleClass="card" HBox.hgrow="ALWAYS">
+                    <padding><Insets top="16" right="18" bottom="16" left="18"/></padding>
+                    <HBox alignment="CENTER_LEFT">
+                        <VBox spacing="1">
+                            <Label text="Upcoming Tasks" styleClass="section-title"/>
+                            <Label text="Milestones and alerts pulled from your live season"
+                                   styleClass="section-caption"/>
+                        </VBox>
+                    </HBox>
+                    <VBox fx:id="taskList" spacing="8" VBox.vgrow="ALWAYS"/>
+                </VBox>
+
+                <VBox spacing="10" prefWidth="300" styleClass="card">
+                    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+                    <Label fx:id="monthTitleLabel" text="Season Progress" styleClass="calendar-month-title"/>
+                    <GridPane fx:id="calendarGrid" hgap="3" vgap="3" alignment="CENTER"/>
+                    <Label fx:id="seasonCaption" text="Day 0 of season. Start simulating to see progress."
+                           wrapText="true" maxWidth="Infinity" styleClass="section-caption"/>
+                </VBox>
+            </HBox>
+
+            <VBox spacing="10">
+                <HBox alignment="CENTER_LEFT">
+                    <VBox spacing="1">
+                        <Label text="Your Fields" styleClass="section-title"/>
+                        <Label text="Each planted crop is shown as its own field plot"
+                               styleClass="section-caption"/>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="fieldCountBadge" text="0 FIELDS" styleClass="soft-badge"/>
+                </HBox>
+                <FlowPane fx:id="fieldContainer" hgap="14" vgap="14" prefWrapLength="660"/>
+            </VBox>
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox spacing="12" alignment="CENTER_RIGHT" styleClass="footer-bar">
+            <padding><Insets top="13" right="30" bottom="13" left="30"/></padding>
+            <Label text="Fields overview reflects your live season state."
+                   styleClass="section-caption"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="backButton" text="&#8592; Back" onAction="#handleBack"
+                    styleClass="secondary-button"/>
+        </HBox>
+    </bottom>
+</BorderPane>
+    </content>
+</ScrollPane>
+</VBox>
