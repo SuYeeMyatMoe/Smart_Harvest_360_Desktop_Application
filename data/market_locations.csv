@@ -1,0 +1,60 @@
+location,shop_name,shop_type,distance_km,price_multiplier,demand,logo
+Johor,NSK Grocer,Supermarket,3.2,1.05,High,/images/shops/nsk.png
+Johor,Jaya Grocer,Supermarket,5.1,1.08,High,/images/shops/jaya-grocer.png
+Johor,Lotus's,Supermarket,6.4,1.02,High,/images/shops/lotus.png
+Johor,Local Wet Market,Wet Market,2.4,1.06,High,/images/shops/local-market.png
+Kedah,Lotus's,Supermarket,3.5,1.03,High,/images/shops/lotus.png
+Kedah,AEON,Supermarket,5.2,1.01,Medium,/images/shops/aeon.png
+Kedah,Local Wet Market,Wet Market,2.1,1.07,High,/images/shops/local-market.png
+Kedah,Wholesale Buyer,Wholesale,7.0,0.95,Very High,/images/shops/wholesale.png
+Kelantan,Lotus's,Supermarket,3.8,1.02,High,/images/shops/lotus.png
+Kelantan,AEON,Supermarket,5.4,1.01,Medium,/images/shops/aeon.png
+Kelantan,Local Wet Market,Wet Market,2.2,1.06,High,/images/shops/local-market.png
+Kelantan,Wholesale Buyer,Wholesale,6.8,0.95,Very High,/images/shops/wholesale.png
+Melaka,NSK Grocer,Supermarket,4.0,1.05,High,/images/shops/nsk.png
+Melaka,Jaya Grocer,Supermarket,5.5,1.07,High,/images/shops/jaya-grocer.png
+Melaka,Lotus's,Supermarket,6.2,1.02,High,/images/shops/lotus.png
+Melaka,Local Wet Market,Wet Market,2.6,1.06,High,/images/shops/local-market.png
+Negeri Sembilan,NSK Grocer,Supermarket,4.1,1.05,High,/images/shops/nsk.png
+Negeri Sembilan,Jaya Grocer,Supermarket,5.8,1.07,High,/images/shops/jaya-grocer.png
+Negeri Sembilan,Lotus's,Supermarket,6.5,1.02,High,/images/shops/lotus.png
+Negeri Sembilan,Local Wet Market,Wet Market,2.7,1.06,High,/images/shops/local-market.png
+Pahang,Jaya Grocer,Supermarket,5.0,1.08,High,/images/shops/jaya-grocer.png
+Pahang,Lotus's,Supermarket,6.3,1.02,High,/images/shops/lotus.png
+Pahang,AEON,Supermarket,7.1,1.00,Medium,/images/shops/aeon.png
+Pahang,Local Fruit Market,Wet Market,2.5,1.09,High,/images/shops/local-market.png
+Perak,NSK Grocer,Supermarket,3.9,1.05,High,/images/shops/nsk.png
+Perak,Lotus's,Supermarket,5.3,1.02,High,/images/shops/lotus.png
+Perak,AEON,Supermarket,6.0,1.01,Medium,/images/shops/aeon.png
+Perak,Local Wet Market,Wet Market,2.3,1.06,High,/images/shops/local-market.png
+Perlis,Lotus's,Supermarket,4.2,1.02,High,/images/shops/lotus.png
+Perlis,Local Wet Market,Wet Market,2.0,1.06,High,/images/shops/local-market.png
+Perlis,Wholesale Buyer,Wholesale,6.5,0.95,Very High,/images/shops/wholesale.png
+Penang,NSK Grocer,Supermarket,3.3,1.05,High,/images/shops/nsk.png
+Penang,Jaya Grocer,Supermarket,4.8,1.08,High,/images/shops/jaya-grocer.png
+Penang,Lotus's,Supermarket,5.7,1.02,High,/images/shops/lotus.png
+Penang,Local Wet Market,Wet Market,2.0,1.07,High,/images/shops/local-market.png
+Sabah,Lotus's,Supermarket,4.5,1.02,High,/images/shops/lotus.png
+Sabah,AEON,Supermarket,6.0,1.01,Medium,/images/shops/aeon.png
+Sabah,Local Market,Wet Market,2.8,1.06,High,/images/shops/local-market.png
+Sabah,Wholesale Buyer,Wholesale,8.0,0.95,Very High,/images/shops/wholesale.png
+Sarawak,NSK Grocer,Supermarket,4.2,1.05,High,/images/shops/nsk.png
+Sarawak,Lotus's,Supermarket,5.8,1.02,High,/images/shops/lotus.png
+Sarawak,AEON,Supermarket,6.4,1.01,Medium,/images/shops/aeon.png
+Sarawak,Local Market,Wet Market,2.6,1.07,High,/images/shops/local-market.png
+Selangor,NSK Grocer,Supermarket,3.2,1.05,High,/images/shops/nsk.png
+Selangor,Jaya Grocer,Supermarket,4.7,1.08,High,/images/shops/jaya-grocer.png
+Selangor,Lotus's,Supermarket,5.9,1.02,High,/images/shops/lotus.png
+Selangor,AEON,Supermarket,7.0,1.01,Medium,/images/shops/aeon.png
+Terengganu,Lotus's,Supermarket,4.0,1.02,High,/images/shops/lotus.png
+Terengganu,AEON,Supermarket,5.6,1.01,Medium,/images/shops/aeon.png
+Terengganu,Local Wet Market,Wet Market,2.3,1.07,High,/images/shops/local-market.png
+Terengganu,Wholesale Buyer,Wholesale,7.2,0.95,Very High,/images/shops/wholesale.png
+Kuala Lumpur,NSK Grocer,Supermarket,2.8,1.05,High,/images/shops/nsk.png
+Kuala Lumpur,Jaya Grocer,Supermarket,4.2,1.08,High,/images/shops/jaya-grocer.png
+Kuala Lumpur,Lotus's,Supermarket,5.3,1.02,High,/images/shops/lotus.png
+Kuala Lumpur,AEON,Supermarket,6.0,1.01,Medium,/images/shops/aeon.png
+Putrajaya,Jaya Grocer,Supermarket,3.4,1.08,High,/images/shops/jaya-grocer.png
+Putrajaya,Lotus's,Supermarket,4.7,1.02,High,/images/shops/lotus.png
+Putrajaya,AEON,Supermarket,5.8,1.01,Medium,/images/shops/aeon.png
+Putrajaya,Local Market,Wet Market,2.1,1.06,High,/images/shops/local-market.png
