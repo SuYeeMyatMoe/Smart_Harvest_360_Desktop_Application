@@ -15,15 +15,11 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane xmlns:fx="http://javafx.com/fxml"
+<BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="SmartHarvest360.controllers.FarmSetupController"
             stylesheets="@../style.css"
-            fitToWidth="true" fitToHeight="true" pannable="true"
-            hbarPolicy="AS_NEEDED" vbarPolicy="AS_NEEDED"
-            styleClass="app-scroll">
-    <content>
-        <BorderPane prefWidth="960" prefHeight="680" minWidth="720" minHeight="640"
-                    styleClass="app-background">
+            prefWidth="960" prefHeight="680" minWidth="720" minHeight="520"
+            styleClass="app-background">
             <top>
                 <HBox alignment="CENTER_LEFT" spacing="12" styleClass="top-shell">
                     <padding><Insets top="14" right="30" bottom="14" left="30"/></padding>
@@ -40,6 +36,10 @@
             </top>
 
             <center>
+                <ScrollPane fitToWidth="true" fitToHeight="false" pannable="true"
+                            hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                            styleClass="app-scroll">
+                    <content>
                 <VBox spacing="14" styleClass="content-wrap">
                     <padding><Insets top="18" right="30" bottom="18" left="30"/></padding>
 
@@ -169,6 +169,8 @@
                         </VBox>
                     </HBox>
                 </VBox>
+                    </content>
+                </ScrollPane>
             </center>
 
             <bottom>
@@ -181,6 +183,4 @@
                             styleClass="primary-button"/>
                 </HBox>
             </bottom>
-        </BorderPane>
-    </content>
-</ScrollPane>
+</BorderPane>

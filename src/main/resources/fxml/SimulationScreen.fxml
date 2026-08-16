@@ -21,6 +21,7 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.shape.Ellipse?>
 <?import javafx.scene.shape.Rectangle?>
+<?import SmartHarvest360.ui.Crop3DView?>
 
 <ScrollPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="SmartHarvest360.controllers.SimulationController"
@@ -123,25 +124,10 @@
                                 <!-- Soil is pinned to bottom in controller (managed=false). -->
                                 <Rectangle fx:id="soilRect" width="266" height="42"
                                            fill="#7a4f2a" managed="false"/>
-                                <Pane fx:id="plantLayer" prefHeight="188" maxHeight="188"
-                                      prefWidth="266" maxWidth="266"
-                                      StackPane.alignment="TOP_CENTER"
-                                      styleClass="sim-plant-layer">
-                                    <Pane fx:id="plantBox" layoutX="98" layoutY="0" prefWidth="70" prefHeight="188">
-                                        <Rectangle fx:id="stemRect" x="31" y="60" width="8" height="120"
-                                                   arcWidth="4" arcHeight="4" fill="#3d7a4a"/>
-                                        <Ellipse fx:id="leafLeftLower" centerX="18" centerY="120"
-                                                 radiusX="14" radiusY="7" fill="#3f9d5f" rotate="-35"/>
-                                        <Ellipse fx:id="leafRightLower" centerX="52" centerY="112"
-                                                 radiusX="14" radiusY="7" fill="#3f9d5f" rotate="35"/>
-                                        <Ellipse fx:id="leafLeftUpper" centerX="16" centerY="85"
-                                                 radiusX="12" radiusY="6" fill="#2f9e68" rotate="-40"/>
-                                        <Ellipse fx:id="leafRightUpper" centerX="54" centerY="78"
-                                                 radiusX="12" radiusY="6" fill="#2f9e68" rotate="40"/>
-                                        <Circle fx:id="canopyCircle" centerX="35" centerY="48"
-                                                radius="16" fill="#2f9e68"/>
-                                    </Pane>
-                                </Pane>
+                                <Crop3DView fx:id="crop3dView" StackPane.alignment="CENTER"/>
+                                <Label text="3D · DRAG TO ROTATE" styleClass="model-3d-badge"
+                                       StackPane.alignment="BOTTOM_LEFT"
+                                       translateX="10" translateY="-10"/>
                                 <Label fx:id="fieldWeatherBadge" text="Sunny" styleClass="field-weather-badge"
                                        StackPane.alignment="TOP_RIGHT"
                                        translateX="-10" translateY="10"/>

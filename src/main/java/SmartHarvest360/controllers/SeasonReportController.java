@@ -6,16 +6,19 @@ import SmartHarvest360.ml.GradePredictor;
 import SmartHarvest360.model.SaleRecord;
 import SmartHarvest360.navigation.SceneNavigator;
 import SmartHarvest360.session.AppSession;
+import SmartHarvest360.ui.FinanceBar3DChart;
+import SmartHarvest360.ui.RevenuePie3DChart;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
+import javafx.animation.KeyFrame;
+import javafx.animation.ScaleTransition;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.PieChart;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
+import javafx.util.Duration;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,11 +41,12 @@ public class SeasonReportController {
     @FXML private Label actualGradeReportLabel;
     @FXML private Label gradeCoachLabel;
     @FXML private Label filePathLabel;
-    @FXML private PieChart revenueChart;
-    @FXML private BarChart<String, Number> financeChart;
+    @FXML private RevenuePie3DChart revenueChart3d;
+    @FXML private FinanceBar3DChart financeChart3d;
     @FXML private Button newSeasonButton;
     @FXML private Button downloadReportButton;
     @FXML private Button openFolderButton;
+    @FXML private ScrollPane reportScroll;
 
     private AppSession session;
     private Path lastSavedPath;
@@ -59,12 +63,17 @@ public class SeasonReportController {
         double profit = revenue - cost;
         double roi = cost == 0.0 ? 0.0 : profit / cost * 100.0;
 
-        revenueLabel.setText(money(revenue));
-        costLabel.setText(money(cost));
-        profitLabel.setText(money(profit));
-        roiLabel.setText(String.format(Locale.US, "%.2f%%", roi));
+        animateMoney(revenueLabel, revenue);
+        animateMoney(costLabel, cost);
+        animateMoney(profitLabel, profit);
+        animatePercent(roiLabel, roi);
         populateCharts(sales, revenue, cost, profit);
         populateGradeCompare(roi, profit);
+        Platform.runLater(() -> {
+            reportScroll.setVvalue(0.0);
+            reportScroll.setHvalue(0.0);
+            animateCharts();
+        });
 
         try {
             CsvDataStore.saveSeasonReport(sales);
@@ -169,38 +178,46 @@ public class SeasonReportController {
             revenueByCrop.merge(sale.cropName(), sale.revenue(), Double::sum);
         }
 
-        var pieData = FXCollections.<PieChart.Data>observableArrayList();
-        if (revenueByCrop.isEmpty()) {
-            pieData.add(new PieChart.Data("No sales", 1));
-        } else {
-            revenueByCrop.forEach((crop, amount) -> pieData.add(new PieChart.Data(crop, amount)));
-        }
-        revenueChart.setData(pieData);
-        revenueChart.setLabelsVisible(true);
-        revenueChart.setLegendVisible(true);
-        revenueChart.setClockwise(true);
-        revenueChart.setStartAngle(90);
-
-        financeChart.getData().clear();
-        XYChart.Series<String, Number> revenueSeries = new XYChart.Series<>();
-        revenueSeries.setName("Revenue");
-        revenueSeries.getData().add(new XYChart.Data<>("Season", revenue));
-
-        XYChart.Series<String, Number> costSeries = new XYChart.Series<>();
-        costSeries.setName("Cost");
-        costSeries.getData().add(new XYChart.Data<>("Season", cost));
-
-        XYChart.Series<String, Number> profitSeries = new XYChart.Series<>();
-        profitSeries.setName(profit >= 0 ? "Profit" : "Loss");
-        profitSeries.getData().add(new XYChart.Data<>("Season", Math.abs(profit)));
-
-        financeChart.getData().addAll(revenueSeries, costSeries, profitSeries);
-        financeChart.setLegendVisible(true);
-        financeChart.setCategoryGap(40);
-        financeChart.setBarGap(8);
+        revenueChart3d.setData(revenueByCrop);
+        financeChart3d.setValues(revenue, cost, profit);
     }
 
     private static String money(double value) {
         return String.format(Locale.US, "RM %,.2f", value);
+    }
+
+    private void animateMoney(Label label, double target) {
+        animateNumber(label, target, value -> money(value));
+    }
+
+    private void animatePercent(Label label, double target) {
+        animateNumber(label, target, value -> String.format(Locale.US, "%.2f%%", value));
+    }
+
+    private void animateNumber(Label label, double target, java.util.function.DoubleFunction<String> formatter) {
+        final int frames = 36;
+        Timeline timeline = new Timeline();
+        for (int frame = 0; frame <= frames; frame++) {
+            double progress = frame / (double) frames;
+            double eased = 1.0 - Math.pow(1.0 - progress, 3);
+            double value = target * eased;
+            timeline.getKeyFrames().add(new KeyFrame(Duration.millis(frame * 24.0),
+                    event -> label.setText(formatter.apply(value))));
+        }
+        timeline.play();
+    }
+
+    private void animateCharts() {
+        for (javafx.scene.Node chart : List.of(revenueChart3d, financeChart3d)) {
+            chart.setScaleX(0.96);
+            chart.setScaleY(0.96);
+            chart.setOpacity(0.0);
+            javafx.animation.FadeTransition fade = new javafx.animation.FadeTransition(Duration.millis(620), chart);
+            fade.setToValue(1.0);
+            ScaleTransition scale = new ScaleTransition(Duration.millis(620), chart);
+            scale.setToX(1.0);
+            scale.setToY(1.0);
+            new javafx.animation.ParallelTransition(fade, scale).play();
+        }
     }
 }

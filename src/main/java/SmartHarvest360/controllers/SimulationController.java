@@ -10,6 +10,7 @@ import SmartHarvest360.model.SimDayLog;
 import SmartHarvest360.navigation.SceneNavigator;
 import SmartHarvest360.plan.DetailedPlanReportBuilder;
 import SmartHarvest360.session.AppSession;
+import SmartHarvest360.ui.Crop3DView;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -25,11 +26,8 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
@@ -42,10 +40,6 @@ public class SimulationController {
     private static final double FIELD_W = 266;
     private static final double FIELD_H = 230;
     private static final double SOIL_H = 42;
-    private static final double PLANT_AREA_H = FIELD_H - SOIL_H;
-    private static final double MAX_STEM = 120;
-    private static final double MAX_CANOPY = 24;
-    private static final double PLANT_BOX_W = 70;
 
     @FXML private Label cropLabel;
     @FXML private Label dayLabel;
@@ -74,16 +68,9 @@ public class SimulationController {
     @FXML private TableColumn<SimDayLog, Number> growthCol;
     @FXML private TableColumn<SimDayLog, String> statusCol;
     @FXML private StackPane fieldPane;
-    @FXML private Pane plantLayer;
+    @FXML private Crop3DView crop3dView;
     @FXML private Rectangle skyRect;
     @FXML private Rectangle soilRect;
-    @FXML private Pane plantBox;
-    @FXML private Rectangle stemRect;
-    @FXML private Circle canopyCircle;
-    @FXML private Ellipse leafLeftLower;
-    @FXML private Ellipse leafRightLower;
-    @FXML private Ellipse leafLeftUpper;
-    @FXML private Ellipse leafRightUpper;
     @FXML private Button irrigateButton;
     @FXML private Button conserveButton;
     @FXML private Button fertilizeButton;
@@ -119,6 +106,7 @@ public class SimulationController {
 
         Crop crop = session.getActiveCrop();
         cropLabel.setText(crop.getName());
+        crop3dView.setCrop(crop.getName());
         configureField();
         configureTable();
         configureSpeed();
@@ -135,7 +123,7 @@ public class SimulationController {
         }
 
         updateScreen(lastWeather, "Growing");
-        animatePlantTo(growthPctFraction());
+        crop3dView.setGrowth(growthPctFraction(), false);
         highlightActionCards(recommendedAction);
     }
 
@@ -223,11 +211,6 @@ public class SimulationController {
         fieldClip.setArcHeight(18);
         fieldPane.setClip(fieldClip);
 
-        Rectangle plantClip = new Rectangle(FIELD_W, PLANT_AREA_H);
-        plantLayer.setClip(plantClip);
-        plantLayer.setPrefSize(FIELD_W, PLANT_AREA_H);
-        plantLayer.setMaxSize(FIELD_W, PLANT_AREA_H);
-        StackPane.setAlignment(plantLayer, javafx.geometry.Pos.TOP_CENTER);
     }
 
     private void configureTable() {
@@ -387,7 +370,7 @@ public class SimulationController {
         lastActionLabel.setText("Last action: " + action + " - " + weather);
 
         updateScreen(weather, status);
-        animatePlantTo(growthPct / 100.0);
+        crop3dView.setGrowth(growthPct / 100.0, animate);
 
         if (session.isCropReady()) {
             stopAutoPlay();
@@ -478,64 +461,6 @@ public class SimulationController {
             default -> Color.web("#cfe6dc");
         };
         skyRect.setFill(fill);
-    }
-
-    private void animatePlantTo(double progress) {
-        double clamped = Math.max(0.05, Math.min(1.0, progress));
-        double stemHeight = 18 + clamped * (MAX_STEM - 18);
-        double canopyRadius = 8 + clamped * (MAX_CANOPY - 8);
-        double groundY = PLANT_AREA_H - 4; // plant rooted just above soil line
-        double stemTop = groundY - stemHeight;
-        double centerX = PLANT_BOX_W / 2.0;
-
-        // Absolute layout: stem grows upward from soil; canopy sits on top.
-        plantBox.setPrefSize(PLANT_BOX_W, PLANT_AREA_H);
-        plantBox.setLayoutX((FIELD_W - PLANT_BOX_W) / 2.0);
-        plantBox.setLayoutY(0);
-
-        stemRect.setX(centerX - 4);
-        stemRect.setY(stemTop);
-        stemRect.setWidth(8);
-        stemRect.setHeight(stemHeight);
-
-        canopyCircle.setCenterX(centerX);
-        canopyCircle.setCenterY(stemTop - canopyRadius * 0.35);
-        canopyCircle.setRadius(canopyRadius);
-        canopyCircle.setFill(Color.web(clamped > 0.85 ? "#1f8f58" : "#2f9e68"));
-
-        // Leaves appear as the plant grows; stay attached to the stem.
-        double leafScale = Math.max(0.25, clamped);
-        boolean showUpper = clamped >= 0.35;
-        boolean showLower = clamped >= 0.15;
-
-        positionLeaf(leafLeftLower, centerX - 18 * leafScale, stemTop + stemHeight * 0.62,
-                11 * leafScale, 5.5 * leafScale, -32, showLower, "#45a866");
-        positionLeaf(leafRightLower, centerX + 18 * leafScale, stemTop + stemHeight * 0.55,
-                11 * leafScale, 5.5 * leafScale, 32, showLower, "#45a866");
-        positionLeaf(leafLeftUpper, centerX - 16 * leafScale, stemTop + stemHeight * 0.32,
-                10 * leafScale, 5 * leafScale, -38, showUpper, "#2f9e68");
-        positionLeaf(leafRightUpper, centerX + 16 * leafScale, stemTop + stemHeight * 0.28,
-                10 * leafScale, 5 * leafScale, 38, showUpper, "#2f9e68");
-    }
-
-    private void positionLeaf(
-            Ellipse leaf,
-            double cx,
-            double cy,
-            double rx,
-            double ry,
-            double rotate,
-            boolean visible,
-            String color
-    ) {
-        leaf.setCenterX(cx);
-        leaf.setCenterY(cy);
-        leaf.setRadiusX(Math.max(2, rx));
-        leaf.setRadiusY(Math.max(1.5, ry));
-        leaf.setRotate(rotate);
-        leaf.setFill(Color.web(color));
-        leaf.setVisible(visible);
-        leaf.setManaged(false);
     }
 
     private void highlightActionCards(String action) {

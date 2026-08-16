@@ -10,11 +10,11 @@ import javafx.stage.Stage;
 public class SmartHarvestApp extends Application {
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/FarmSetupScreen.fxml"));
-        stage.setTitle("SmartHarvest 360");
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/IntroScreen.fxml"));
+        stage.setTitle("SmartHarvest 360 — AI Farm Intelligence");
         stage.setScene(new Scene(root, 1180, 760));
-        stage.setMinWidth(980);
-        stage.setMinHeight(700);
+        stage.setMinWidth(760);
+        stage.setMinHeight(560);
         stage.show();
     }
 
