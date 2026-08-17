@@ -97,6 +97,11 @@ public abstract class Crop {
         this.marketPrice = marketPrice;
     }
 
+    /** One-time planting cost used by Farm.plantCrop(). */
+    public double getPlantingCost() {
+        return costPerKg * yieldAmount;
+    }
+
     // Each subclass provides its own growth bonus
     public abstract double calculateGrowthBonus();
 

@@ -44,3 +44,8 @@ build/
 
 # Local secrets
 .env
+
+# Local video production cache and portable renderer
+/tools/
+/media/video_assets/
+/media/promo_assets/

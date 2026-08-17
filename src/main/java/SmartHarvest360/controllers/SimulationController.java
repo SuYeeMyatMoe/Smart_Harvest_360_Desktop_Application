@@ -10,7 +10,7 @@ import SmartHarvest360.model.SimDayLog;
 import SmartHarvest360.navigation.SceneNavigator;
 import SmartHarvest360.plan.DetailedPlanReportBuilder;
 import SmartHarvest360.session.AppSession;
-
+import SmartHarvest360.ui.Crop3DView;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 
@@ -30,7 +30,6 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
@@ -39,7 +38,6 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 
 import javafx.scene.paint.Color;
-
 import javafx.scene.shape.Rectangle;
 
 import javafx.util.Duration;
@@ -159,6 +157,9 @@ public class SimulationController {
     private Pane plantLayer;
 
     @FXML
+    private Crop3DView crop3dView;
+
+    @FXML
     private Rectangle skyRect;
 
     @FXML
@@ -193,7 +194,6 @@ public class SimulationController {
 
     @FXML
     private Button harvestButton;
-
 
     private final Random random = new Random();
 
@@ -253,7 +253,7 @@ public class SimulationController {
         Crop crop = session.getActiveCrop();
 
         cropLabel.setText(crop.getName());
-
+        crop3dView.setCrop(crop.getName());
         configureField();
 
         configureVideo();
@@ -293,6 +293,7 @@ public class SimulationController {
          * simulation growth position.
          */
         synchronizeVideoWithSimulation();
+        crop3dView.setGrowth(growthPctFraction(), false);
 
         highlightActionCards(
                 recommendedAction
@@ -1328,6 +1329,7 @@ public class SimulationController {
          * of the simulation.
          */
         synchronizeVideoWithSimulation();
+        crop3dView.setGrowth(growthPct / 100.0, animate);
 
         if (session.isCropReady()) {
 
@@ -1619,7 +1621,6 @@ public class SimulationController {
         skyRect.setFill(fill);
     }
 
-
     /**
      * Kept for compatibility with the original
      * controller.
@@ -1642,6 +1643,9 @@ public class SimulationController {
         positionVideoAtGrowth(
                 clamped
         );
+        if (crop3dView != null) {
+            crop3dView.setGrowth(clamped, true);
+        }
     }
 
 
@@ -1751,6 +1755,11 @@ public class SimulationController {
 
 
     private String getRandomWeather() {
+
+        SmartHarvest360.Weather liveWeather = session.pollLiveWeather();
+        if (liveWeather != null) {
+            return liveWeather.getLabel();
+        }
 
         String[] options = {
                 "Sunny",

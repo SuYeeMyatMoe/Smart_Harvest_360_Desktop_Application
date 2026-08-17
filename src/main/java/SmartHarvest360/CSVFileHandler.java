@@ -70,6 +70,11 @@ public class CSVFileHandler {
                             name, growthDays, waterNeed, fertilizerNeed,
                             yieldAmount, costPerKg, marketPrice
                     ));
+                } else if (type.equalsIgnoreCase("Grain")) {
+                    crops.add(new GrainCrop(
+                            name, growthDays, waterNeed, fertilizerNeed,
+                            yieldAmount, costPerKg, marketPrice
+                    ));
                 } else {
                     throw new IOException("Unknown crop type '" + type + "' for " + name);
                 }
@@ -118,6 +123,12 @@ public class CSVFileHandler {
     ) {
         if (type != null && type.equalsIgnoreCase("Fruit")) {
             return new FruitCrop(
+                    name, growthDays, waterNeed, fertilizerNeed,
+                    yieldAmount, costPerKg, marketPrice
+            );
+        }
+        if (type != null && type.equalsIgnoreCase("Grain")) {
+            return new GrainCrop(
                     name, growthDays, waterNeed, fertilizerNeed,
                     yieldAmount, costPerKg, marketPrice
             );

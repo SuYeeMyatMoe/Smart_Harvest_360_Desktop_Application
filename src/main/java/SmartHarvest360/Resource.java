@@ -76,6 +76,11 @@ public class Resource {
         }
     }
 
+    /** Type-safe overload used by the integrated season simulation backend. */
+    public boolean isAvailable(ResourceType type, double amount) {
+        return type != null && isAvailable(type.name(), amount);
+    }
+
     public boolean consume(String type, double amount) {
 
         if (!isAvailable(type, amount))
@@ -101,5 +106,23 @@ public class Resource {
         }
 
         return true;
+    }
+
+    /** Type-safe overload used by the integrated season simulation backend. */
+    public boolean consume(ResourceType type, double amount) {
+        return type != null && consume(type.name(), amount);
+    }
+
+    /** Restores or increases a resource, for example after a failed planting transaction. */
+    public void add(ResourceType type, double amount) {
+        if (type == null || amount < 0) {
+            throw new IllegalArgumentException("Resource type and non-negative amount are required");
+        }
+        switch (type) {
+            case WATER -> water += amount;
+            case FERTILIZER -> fertilizer += amount;
+            case BUDGET -> budget += amount;
+            case LAND -> land += amount;
+        }
     }
 }

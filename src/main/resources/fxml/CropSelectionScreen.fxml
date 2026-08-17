@@ -90,6 +90,7 @@
                                 </HBox>
                                 <Label fx:id="advisorStatusLabel"
                                        text="Malaysia farm advice from location, soil, and resources"
+                                       visible="false" managed="false"
                                        wrapText="true" maxWidth="Infinity" styleClass="section-caption"/>
 
                                 <HBox spacing="8" alignment="TOP_LEFT">
@@ -111,6 +112,7 @@
                                 </HBox>
 
                                 <Label fx:id="advisorRationaleLabel" text=""
+                                       visible="false" managed="false"
                                        wrapText="true" maxWidth="Infinity" styleClass="section-caption"/>
 
                                 <FlowPane hgap="8" vgap="8">
@@ -130,8 +132,6 @@
                                 <HBox alignment="CENTER_LEFT" spacing="10">
                                     <VBox spacing="1" HBox.hgrow="ALWAYS" minWidth="0">
                                         <Label text="Crop Catalog" styleClass="section-title"/>
-                                        <Label text="Select a row to edit on the right, then save to CSV and MySQL"
-                                               wrapText="true" styleClass="section-caption"/>
                                     </VBox>
                                     <Label fx:id="dbStatusLabel" text="CSV / MySQL" styleClass="soft-badge"/>
                                 </HBox>
@@ -158,8 +158,6 @@
 
                                 <VBox spacing="2">
                                     <Label text="Planted on Farm" styleClass="section-title"/>
-                                    <Label text="Select catalog rows to add, or a planted item to remove."
-                                           wrapText="true" maxWidth="Infinity" styleClass="section-caption"/>
                                 </VBox>
 
                                 <ListView fx:id="plantedList"
@@ -187,8 +185,6 @@
 
                             <VBox spacing="2">
                                 <Label text="Edit Plant Crop" styleClass="section-title"/>
-                                <Label text="Change values, update the row, then save the catalog."
-                                       wrapText="true" maxWidth="Infinity" styleClass="section-caption"/>
                             </VBox>
 
                             <VBox spacing="8" styleClass="crud-form" VBox.vgrow="ALWAYS">
@@ -264,8 +260,6 @@
     <bottom>
         <VBox spacing="8" styleClass="footer-bar">
             <padding><Insets top="10" right="16" bottom="10" left="16"/></padding>
-            <Label text="When crops are planted, continue to the day-by-day simulation."
-                   wrapText="true" maxWidth="Infinity" styleClass="section-caption"/>
             <FlowPane hgap="10" vgap="8" alignment="CENTER_LEFT">
                 <Button fx:id="backButton" text="Back to Farm Setup"
                         onAction="#handleBackToSetup"

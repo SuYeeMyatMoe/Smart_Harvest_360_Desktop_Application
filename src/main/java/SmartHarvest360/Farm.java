@@ -21,6 +21,22 @@ public class Farm {
         crops.add(crop);
     }
 
+    /**
+     * Plants atomically when budget and land are available. Existing UI code may
+     * still use addCrop when it has already validated resources itself.
+     */
+    public boolean plantCrop(Crop crop) {
+        if (crop == null) return false;
+        double cost = crop.getPlantingCost();
+        if (!resource.consume(ResourceType.BUDGET, cost)) return false;
+        if (!resource.consume(ResourceType.LAND, 1.0)) {
+            resource.add(ResourceType.BUDGET, cost);
+            return false;
+        }
+        crops.add(crop);
+        return true;
+    }
+
     
      // Returns all planted crops.
     

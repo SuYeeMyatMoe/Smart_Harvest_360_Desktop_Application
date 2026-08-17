@@ -20,6 +20,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.media.MediaView?>
 <?import javafx.scene.shape.Rectangle?>
+<?import SmartHarvest360.ui.Crop3DView?>
 
 <ScrollPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="SmartHarvest360.controllers.SimulationController"
@@ -328,8 +329,6 @@
                                            arcHeight="18"
                                            fill="#cfe6dc"
                                            managed="false"/>
-
-
                                 <!-- VIDEO CONTAINER -->
 
                                 <StackPane prefWidth="266"
@@ -362,6 +361,9 @@
 
                                 </StackPane>
 
+                                <!-- Interactive 3D crop remains visible above the growth film. -->
+                                <Crop3DView fx:id="crop3dView"
+                                            StackPane.alignment="CENTER"/>
 
                                 <!-- SOIL -->
 
@@ -374,6 +376,12 @@
 
 
                                 <!-- WEATHER -->
+
+                                <Label text="3D + GROWTH FILM"
+                                       styleClass="model-3d-badge"
+                                       StackPane.alignment="BOTTOM_LEFT"
+                                       translateX="10"
+                                       translateY="-10"/>
 
                                 <Label fx:id="fieldWeatherBadge"
                                        text="Sunny"

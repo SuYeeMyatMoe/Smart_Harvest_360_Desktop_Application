@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane fx:id="introRoot" xmlns:fx="http://javafx.com/fxml"
+           fx:controller="SmartHarvest360.controllers.IntroController"
+           stylesheets="@../style.css" minWidth="760" minHeight="560"
+           styleClass="intro-root">
+    <children>
+        <ImageView fx:id="heroImage" preserveRatio="false" smooth="true">
+            <image><Image url="@../images/smartharvest-cinematic-intro.png"/></image>
+        </ImageView>
+        <Region styleClass="intro-vignette"/>
+        <Region fx:id="glowOrb" maxWidth="360" maxHeight="360"
+                StackPane.alignment="CENTER_RIGHT" styleClass="intro-glow"/>
+
+        <VBox fx:id="introContent" alignment="CENTER_LEFT" spacing="18"
+              maxWidth="1040" StackPane.alignment="CENTER_LEFT">
+            <padding><Insets top="48" right="64" bottom="48" left="76"/></padding>
+
+            <VBox spacing="4">
+                <Label text="SMART" styleClass="intro-kicker"/>
+                <Label text="HARVEST 360" styleClass="intro-title"/>
+            </VBox>
+
+            <Label text="From soil intelligence to profitable harvest."
+                   styleClass="intro-subtitle"/>
+            <Label text="Plan the farm. Follow intelligent advice. Grow with confidence."
+                   wrapText="true" maxWidth="560" styleClass="intro-description"/>
+
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <Button fx:id="enterButton" text="Enter Smart Farm  →"
+                        onAction="#handleEnter" styleClass="intro-primary-button"/>
+                <Button text="▶  Watch 30s Film" onAction="#handleWatchFilm"
+                        styleClass="intro-film-button"/>
+                <VBox spacing="1">
+                    <Label text="6-STAGE DECISION JOURNEY" styleClass="intro-meta-title"/>
+                    <Label text="Setup · Advise · Simulate · Plan · Sell · Report"
+                           styleClass="intro-meta"/>
+                </VBox>
+            </HBox>
+        </VBox>
+
+        <HBox alignment="CENTER_LEFT" spacing="10" prefHeight="48" maxHeight="48"
+              StackPane.alignment="BOTTOM_LEFT"
+              styleClass="intro-footer">
+            <padding><Insets top="13" right="76" bottom="13" left="76"/></padding>
+            <Label text="●" styleClass="intro-live-dot"/>
+            <Label text="SMART HARVEST 360" styleClass="intro-footer-text"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="SMARTER SEASONS · STRONGER OUTCOMES" styleClass="intro-footer-text"/>
+        </HBox>
+    </children>
+</StackPane>

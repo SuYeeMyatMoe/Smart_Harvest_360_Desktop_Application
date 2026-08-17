@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Handles market prices and buyer information for selling crops.
@@ -14,6 +15,16 @@ import java.util.Map;
  * on the farm's selected Malaysia state.
  */
 public class Market {
+
+    private final Random random;
+
+    public Market() {
+        this(System.nanoTime());
+    }
+
+    public Market(long seed) {
+        random = new Random(seed);
+    }
 
     /**
      * Returns market prices for the selected location.
@@ -85,6 +96,17 @@ public class Market {
         );
 
         return prices;
+    }
+
+    /** Applies a small seeded daily price drift for reproducible simulations. */
+    public Map<String, Double> nextDayPrices(Map<String, Double> previous) {
+        Map<String, Double> next = new LinkedHashMap<>();
+        if (previous == null) return next;
+        for (Map.Entry<String, Double> entry : previous.entrySet()) {
+            double factor = 0.95 + random.nextDouble() * 0.10;
+            next.put(entry.getKey(), round2(entry.getValue() * factor));
+        }
+        return next;
     }
 
     /**
