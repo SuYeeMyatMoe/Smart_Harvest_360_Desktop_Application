@@ -52,7 +52,7 @@ import java.util.Random;
 /**
  * SmartHarvest 360 Crop Simulation Controller.
  *
- * IMPORTANT SIMULATION RULE:
+ * SIMULATION RULE:
  *
  * 1 simulation day = 1 growth day.
  *
@@ -61,9 +61,12 @@ import java.util.Random;
  * Corn 90 days -> 90 simulation days
  * Paddy X days -> X simulation days
  * Tomato X days -> X simulation days
+ * Durian X days -> X simulation days
  *
- * The crop video is only a visual representation of growth.
- * The video NEVER determines whether the crop is ready.
+ * IMPORTANT:
+ *
+ * The crop video is ONLY a visual representation.
+ * The video NEVER determines crop readiness.
  *
  * Video synchronization:
  *
@@ -72,6 +75,24 @@ import java.util.Random;
  * 100% simulation -> 95% video
  *
  * The final 5% of the video is intentionally unused.
+ *
+ * AUDIO:
+ *
+ * Crop videos are completely muted.
+ *
+ * SPEED:
+ *
+ * The speed slider controls BOTH:
+ *
+ * 1. Simulation day frequency
+ * 2. Video playback rate
+ *
+ * Therefore:
+ *
+ * 1x -> normal
+ * 2x -> twice as fast
+ * 5x -> five times as fast
+ * 10x -> ten times as fast
  */
 public class SimulationController {
 
@@ -80,14 +101,38 @@ public class SimulationController {
     private static final double SOIL_H = 42;
 
     /**
-     * The crop video is intentionally stopped at 95%.
+     * Crop video intentionally stops at 95%.
      */
     private static final double VIDEO_END_FRACTION = 0.95;
 
     /**
-     * Small amount of time used for video movement.
+     * Small amount of extra time used to make the final
+     * video position settle cleanly.
      */
-    private static final double VIDEO_EXTRA_DELAY_MS = 80.0;
+    private static final double VIDEO_EXTRA_DELAY_MS = 30.0;
+
+    /**
+     * Minimum autoplay interval.
+     *
+     * IMPORTANT:
+     *
+     * This used to be 700 ms, which effectively made
+     * high-speed simulation still feel slow.
+     *
+     * A much smaller value allows 5x / 10x simulation
+     * to actually behave like 5x / 10x.
+     */
+    private static final double MIN_AUTOPLAY_MS = 80.0;
+
+    /**
+     * Maximum practical speed available to the simulation.
+     */
+    private static final double MAX_SIMULATION_SPEED = 10.0;
+
+
+    // =========================================================
+    // FXML
+    // =========================================================
 
     @FXML
     private Label cropLabel;
@@ -207,6 +252,10 @@ public class SimulationController {
     private Button harvestButton;
 
 
+    // =========================================================
+    // STATE
+    // =========================================================
+
     private final Random random = new Random();
 
     private final ObservableList<SimDayLog> tableRows =
@@ -232,13 +281,12 @@ public class SimulationController {
     private MediaPlayer plantMediaPlayer;
 
     /**
-     * Name of the currently loaded crop video.
+     * Name of currently loaded crop video.
      */
     private String loadedVideoCrop;
 
     /**
-     * Transition used to stop the video at the exact
-     * simulation position.
+     * Transition used to stop video at exact simulation position.
      */
     private PauseTransition videoStopTransition;
 
@@ -435,6 +483,8 @@ public class SimulationController {
      * Manual action / Coach Step.
      *
      * Every call advances EXACTLY ONE simulation day.
+     *
+     * The speed slider does NOT change this rule.
      */
     private void runActionNow(
             String action
@@ -458,10 +508,6 @@ public class SimulationController {
                 "Last action: " + action
         );
 
-        /*
-         * Stop any old video transition before starting
-         * the new day's video movement.
-         */
         stopVideoTransitionOnly();
 
         advanceOneDay(true);
@@ -545,6 +591,11 @@ public class SimulationController {
                 FIELD_H - SOIL_H
         );
 
+        /*
+         * Keep the existing field dimensions.
+         *
+         * The video fills the crop area.
+         */
         plantVideoView.setPreserveRatio(
                 false
         );
@@ -573,6 +624,15 @@ public class SimulationController {
 
     /**
      * Loads the correct video for the active crop.
+     *
+     * Supported crops:
+     *
+     * tomato
+     * paddy / rice
+     * corn / maize
+     * durian
+     * chilli / chili
+     * papaya
      */
     private void loadCropVideo(
             Crop crop
@@ -591,8 +651,8 @@ public class SimulationController {
                         );
 
         /*
-         * Do not recreate an existing player for
-         * the same crop.
+         * Do not recreate the media player when
+         * the same crop is already loaded.
          */
         if (
                 cropName.equals(
@@ -601,6 +661,12 @@ public class SimulationController {
                         &&
                 plantMediaPlayer != null
         ) {
+
+            /*
+             * Make absolutely sure the existing player
+             * remains muted.
+             */
+            muteVideo();
 
             return;
         }
@@ -663,14 +729,23 @@ public class SimulationController {
                     );
 
             /*
-             * IMPORTANT:
-             *
-             * Never allow the media player to decide
-             * when the simulation starts.
+             * Video plays only once.
              */
             plantMediaPlayer.setCycleCount(1);
 
+            /*
+             * The simulation controls when the video moves.
+             */
             plantMediaPlayer.setAutoPlay(false);
+
+            /*
+             * =================================================
+             * AUDIO OFF
+             * =================================================
+             *
+             * Completely mute crop videos.
+             */
+            muteVideo();
 
             plantVideoView.setMediaPlayer(
                     plantMediaPlayer
@@ -691,6 +766,31 @@ public class SimulationController {
                                         + cropName
                         );
 
+                        /*
+                         * Keep audio permanently disabled.
+                         */
+                        muteVideo();
+
+                        /*
+                         * Make the video speed match the
+                         * currently selected simulation speed.
+                         *
+                         * When not autoplaying, we still keep
+                         * the normal rate.
+                         */
+                        if (playing) {
+
+                            plantMediaPlayer.setRate(
+                                    getSimulationSpeed()
+                            );
+
+                        } else {
+
+                            plantMediaPlayer.setRate(
+                                    1.0
+                            );
+                        }
+
                         Duration duration =
                                 plantMediaPlayer
                                         .getTotalDuration();
@@ -705,8 +805,8 @@ public class SimulationController {
                         }
 
                         /*
-                         * Immediately position video
-                         * according to current simulation day.
+                         * Position immediately at the current
+                         * simulation growth.
                          */
                         positionVideoAtGrowth(
                                 growthPctFraction()
@@ -719,14 +819,14 @@ public class SimulationController {
                     () -> {
 
                         /*
-                         * The video reaching the end is NOT
-                         * the same thing as crop readiness.
-                         *
-                         * Keep it at the final visual frame.
+                         * Video reaching its end is NOT the
+                         * same thing as crop readiness.
                          */
                         if (plantMediaPlayer != null) {
 
                             plantMediaPlayer.pause();
+
+                            muteVideo();
 
                             Duration total =
                                     plantMediaPlayer
@@ -755,15 +855,10 @@ public class SimulationController {
 
                             System.err.println(
                                     "SmartHarvest 360 video error: "
-                                            + plantMediaPlayer
-                                            .getError()
+                                            + plantMediaPlayer.getError()
                             );
                         }
 
-                        /*
-                         * Do NOT change the simulation status
-                         * to "Paused" just because media failed.
-                         */
                         System.err.println(
                                 "Crop video could not be played."
                         );
@@ -782,6 +877,29 @@ public class SimulationController {
             statusLabel.setText(
                     "Unable to load crop video"
             );
+        }
+    }
+
+
+    /**
+     * Completely disables video audio.
+     */
+    private void muteVideo() {
+
+        if (plantMediaPlayer == null) {
+
+            return;
+        }
+
+        try {
+
+            plantMediaPlayer.setMute(true);
+
+            plantMediaPlayer.setVolume(0.0);
+
+        } catch (Exception ignored) {
+
+            // Video audio is not required by the simulation.
         }
     }
 
@@ -825,7 +943,7 @@ public class SimulationController {
 
 
     /**
-     * Synchronizes the video with simulation growth.
+     * Synchronizes video with simulation growth.
      *
      * Example for 90-day corn:
      *
@@ -834,7 +952,7 @@ public class SimulationController {
      * Day 45 -> 50%
      * Day 90 -> 100%
      *
-     * Video uses 95% of its duration.
+     * Video uses only 95% of its duration.
      */
     private void synchronizeVideoWithSimulation() {
 
@@ -868,8 +986,8 @@ public class SimulationController {
                 totalDuration.isIndefinite()
                         ||
                 totalDuration.lessThanOrEqualTo(
-                        Duration.ZERO
-                )
+                                Duration.ZERO
+                        )
         ) {
 
             return;
@@ -885,6 +1003,27 @@ public class SimulationController {
                                 * VIDEO_END_FRACTION
                 );
 
+        /*
+         * When autoplay is active, video rate must match
+         * simulation rate.
+         */
+        if (playing) {
+
+            plantMediaPlayer.setRate(
+                    getSimulationSpeed()
+            );
+
+            muteVideo();
+
+        } else {
+
+            plantMediaPlayer.setRate(
+                    1.0
+            );
+
+            muteVideo();
+        }
+
         animateVideoToGrowth(
                 videoProgress
         );
@@ -894,6 +1033,17 @@ public class SimulationController {
     /**
      * Moves video from its current position to the
      * current simulation position.
+     *
+     * IMPORTANT:
+     *
+     * Video playback rate follows the simulation speed.
+     *
+     * At:
+     *
+     * 1x -> normal
+     * 2x -> 2x video
+     * 5x -> 5x video
+     * 10x -> 10x video
      */
     private void animateVideoToGrowth(
             double targetProgress
@@ -910,11 +1060,11 @@ public class SimulationController {
         if (
                 totalDuration == null
                         ||
-                        totalDuration.isUnknown()
+                totalDuration.isUnknown()
                         ||
-                        totalDuration.isIndefinite()
+                totalDuration.isIndefinite()
                         ||
-                        totalDuration.lessThanOrEqualTo(
+                totalDuration.lessThanOrEqualTo(
                                 Duration.ZERO
                         )
         ) {
@@ -960,8 +1110,8 @@ public class SimulationController {
                 targetTime.toMillis();
 
         /*
-         * If the video is already ahead of the target,
-         * immediately correct it.
+         * If video has somehow moved ahead, immediately
+         * correct it.
          */
         if (
                 currentMillis
@@ -975,6 +1125,8 @@ public class SimulationController {
                     targetTime
             );
 
+            muteVideo();
+
             return;
         }
 
@@ -984,9 +1136,9 @@ public class SimulationController {
                         currentMillis;
 
         /*
-         * Nothing to animate.
+         * Nothing meaningful to animate.
          */
-        if (distanceMillis <= 25) {
+        if (distanceMillis <= 15) {
 
             plantMediaPlayer.pause();
 
@@ -994,12 +1146,31 @@ public class SimulationController {
                     targetTime
             );
 
+            muteVideo();
+
             return;
         }
 
         /*
-         * Play only the portion of the video belonging
-         * to this one simulation day.
+         * =====================================================
+         * VIDEO SPEED
+         * =====================================================
+         *
+         * Use exactly the same speed as the simulation.
+         */
+        double speed =
+                playing
+                        ? getSimulationSpeed()
+                        : 1.0;
+
+        plantMediaPlayer.setRate(
+                speed
+        );
+
+        muteVideo();
+
+        /*
+         * Start exactly at the current position.
          */
         plantMediaPlayer.seek(
                 currentTime
@@ -1008,13 +1179,22 @@ public class SimulationController {
         plantMediaPlayer.play();
 
         /*
-         * Stop precisely after the current day's
-         * video segment.
+         * Because MediaPlayer is running at the selected
+         * playback rate, the real-world time needed to cover
+         * this portion of the video is:
+         *
+         * distance / playbackRate
+         *
+         * This is what makes 2x actually twice as fast.
          */
         double stopAfterMillis =
                 Math.max(
-                        100,
-                        distanceMillis
+                        25.0,
+                        (
+                                distanceMillis
+                                        /
+                                        speed
+                        )
                                 + VIDEO_EXTRA_DELAY_MS
                 );
 
@@ -1035,9 +1215,15 @@ public class SimulationController {
 
                     plantMediaPlayer.pause();
 
+                    /*
+                     * Always return to the exact simulation
+                     * position after the visual movement.
+                     */
                     plantMediaPlayer.seek(
                             targetTime
                     );
+
+                    muteVideo();
 
                     videoStopTransition = null;
                 }
@@ -1048,7 +1234,7 @@ public class SimulationController {
 
 
     /**
-     * Positions the video without animation.
+     * Positions video without animation.
      */
     private void positionVideoAtGrowth(
             double progress
@@ -1095,6 +1281,12 @@ public class SimulationController {
 
         plantMediaPlayer.pause();
 
+        plantMediaPlayer.setRate(
+                1.0
+        );
+
+        muteVideo();
+
         plantMediaPlayer.seek(
                 target
         );
@@ -1118,7 +1310,7 @@ public class SimulationController {
 
 
     /**
-     * Fully disposes the crop video.
+     * Fully disposes crop video.
      */
     private void stopPlantVideo() {
 
@@ -1306,21 +1498,81 @@ public class SimulationController {
 
     private void configureSpeed() {
 
+        /*
+         * =====================================================
+         * IMPORTANT SPEED FIX
+         * =====================================================
+         *
+         * Allow up to 10x even if the original FXML slider
+         * had a smaller maximum.
+         */
+        if (
+                speedSlider.getMax()
+                        <
+                        MAX_SIMULATION_SPEED
+        ) {
+
+            speedSlider.setMax(
+                    MAX_SIMULATION_SPEED
+            );
+        }
+
+        /*
+         * Prevent an invalid zero / negative speed.
+         */
+        if (
+                speedSlider.getValue()
+                        <
+                        0.5
+        ) {
+
+            speedSlider.setValue(
+                    1.0
+            );
+        }
+
         speedSlider.valueProperty()
                 .addListener(
                         (obs, oldV, newV) -> {
+
+                            double speed =
+                                    Math.max(
+                                            0.5,
+                                            Math.min(
+                                                    MAX_SIMULATION_SPEED,
+                                                    newV.doubleValue()
+                                            )
+                                    );
 
                             speedLabel.setText(
                                     String.format(
                                             Locale.US,
                                             "%.1f×",
-                                            newV.doubleValue()
+                                            speed
                                     )
                             );
 
                             /*
-                             * If autoplay is currently running,
-                             * restart the timer using the new speed.
+                             * Immediately change video playback
+                             * rate when the slider moves.
+                             */
+                            if (
+                                    plantMediaPlayer != null
+                            ) {
+
+                                if (playing) {
+
+                                    plantMediaPlayer.setRate(
+                                            speed
+                                    );
+
+                                    muteVideo();
+                                }
+                            }
+
+                            /*
+                             * If autoplay is already running,
+                             * restart timer using the new speed.
                              */
                             if (playing) {
 
@@ -1333,6 +1585,26 @@ public class SimulationController {
                 String.format(
                         Locale.US,
                         "%.1f×",
+                        getSimulationSpeed()
+                )
+        );
+    }
+
+
+    /**
+     * Returns current simulation speed.
+     */
+    private double getSimulationSpeed() {
+
+        if (speedSlider == null) {
+
+            return 1.0;
+        }
+
+        return Math.max(
+                0.5,
+                Math.min(
+                        MAX_SIMULATION_SPEED,
                         speedSlider.getValue()
                 )
         );
@@ -1361,21 +1633,41 @@ public class SimulationController {
         );
 
         double speed =
-                Math.max(
-                        0.5,
-                        speedSlider.getValue()
-                );
+                getSimulationSpeed();
 
         /*
-         * One simulation day per timer cycle.
+         * =====================================================
+         * REAL SPEED CALCULATION
+         * =====================================================
          *
-         * The video is synchronized separately.
+         * Base = 1500 ms per simulation day.
+         *
+         * 1x  -> 1500 ms
+         * 2x  -> 750 ms
+         * 5x  -> 300 ms
+         * 10x -> 150 ms
+         *
+         * There is no old 700 ms bottleneck anymore.
          */
         double millis =
                 Math.max(
-                        700,
-                        1500 / speed
+                        MIN_AUTOPLAY_MS,
+                        1500.0 / speed
                 );
+
+        /*
+         * Make video use the same speed.
+         */
+        if (
+                plantMediaPlayer != null
+        ) {
+
+            plantMediaPlayer.setRate(
+                    speed
+            );
+
+            muteVideo();
+        }
 
         autoPlay =
                 new Timeline(
@@ -1427,7 +1719,7 @@ public class SimulationController {
 
 
     /**
-     * Restarts autoplay after changing speed.
+     * Restarts autoplay after speed changes.
      */
     private void restartAutoPlay() {
 
@@ -1464,9 +1756,25 @@ public class SimulationController {
         stopAutoPlayTimerOnly();
 
         /*
-         * Do not reset the crop video.
+         * Return video to normal playback rate while paused.
+         */
+        if (
+                plantMediaPlayer != null
+        ) {
+
+            plantMediaPlayer.pause();
+
+            plantMediaPlayer.setRate(
+                    1.0
+            );
+
+            muteVideo();
+        }
+
+        /*
+         * Do not reset crop video.
          *
-         * Keep it exactly where the simulation is.
+         * Keep it exactly where simulation is.
          */
         synchronizeVideoWithSimulation();
     }
@@ -1630,10 +1938,10 @@ public class SimulationController {
             fertUsed = 0;
 
             /*
-             * The simulation day still advances.
+             * Simulation day still advances.
              *
-             * However, the plant does not receive its
-             * growth point when resources are unavailable.
+             * No growth point is awarded when resources
+             * are unavailable.
              */
             session.adjustCareScore(
                     -4
@@ -1659,20 +1967,11 @@ public class SimulationController {
 
             /*
              * =================================================
-             * CRITICAL FIX
+             * CRITICAL GROWTH RULE
              * =================================================
              *
              * ONE successful simulation day =
              * ONE growth day.
-             *
-             * Previously this code calculated:
-             *
-             * ceil(growthDays / 24)
-             *
-             * which caused a 90-day crop to finish after
-             * roughly 18-22 clicks.
-             *
-             * Now:
              *
              * Day 1  -> +1 growth
              * Day 2  -> +1 growth
@@ -1737,7 +2036,7 @@ public class SimulationController {
 
 
         /*
-         * Update the UI BEFORE video synchronization.
+         * Update UI before video synchronization.
          */
         updateScreen(
                 weather,
@@ -1749,8 +2048,6 @@ public class SimulationController {
          * =====================================================
          * VIDEO SYNCHRONIZATION
          * =====================================================
-         *
-         * The video now follows the exact growth percentage.
          *
          * Coach Step:
          *
@@ -1796,9 +2093,8 @@ public class SimulationController {
         ) {
 
             /*
-             * Do NOT call this "Paused".
-             *
              * The simulation did not pause.
+             *
              * The plant simply failed to grow that day
              * because resources were unavailable.
              */
@@ -1965,10 +2261,10 @@ public class SimulationController {
 
 
         /*
-         * Only show the simulation status here.
+         * Only show simulation status here.
          *
-         * Video being paused is completely independent
-         * from simulation state.
+         * Video being paused is independent of
+         * simulation state.
          */
         if (!playing) {
 
@@ -2007,7 +2303,7 @@ public class SimulationController {
 
 
         /*
-         * Only synchronize if the media player is ready.
+         * Synchronize video after UI state has been updated.
          */
         synchronizeVideoWithSimulation();
 
@@ -2291,8 +2587,8 @@ public class SimulationController {
             stopAutoPlay();
 
             /*
-             * Make absolutely sure the final video frame
-             * corresponds to 100% crop growth.
+             * Make absolutely sure final video frame corresponds
+             * to 100% crop growth.
              */
             positionVideoAtGrowth(
                     VIDEO_END_FRACTION
