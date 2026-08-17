@@ -1,4 +1,4 @@
-# SmartHarvest 360
+# SmartHarvest 360 Desktop Application
 
 SmartHarvest 360 is a JavaFX desktop application that simulates crop growth with ML farm advice,
 compares market prices, records harvest sales, and shows a final season report with 3D charts and CSV export.
