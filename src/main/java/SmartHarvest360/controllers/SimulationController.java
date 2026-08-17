@@ -10,8 +10,9 @@ import SmartHarvest360.model.SimDayLog;
 import SmartHarvest360.navigation.SceneNavigator;
 import SmartHarvest360.plan.DetailedPlanReportBuilder;
 import SmartHarvest360.session.AppSession;
-import SmartHarvest360.ui.Crop3DView;
+
 import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 
 import javafx.beans.property.SimpleDoubleProperty;
@@ -30,6 +31,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
@@ -48,29 +50,44 @@ import java.util.Random;
 
 
 /**
- * SmartHarvest 360 crop simulation controller.
+ * SmartHarvest 360 Crop Simulation Controller.
  *
- * The existing simulation logic is kept unchanged.
+ * IMPORTANT SIMULATION RULE:
  *
- * The crop video is only a visual representation of the
- * simulation growth.
+ * 1 simulation day = 1 growth day.
  *
- * Simulation growth:
+ * Therefore:
  *
- *     0%   -> video 0%
- *     25%  -> video 25%
- *     50%  -> video 50%
- *     75%  -> video 75%
- *     100% -> video 100%
+ * Corn 90 days -> 90 simulation days
+ * Paddy X days -> X simulation days
+ * Tomato X days -> X simulation days
  *
- * The video NEVER controls the simulation.
+ * The crop video is only a visual representation of growth.
+ * The video NEVER determines whether the crop is ready.
+ *
+ * Video synchronization:
+ *
+ * 0% simulation -> 0% video
+ * 50% simulation -> 47.5% video
+ * 100% simulation -> 95% video
+ *
+ * The final 5% of the video is intentionally unused.
  */
 public class SimulationController {
 
     private static final double FIELD_W = 266;
     private static final double FIELD_H = 230;
     private static final double SOIL_H = 42;
-    private static final double PLANT_AREA_H = FIELD_H - SOIL_H;
+
+    /**
+     * The crop video is intentionally stopped at 95%.
+     */
+    private static final double VIDEO_END_FRACTION = 0.95;
+
+    /**
+     * Small amount of time used for video movement.
+     */
+    private static final double VIDEO_EXTRA_DELAY_MS = 80.0;
 
     @FXML
     private Label cropLabel;
@@ -157,17 +174,11 @@ public class SimulationController {
     private Pane plantLayer;
 
     @FXML
-    private Crop3DView crop3dView;
-
-    @FXML
     private Rectangle skyRect;
 
     @FXML
     private Rectangle soilRect;
 
-    /**
-     * Crop growth video.
-     */
     @FXML
     private MediaView plantVideoView;
 
@@ -195,6 +206,7 @@ public class SimulationController {
     @FXML
     private Button harvestButton;
 
+
     private final Random random = new Random();
 
     private final ObservableList<SimDayLog> tableRows =
@@ -204,7 +216,7 @@ public class SimulationController {
 
     private Timeline autoPlay;
 
-    private boolean playing;
+    private boolean playing = false;
 
     private String lastWeather = "Sunny";
 
@@ -215,15 +227,25 @@ public class SimulationController {
     private Rectangle fieldClip;
 
     /**
-     * MediaPlayer for the selected crop.
+     * Crop growth video player.
      */
     private MediaPlayer plantMediaPlayer;
 
     /**
-     * Name of the crop whose video is currently loaded.
+     * Name of the currently loaded crop video.
      */
     private String loadedVideoCrop;
 
+    /**
+     * Transition used to stop the video at the exact
+     * simulation position.
+     */
+    private PauseTransition videoStopTransition;
+
+
+    // =========================================================
+    // INITIALIZATION
+    // =========================================================
 
     @FXML
     public void initialize() {
@@ -235,7 +257,10 @@ public class SimulationController {
         if (session.getFarmProfile() == null) {
 
             session.setFarmProfile(
-                    new FarmProfile("Selangor", "Loam")
+                    new FarmProfile(
+                            "Selangor",
+                            "Loam"
+                    )
             );
         }
 
@@ -252,8 +277,19 @@ public class SimulationController {
 
         Crop crop = session.getActiveCrop();
 
-        cropLabel.setText(crop.getName());
-        crop3dView.setCrop(crop.getName());
+        if (crop == null) {
+
+            statusLabel.setText(
+                    "No crop selected."
+            );
+
+            return;
+        }
+
+        cropLabel.setText(
+                crop.getName()
+        );
+
         configureField();
 
         configureVideo();
@@ -262,21 +298,24 @@ public class SimulationController {
 
         configureSpeed();
 
-        tableRows.setAll(session.getDayLogs());
+        tableRows.setAll(
+                session.getDayLogs()
+        );
 
         if (tableRows.isEmpty()) {
 
             int growthPct = growthPercent();
 
-            SimDayLog start = new SimDayLog(
-                    session.getCurrentDay(),
-                    "Sunny",
-                    "Setup",
-                    0,
-                    0,
-                    "Season started",
-                    growthPct
-            );
+            SimDayLog start =
+                    new SimDayLog(
+                            session.getCurrentDay(),
+                            "Sunny",
+                            "Setup",
+                            0,
+                            0,
+                            "Season started",
+                            growthPct
+                    );
 
             session.addDayLog(start);
 
@@ -288,18 +327,17 @@ public class SimulationController {
                 "Growing"
         );
 
-        /*
-         * Put the video at the exact current
-         * simulation growth position.
-         */
         synchronizeVideoWithSimulation();
-        crop3dView.setGrowth(growthPctFraction(), false);
 
         highlightActionCards(
                 recommendedAction
         );
     }
 
+
+    // =========================================================
+    // ACTION BUTTONS
+    // =========================================================
 
     @FXML
     private void handleIrrigate() {
@@ -332,7 +370,18 @@ public class SimulationController {
     @FXML
     private void handleApplyTip() {
 
-        runActionNow(recommendedAction);
+        runActionNow(
+                recommendedAction
+        );
+    }
+
+
+    @FXML
+    private void handleNextDay() {
+
+        runActionNow(
+                recommendedAction
+        );
     }
 
 
@@ -342,6 +391,8 @@ public class SimulationController {
         if (session.isCropReady()) {
 
             stopAutoPlay();
+
+            updateReadyState();
 
             return;
         }
@@ -358,13 +409,6 @@ public class SimulationController {
 
 
     @FXML
-    private void handleNextDay() {
-
-        runActionNow(recommendedAction);
-    }
-
-
-    @FXML
     private void handleGoToHarvest() {
 
         stopAutoPlay();
@@ -374,7 +418,9 @@ public class SimulationController {
         if (session.isCropReady()) {
 
             session.setDetailedPlanReport(
-                    DetailedPlanReportBuilder.fromSession(session)
+                    DetailedPlanReportBuilder.fromSession(
+                            session
+                    )
             );
 
             SceneNavigator.switchTo(
@@ -385,7 +431,14 @@ public class SimulationController {
     }
 
 
-    private void runActionNow(String action) {
+    /**
+     * Manual action / Coach Step.
+     *
+     * Every call advances EXACTLY ONE simulation day.
+     */
+    private void runActionNow(
+            String action
+    ) {
 
         if (session.isCropReady()) {
 
@@ -394,17 +447,30 @@ public class SimulationController {
             return;
         }
 
-        selectedAction = action;
+        selectedAction =
+                action;
 
-        highlightActionCards(action);
+        highlightActionCards(
+                action
+        );
 
         lastActionLabel.setText(
                 "Last action: " + action
         );
 
+        /*
+         * Stop any old video transition before starting
+         * the new day's video movement.
+         */
+        stopVideoTransitionOnly();
+
         advanceOneDay(true);
     }
 
+
+    // =========================================================
+    // FIELD
+    // =========================================================
 
     private void configureField() {
 
@@ -412,9 +478,13 @@ public class SimulationController {
 
         soilRect.setManaged(false);
 
-        skyRect.setWidth(FIELD_W);
+        skyRect.setWidth(
+                FIELD_W
+        );
 
-        skyRect.setHeight(FIELD_H);
+        skyRect.setHeight(
+                FIELD_H
+        );
 
         skyRect.setArcWidth(18);
 
@@ -424,9 +494,13 @@ public class SimulationController {
 
         skyRect.setLayoutY(0);
 
-        soilRect.setWidth(FIELD_W);
+        soilRect.setWidth(
+                FIELD_W
+        );
 
-        soilRect.setHeight(SOIL_H);
+        soilRect.setHeight(
+                SOIL_H
+        );
 
         soilRect.setLayoutX(0);
 
@@ -434,51 +508,33 @@ public class SimulationController {
                 FIELD_H - SOIL_H
         );
 
-        fieldClip = new Rectangle(
-                FIELD_W,
-                FIELD_H
-        );
+        fieldClip =
+                new Rectangle(
+                        FIELD_W,
+                        FIELD_H
+                );
 
         fieldClip.setArcWidth(18);
 
         fieldClip.setArcHeight(18);
 
-        fieldPane.setClip(fieldClip);
-
-        Rectangle plantClip =
-                new Rectangle(
-                        FIELD_W,
-                        PLANT_AREA_H
-                );
-
-        plantLayer.setClip(plantClip);
-
-        plantLayer.setPrefSize(
-                FIELD_W,
-                PLANT_AREA_H
+        fieldPane.setClip(
+                fieldClip
         );
 
-        plantLayer.setMaxSize(
-                FIELD_W,
-                PLANT_AREA_H
-        );
+        if (plantLayer != null) {
 
-        StackPane.setAlignment(
-                plantLayer,
-                javafx.geometry.Pos.TOP_CENTER
-        );
+            plantLayer.setVisible(false);
+
+            plantLayer.setManaged(false);
+        }
     }
 
 
-    /**
-     * Configure crop video.
-     *
-     * IMPORTANT:
-     *
-     * The video is fitted ONLY inside the plant area.
-     *
-     * It does not resize the entire field.
-     */
+    // =========================================================
+    // VIDEO
+    // =========================================================
+
     private void configureVideo() {
 
         plantVideoView.setFitWidth(
@@ -486,24 +542,28 @@ public class SimulationController {
         );
 
         plantVideoView.setFitHeight(
-                PLANT_AREA_H
+                FIELD_H - SOIL_H
         );
 
-        /*
-         * Keep the video exactly inside the crop
-         * field area.
-         */
-        plantVideoView.setPreserveRatio(false);
+        plantVideoView.setPreserveRatio(
+                false
+        );
 
-        plantVideoView.setSmooth(true);
+        plantVideoView.setSmooth(
+                true
+        );
 
-        plantVideoView.setManaged(false);
+        plantVideoView.setManaged(
+                false
+        );
 
         plantVideoView.setLayoutX(0);
 
         plantVideoView.setLayoutY(0);
 
-        plantVideoView.setVisible(false);
+        plantVideoView.setVisible(
+                false
+        );
 
         loadCropVideo(
                 session.getActiveCrop()
@@ -512,34 +572,45 @@ public class SimulationController {
 
 
     /**
-     * Loads the video for the selected crop.
+     * Loads the correct video for the active crop.
      */
-    private void loadCropVideo(Crop crop) {
+    private void loadCropVideo(
+            Crop crop
+    ) {
 
         if (crop == null) {
+
             return;
         }
 
         String cropName =
                 crop.getName()
                         .trim()
-                        .toLowerCase(Locale.ROOT);
+                        .toLowerCase(
+                                Locale.ROOT
+                        );
 
         /*
-         * Don't recreate the player when the same
-         * crop is already loaded.
+         * Do not recreate an existing player for
+         * the same crop.
          */
         if (
-                cropName.equals(loadedVideoCrop)
-                        && plantMediaPlayer != null
+                cropName.equals(
+                        loadedVideoCrop
+                )
+                        &&
+                plantMediaPlayer != null
         ) {
+
             return;
         }
 
         stopPlantVideo();
 
         String videoFile =
-                getVideoFileName(cropName);
+                getVideoFileName(
+                        cropName
+                );
 
         if (videoFile == null) {
 
@@ -574,57 +645,130 @@ public class SimulationController {
 
         try {
 
+            System.out.println(
+                    "Loading crop video: "
+                            + cropName
+                            + " -> "
+                            + videoFile
+            );
+
             Media media =
                     new Media(
                             videoUrl.toExternalForm()
                     );
 
             plantMediaPlayer =
-                    new MediaPlayer(media);
+                    new MediaPlayer(
+                            media
+                    );
 
             /*
-             * The video must NOT loop.
+             * IMPORTANT:
+             *
+             * Never allow the media player to decide
+             * when the simulation starts.
              */
             plantMediaPlayer.setCycleCount(1);
 
-            /*
-             * The simulation controls the video.
-             */
             plantMediaPlayer.setAutoPlay(false);
 
             plantVideoView.setMediaPlayer(
                     plantMediaPlayer
             );
 
-            plantVideoView.setVisible(true);
+            plantVideoView.setVisible(
+                    true
+            );
 
-            loadedVideoCrop = cropName;
+            loadedVideoCrop =
+                    cropName;
 
-            /*
-             * When JavaFX finishes reading the media
-             * metadata, synchronize it to the current
-             * simulation position.
-             */
-            plantMediaPlayer.setOnReady(() -> {
+            plantMediaPlayer.setOnReady(
+                    () -> {
 
-                synchronizeVideoWithSimulation();
+                        System.out.println(
+                                "Video READY: "
+                                        + cropName
+                        );
 
-            });
+                        Duration duration =
+                                plantMediaPlayer
+                                        .getTotalDuration();
 
-            plantMediaPlayer.setOnError(() -> {
+                        if (duration != null) {
 
-                if (plantMediaPlayer != null) {
+                            System.out.println(
+                                    "Video duration: "
+                                            + duration.toMillis()
+                                            + " ms"
+                            );
+                        }
 
-                    System.err.println(
-                            "SmartHarvest 360 video error: "
-                                    + plantMediaPlayer.getError()
-                    );
-                }
+                        /*
+                         * Immediately position video
+                         * according to current simulation day.
+                         */
+                        positionVideoAtGrowth(
+                                growthPctFraction()
+                                        * VIDEO_END_FRACTION
+                        );
+                    }
+            );
 
-                statusLabel.setText(
-                        "Unable to play crop video"
-                );
-            });
+            plantMediaPlayer.setOnEndOfMedia(
+                    () -> {
+
+                        /*
+                         * The video reaching the end is NOT
+                         * the same thing as crop readiness.
+                         *
+                         * Keep it at the final visual frame.
+                         */
+                        if (plantMediaPlayer != null) {
+
+                            plantMediaPlayer.pause();
+
+                            Duration total =
+                                    plantMediaPlayer
+                                            .getTotalDuration();
+
+                            if (
+                                    total != null
+                            ) {
+
+                                plantMediaPlayer.seek(
+                                        total.multiply(
+                                                VIDEO_END_FRACTION
+                                        )
+                                );
+                            }
+                        }
+                    }
+            );
+
+            plantMediaPlayer.setOnError(
+                    () -> {
+
+                        if (
+                                plantMediaPlayer != null
+                        ) {
+
+                            System.err.println(
+                                    "SmartHarvest 360 video error: "
+                                            + plantMediaPlayer
+                                            .getError()
+                            );
+                        }
+
+                        /*
+                         * Do NOT change the simulation status
+                         * to "Paused" just because media failed.
+                         */
+                        System.err.println(
+                                "Crop video could not be played."
+                        );
+                    }
+            );
 
         } catch (Exception ex) {
 
@@ -632,6 +776,8 @@ public class SimulationController {
                     "Could not load crop video: "
                             + ex.getMessage()
             );
+
+            ex.printStackTrace();
 
             statusLabel.setText(
                     "Unable to load crop video"
@@ -641,7 +787,9 @@ public class SimulationController {
 
 
     /**
-     * Maps crop names to video files.
+     * Maps crop names to files inside:
+     *
+     * src/main/resources/videos/
      */
     private String getVideoFileName(
             String cropName
@@ -649,13 +797,16 @@ public class SimulationController {
 
         return switch (cropName) {
 
-            case "chilli", "chili" ->
+            case "chilli",
+                 "chili" ->
                     "chilli.mp4";
 
-            case "paddy", "rice" ->
+            case "paddy",
+                 "rice" ->
                     "paddy.mp4";
 
-            case "corn", "maize" ->
+            case "corn",
+                 "maize" ->
                     "corn.mp4";
 
             case "durian" ->
@@ -674,34 +825,35 @@ public class SimulationController {
 
 
     /**
-     * Synchronizes the video to the CURRENT
-     * simulation growth.
+     * Synchronizes the video with simulation growth.
      *
-     * This is the only relationship between
-     * the simulation and the video.
+     * Example for 90-day corn:
      *
-     * 0% simulation  = 0% video
-     * 100% simulation = 100% video
+     * Day 0  -> 0%
+     * Day 1  -> 1.11%
+     * Day 45 -> 50%
+     * Day 90 -> 100%
      *
-     * The video is always paused after seeking.
+     * Video uses 95% of its duration.
      */
     private void synchronizeVideoWithSimulation() {
 
         if (plantMediaPlayer == null) {
+
             return;
         }
 
-        MediaPlayer.Status mediaStatus =
+        MediaPlayer.Status status =
                 plantMediaPlayer.getStatus();
 
-        /*
-         * Do not attempt to seek while the media
-         * is still being created.
-         */
         if (
-                mediaStatus == MediaPlayer.Status.UNKNOWN
-                        || mediaStatus == MediaPlayer.Status.DISPOSED
+                status == MediaPlayer.Status.UNKNOWN
+                        ||
+                status == MediaPlayer.Status.DISPOSED
+                        ||
+                status == MediaPlayer.Status.HALTED
         ) {
+
             return;
         }
 
@@ -710,31 +862,200 @@ public class SimulationController {
 
         if (
                 totalDuration == null
-                        || totalDuration.isUnknown()
-                        || totalDuration.isIndefinite()
-                        || totalDuration.lessThanOrEqualTo(Duration.ZERO)
+                        ||
+                totalDuration.isUnknown()
+                        ||
+                totalDuration.isIndefinite()
+                        ||
+                totalDuration.lessThanOrEqualTo(
+                        Duration.ZERO
+                )
         ) {
+
             return;
         }
 
-        double progress = Math.min(1.0, growthPctFraction() / 0.95);
+        double simulationProgress =
+                growthPctFraction();
 
-        positionVideoAtGrowth(
-                progress
+        double videoProgress =
+                Math.min(
+                        VIDEO_END_FRACTION,
+                        simulationProgress
+                                * VIDEO_END_FRACTION
+                );
+
+        animateVideoToGrowth(
+                videoProgress
         );
     }
 
 
     /**
-     * Places the video at a specific growth percentage.
-     *
-     * This method does NOT change simulation state.
+     * Moves video from its current position to the
+     * current simulation position.
+     */
+    private void animateVideoToGrowth(
+            double targetProgress
+    ) {
+
+        if (plantMediaPlayer == null) {
+
+            return;
+        }
+
+        Duration totalDuration =
+                plantMediaPlayer.getTotalDuration();
+
+        if (
+                totalDuration == null
+                        ||
+                        totalDuration.isUnknown()
+                        ||
+                        totalDuration.isIndefinite()
+                        ||
+                        totalDuration.lessThanOrEqualTo(
+                                Duration.ZERO
+                        )
+        ) {
+
+            return;
+        }
+
+        double clampedTarget =
+                Math.max(
+                        0.0,
+                        Math.min(
+                                VIDEO_END_FRACTION,
+                                targetProgress
+                        )
+                );
+
+        Duration targetTime =
+                totalDuration.multiply(
+                        clampedTarget
+                );
+
+        Duration currentTime =
+                plantMediaPlayer.getCurrentTime();
+
+        if (
+                currentTime == null
+                        ||
+                        currentTime.isUnknown()
+                        ||
+                        currentTime.isIndefinite()
+        ) {
+
+            currentTime =
+                    Duration.ZERO;
+        }
+
+        stopVideoTransitionOnly();
+
+        double currentMillis =
+                currentTime.toMillis();
+
+        double targetMillis =
+                targetTime.toMillis();
+
+        /*
+         * If the video is already ahead of the target,
+         * immediately correct it.
+         */
+        if (
+                currentMillis
+                        >
+                        targetMillis + 25
+        ) {
+
+            plantMediaPlayer.pause();
+
+            plantMediaPlayer.seek(
+                    targetTime
+            );
+
+            return;
+        }
+
+        double distanceMillis =
+                targetMillis
+                        -
+                        currentMillis;
+
+        /*
+         * Nothing to animate.
+         */
+        if (distanceMillis <= 25) {
+
+            plantMediaPlayer.pause();
+
+            plantMediaPlayer.seek(
+                    targetTime
+            );
+
+            return;
+        }
+
+        /*
+         * Play only the portion of the video belonging
+         * to this one simulation day.
+         */
+        plantMediaPlayer.seek(
+                currentTime
+        );
+
+        plantMediaPlayer.play();
+
+        /*
+         * Stop precisely after the current day's
+         * video segment.
+         */
+        double stopAfterMillis =
+                Math.max(
+                        100,
+                        distanceMillis
+                                + VIDEO_EXTRA_DELAY_MS
+                );
+
+        videoStopTransition =
+                new PauseTransition(
+                        Duration.millis(
+                                stopAfterMillis
+                        )
+                );
+
+        videoStopTransition.setOnFinished(
+                event -> {
+
+                    if (plantMediaPlayer == null) {
+
+                        return;
+                    }
+
+                    plantMediaPlayer.pause();
+
+                    plantMediaPlayer.seek(
+                            targetTime
+                    );
+
+                    videoStopTransition = null;
+                }
+        );
+
+        videoStopTransition.play();
+    }
+
+
+    /**
+     * Positions the video without animation.
      */
     private void positionVideoAtGrowth(
             double progress
     ) {
 
         if (plantMediaPlayer == null) {
+
             return;
         }
 
@@ -743,10 +1064,16 @@ public class SimulationController {
 
         if (
                 totalDuration == null
-                        || totalDuration.isUnknown()
-                        || totalDuration.isIndefinite()
-                        || totalDuration.lessThanOrEqualTo(Duration.ZERO)
+                        ||
+                        totalDuration.isUnknown()
+                        ||
+                        totalDuration.isIndefinite()
+                        ||
+                        totalDuration.lessThanOrEqualTo(
+                                Duration.ZERO
+                        )
         ) {
+
             return;
         }
 
@@ -754,45 +1081,52 @@ public class SimulationController {
                 Math.max(
                         0.0,
                         Math.min(
-                                1.0,
+                                VIDEO_END_FRACTION,
                                 progress
                         )
                 );
 
-        /*
-         * Never allow the player to continue playing
-         * on its own.
-         */
-        plantMediaPlayer.pause();
-
-        /*
-         * Calculate the exact position from the
-         * COMPLETE video duration.
-         */
         Duration target =
                 totalDuration.multiply(
                         clamped
                 );
 
-        /*
-         * Avoid requesting a position beyond the
-         * actual end of the media.
-         */
-        if (target.greaterThan(totalDuration)) {
+        stopVideoTransitionOnly();
 
-            target = totalDuration;
-        }
+        plantMediaPlayer.pause();
 
-        plantMediaPlayer.seek(target);
+        plantMediaPlayer.seek(
+                target
+        );
     }
 
 
     /**
-     * Stops and disposes the current video player.
+     * Stops only the video transition.
+     */
+    private void stopVideoTransitionOnly() {
+
+        if (
+                videoStopTransition != null
+        ) {
+
+            videoStopTransition.stop();
+
+            videoStopTransition = null;
+        }
+    }
+
+
+    /**
+     * Fully disposes the crop video.
      */
     private void stopPlantVideo() {
 
-        if (plantMediaPlayer != null) {
+        stopVideoTransitionOnly();
+
+        if (
+                plantMediaPlayer != null
+        ) {
 
             try {
 
@@ -812,98 +1146,117 @@ public class SimulationController {
 
         loadedVideoCrop = null;
 
-        if (plantVideoView != null) {
+        if (
+                plantVideoView != null
+        ) {
 
-            plantVideoView.setMediaPlayer(null);
+            plantVideoView.setMediaPlayer(
+                    null
+            );
 
-            plantVideoView.setVisible(false);
+            plantVideoView.setVisible(
+                    false
+            );
         }
     }
 
 
-    /**
-     * Configure simulation activity table.
-     */
+    // =========================================================
+    // TABLE
+    // =========================================================
+
     private void configureTable() {
 
-        activityTable.setItems(tableRows);
+        activityTable.setItems(
+                tableRows
+        );
 
         activityTable.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );
 
         dayCol.setCellValueFactory(
-                c -> new SimpleIntegerProperty(
-                        c.getValue().getDay()
-                )
+                c ->
+                        new SimpleIntegerProperty(
+                                c.getValue().getDay()
+                        )
         );
 
         weatherCol.setCellValueFactory(
-                c -> new SimpleStringProperty(
-                        c.getValue().getWeather()
-                )
+                c ->
+                        new SimpleStringProperty(
+                                c.getValue().getWeather()
+                        )
         );
 
         actionCol.setCellValueFactory(
-                c -> new SimpleStringProperty(
-                        c.getValue().getAction()
-                )
+                c ->
+                        new SimpleStringProperty(
+                                c.getValue().getAction()
+                        )
         );
 
         waterCol.setCellValueFactory(
-                c -> new SimpleDoubleProperty(
-                        c.getValue().getWaterUsed()
-                )
+                c ->
+                        new SimpleDoubleProperty(
+                                c.getValue().getWaterUsed()
+                        )
         );
 
         fertCol.setCellValueFactory(
-                c -> new SimpleDoubleProperty(
-                        c.getValue().getFertilizerUsed()
-                )
+                c ->
+                        new SimpleDoubleProperty(
+                                c.getValue().getFertilizerUsed()
+                        )
         );
 
         growthCol.setCellValueFactory(
-                c -> new SimpleIntegerProperty(
-                        c.getValue().getGrowthPercent()
-                )
+                c ->
+                        new SimpleIntegerProperty(
+                                c.getValue().getGrowthPercent()
+                        )
         );
 
         statusCol.setCellValueFactory(
-                c -> new SimpleStringProperty(
-                        c.getValue().getStatus()
-                )
+                c ->
+                        new SimpleStringProperty(
+                                c.getValue().getStatus()
+                        )
         );
 
         waterCol.setCellFactory(
-                col -> numericCell("%.1f")
+                col ->
+                        numericCell("%.1f")
         );
 
         fertCol.setCellFactory(
-                col -> numericCell("%.2f")
+                col ->
+                        numericCell("%.2f")
         );
 
         growthCol.setCellFactory(
-                col -> new TableCell<>() {
+                col ->
+                        new TableCell<>() {
 
-                    @Override
-                    protected void updateItem(
-                            Number value,
-                            boolean empty
-                    ) {
+                            @Override
+                            protected void updateItem(
+                                    Number value,
+                                    boolean empty
+                            ) {
 
-                        super.updateItem(
-                                value,
-                                empty
-                        );
+                                super.updateItem(
+                                        value,
+                                        empty
+                                );
 
-                        setText(
-                                empty || value == null
-                                        ? null
-                                        : value.intValue()
-                                        + "%"
-                        );
-                    }
-                }
+                                setText(
+                                        empty || value == null
+                                                ? null
+                                                : value.intValue()
+                                                + "%"
+                                );
+                            }
+                        }
         );
     }
 
@@ -947,9 +1300,10 @@ public class SimulationController {
     }
 
 
-    /**
-     * Configure simulation speed.
-     */
+    // =========================================================
+    // SPEED
+    // =========================================================
+
     private void configureSpeed() {
 
         speedSlider.valueProperty()
@@ -963,6 +1317,15 @@ public class SimulationController {
                                             newV.doubleValue()
                                     )
                             );
+
+                            /*
+                             * If autoplay is currently running,
+                             * restart the timer using the new speed.
+                             */
+                            if (playing) {
+
+                                restartAutoPlay();
+                            }
                         }
                 );
 
@@ -976,16 +1339,26 @@ public class SimulationController {
     }
 
 
-    /**
-     * Starts simulation autoplay.
-     */
+    // =========================================================
+    // AUTOPLAY
+    // =========================================================
+
     private void startAutoPlay() {
 
         stopAutoPlayTimerOnly();
 
+        if (session.isCropReady()) {
+
+            updateReadyState();
+
+            return;
+        }
+
         playing = true;
 
-        playPauseButton.setText("Pause");
+        playPauseButton.setText(
+                "Pause"
+        );
 
         double speed =
                 Math.max(
@@ -993,17 +1366,24 @@ public class SimulationController {
                         speedSlider.getValue()
                 );
 
+        /*
+         * One simulation day per timer cycle.
+         *
+         * The video is synchronized separately.
+         */
         double millis =
                 Math.max(
-                        120,
-                        900 / speed
+                        700,
+                        1500 / speed
                 );
 
         autoPlay =
                 new Timeline(
                         new KeyFrame(
-                                Duration.millis(millis),
-                                e -> {
+                                Duration.millis(
+                                        millis
+                                ),
+                                event -> {
 
                                     if (
                                             session.isCropReady()
@@ -1021,7 +1401,9 @@ public class SimulationController {
                                             recommendedAction
                                     );
 
-                                    advanceOneDay(true);
+                                    advanceOneDay(
+                                            true
+                                    );
                                 }
                         )
                 );
@@ -1033,22 +1415,36 @@ public class SimulationController {
         autoPlay.play();
 
         statusLabel.setText(
-                "Auto-play following coach @ "
-                        + String.format(
-                        Locale.US,
-                        "%.1f×",
-                        speed
-                )
+                "Simulation running @ "
+                        +
+                        String.format(
+                                Locale.US,
+                                "%.1f×",
+                                speed
+                        )
         );
     }
 
 
     /**
-     * Stops only the simulation timer.
+     * Restarts autoplay after changing speed.
      */
+    private void restartAutoPlay() {
+
+        if (!playing) {
+
+            return;
+        }
+
+        startAutoPlay();
+    }
+
+
     private void stopAutoPlayTimerOnly() {
 
-        if (autoPlay != null) {
+        if (
+                autoPlay != null
+        ) {
 
             autoPlay.stop();
 
@@ -1057,36 +1453,36 @@ public class SimulationController {
     }
 
 
-    /**
-     * Stops simulation autoplay.
-     *
-     * The video is deliberately NOT stopped here.
-     *
-     * It remains at the current simulation growth.
-     */
     private void stopAutoPlay() {
 
         playing = false;
 
-        playPauseButton.setText("Play");
+        playPauseButton.setText(
+                "Play"
+        );
 
         stopAutoPlayTimerOnly();
 
+        /*
+         * Do not reset the crop video.
+         *
+         * Keep it exactly where the simulation is.
+         */
         synchronizeVideoWithSimulation();
     }
 
 
-    /**
-     * Advances simulation by one day.
-     *
-     * The existing simulation calculations
-     * remain unchanged.
-     */
+    // =========================================================
+    // ONE SIMULATION DAY
+    // =========================================================
+
     private void advanceOneDay(
             boolean animate
     ) {
 
-        if (session.isCropReady()) {
+        if (
+                session.isCropReady()
+        ) {
 
             stopAutoPlay();
 
@@ -1098,8 +1494,18 @@ public class SimulationController {
         Crop crop =
                 session.getActiveCrop();
 
+        if (crop == null) {
+
+            statusLabel.setText(
+                    "No crop selected."
+            );
+
+            return;
+        }
+
         Resource resource =
-                session.getFarm().getResource();
+                session.getFarm()
+                        .getResource();
 
         String weather =
                 getRandomWeather();
@@ -1111,10 +1517,11 @@ public class SimulationController {
 
         double baseWater =
                 crop.getWaterNeed()
-                        / Math.max(
-                        1,
-                        crop.getGrowthDays()
-                );
+                        /
+                        Math.max(
+                                1,
+                                crop.getGrowthDays()
+                        );
 
         double weatherFactor =
                 switch (weather) {
@@ -1140,8 +1547,6 @@ public class SimulationController {
 
         double fertUsed = 0.0;
 
-        double growthGain = 1.0;
-
         String status;
 
         switch (action) {
@@ -1149,11 +1554,6 @@ public class SimulationController {
             case "Conserve" -> {
 
                 waterUsed *= 0.55;
-
-                growthGain =
-                        weather.equals("Rain")
-                                ? 1.0
-                                : 0.75;
             }
 
             case "Fertilize" -> {
@@ -1162,14 +1562,13 @@ public class SimulationController {
                         Math.max(
                                 0.4,
                                 crop.getFertilizerNeed()
-                                        / Math.max(
-                                        8.0,
-                                        crop.getGrowthDays()
-                                                / 5.0
-                                )
+                                        /
+                                        Math.max(
+                                                8.0,
+                                                crop.getGrowthDays()
+                                                        / 5.0
+                                        )
                         );
-
-                growthGain = 1.25;
             }
 
             case "Protect" -> {
@@ -1177,29 +1576,25 @@ public class SimulationController {
                 waterUsed *= 0.7;
 
                 fertUsed = 0.15;
-
-                growthGain =
-                        (
-                                weather.equals("Storm")
-                                        || weather.equals("Heat")
-                        )
-                                ? 1.05
-                                : 0.85;
             }
 
             default -> {
 
                 waterUsed *= 1.15;
-
-                growthGain =
-                        weather.equals("Sunny")
-                                || weather.equals("Heat")
-                                ? 1.2
-                                : 1.0;
             }
         }
 
+
+        /*
+         * =====================================================
+         * EXACTLY ONE CALENDAR DAY
+         * =====================================================
+         *
+         * Every button press / Coach Step / autoplay tick
+         * advances exactly ONE day.
+         */
         session.advanceDay();
+
 
         boolean hasWater =
                 resource.isAvailable(
@@ -1209,28 +1604,40 @@ public class SimulationController {
 
         boolean hasFert =
                 fertUsed <= 0
-                        || resource.isAvailable(
+                        ||
+                resource.isAvailable(
                         "fertilizer",
                         fertUsed
                 );
 
+
         boolean grew = false;
+
 
         if (
                 !hasWater
-                        || !hasFert
+                        ||
+                !hasFert
         ) {
 
             status =
                     !hasWater
-                            ? "Paused - low water"
-                            : "Paused - low fertilizer";
+                            ? "Low water"
+                            : "Low fertilizer";
 
             waterUsed = 0;
 
             fertUsed = 0;
 
-            session.adjustCareScore(-4);
+            /*
+             * The simulation day still advances.
+             *
+             * However, the plant does not receive its
+             * growth point when resources are unavailable.
+             */
+            session.adjustCareScore(
+                    -4
+            );
 
         } else {
 
@@ -1239,7 +1646,9 @@ public class SimulationController {
                     waterUsed
             );
 
-            if (fertUsed > 0) {
+            if (
+                    fertUsed > 0
+            ) {
 
                 resource.consume(
                         "fertilizer",
@@ -1247,32 +1656,30 @@ public class SimulationController {
                 );
             }
 
-            int baseStep =
-                    Math.max(
-                            1,
-                            (int) Math.ceil(
-                                    crop.getGrowthDays()
-                                            / 24.0
-                            )
-                    );
 
-            int ticks =
-                    Math.max(
-                            1,
-                            (int) Math.round(
-                                    baseStep * growthGain
-                            )
-                    );
-
-            for (
-                    int i = 0;
-                    i < ticks
-                            && !session.isCropReady();
-                    i++
-            ) {
-
-                session.addGrowthDay();
-            }
+            /*
+             * =================================================
+             * CRITICAL FIX
+             * =================================================
+             *
+             * ONE successful simulation day =
+             * ONE growth day.
+             *
+             * Previously this code calculated:
+             *
+             * ceil(growthDays / 24)
+             *
+             * which caused a 90-day crop to finish after
+             * roughly 18-22 clicks.
+             *
+             * Now:
+             *
+             * Day 1  -> +1 growth
+             * Day 2  -> +1 growth
+             * ...
+             * Day 90 -> +1 growth
+             */
+            session.addGrowthDay();
 
             grew = true;
 
@@ -1287,8 +1694,10 @@ public class SimulationController {
             );
         }
 
+
         int growthPct =
                 growthPercent();
+
 
         SimDayLog row =
                 new SimDayLog(
@@ -1301,70 +1710,122 @@ public class SimulationController {
                         growthPct
                 );
 
-        session.addDayLog(row);
 
-        tableRows.add(row);
+        session.addDayLog(
+                row
+        );
+
+        tableRows.add(
+                row
+        );
+
 
         activityTable.scrollTo(
                 tableRows.size() - 1
         );
 
+
         lastActionLabel.setText(
                 "Last action: "
-                        + action
-                        + " - "
-                        + weather
+                        +
+                        action
+                        +
+                        " - "
+                        +
+                        weather
         );
 
+
+        /*
+         * Update the UI BEFORE video synchronization.
+         */
         updateScreen(
                 weather,
                 status
         );
 
-        /*
-         * Synchronize ONLY after the simulation
-         * has finished changing its growth.
-         *
-         * Therefore the video cannot get ahead
-         * of the simulation.
-         */
-        synchronizeVideoWithSimulation();
-        crop3dView.setGrowth(growthPct / 100.0, animate);
 
-        if (session.isCropReady()) {
+        /*
+         * =====================================================
+         * VIDEO SYNCHRONIZATION
+         * =====================================================
+         *
+         * The video now follows the exact growth percentage.
+         *
+         * Coach Step:
+         *
+         * click -> day +1 -> growth +1 -> video +1 day
+         *
+         * Autoplay:
+         *
+         * timer -> day +1 -> growth +1 -> video +1 day
+         */
+        if (animate) {
+
+            synchronizeVideoWithSimulation();
+
+        } else {
+
+            positionVideoAtGrowth(
+                    growthPctFraction()
+                            * VIDEO_END_FRACTION
+            );
+        }
+
+
+        if (
+                session.isCropReady()
+        ) {
 
             stopAutoPlay();
 
-            /*
-             * The simulation is now exactly 100%.
-             *
-             * Force the video to the END of its
-             * complete duration.
-             */
-            positionVideoAtGrowth(1.0);
+            positionVideoAtGrowth(
+                    VIDEO_END_FRACTION
+            );
 
             statusLabel.setText(
                     crop.getName()
-                            + " is ready - continue to market."
+                            +
+                            " is ready - continue to market."
             );
 
-        } else if (!grew) {
+            updateReadyState();
 
+        } else if (
+                !grew
+        ) {
+
+            /*
+             * Do NOT call this "Paused".
+             *
+             * The simulation did not pause.
+             * The plant simply failed to grow that day
+             * because resources were unavailable.
+             */
             statusLabel.setText(
                     status
-                            + " - try Conserve or follow the coach."
+                            +
+                            " - try Conserve or follow the coach."
             );
 
-        } else if (!playing) {
+        } else if (
+                !playing
+        ) {
 
             statusLabel.setText(
                     action
-                            + " applied - care "
-                            + session.getCareScore()
+                            +
+                            " applied - care "
+                            +
+                            session.getCareScore()
             );
         }
     }
 
+
+    // =========================================================
+    // CARE SCORE
+    // =========================================================
 
     private void applyCareForAction(
             String action,
@@ -1378,59 +1839,83 @@ public class SimulationController {
 
         if (match) {
 
-            session.adjustCareScore(6);
+            session.adjustCareScore(
+                    6
+            );
 
         } else {
 
-            session.adjustCareScore(-1);
+            session.adjustCareScore(
+                    -1
+            );
         }
+
 
         if (
                 (
                         "Storm".equals(weather)
-                                || "Heat".equals(weather)
+                                ||
+                        "Heat".equals(weather)
                 )
-                        && "Protect".equals(action)
+                        &&
+                "Protect".equals(action)
         ) {
 
-            session.adjustCareScore(5);
+            session.adjustCareScore(
+                    5
+            );
 
         } else if (
                 (
                         "Storm".equals(weather)
-                                || "Heat".equals(weather)
+                                ||
+                        "Heat".equals(weather)
                 )
-                        && !"Protect".equals(action)
+                        &&
+                !"Protect".equals(action)
         ) {
 
-            session.adjustCareScore(-7);
+            session.adjustCareScore(
+                    -7
+            );
         }
+
 
         if (
                 "Fertilize".equals(action)
-                        && match
+                        &&
+                match
         ) {
 
-            session.adjustCareScore(2);
+            session.adjustCareScore(
+                    2
+            );
         }
     }
 
+
+    // =========================================================
+    // SCREEN
+    // =========================================================
 
     private void updateScreen(
             String weather,
             String status
     ) {
 
-        lastWeather = weather;
+        lastWeather =
+                weather;
 
         Crop crop =
                 session.getActiveCrop();
 
         Resource resource =
-                session.getFarm().getResource();
+                session.getFarm()
+                        .getResource();
 
         double progress =
                 growthPctFraction();
+
 
         dayLabel.setText(
                 String.valueOf(
@@ -1438,9 +1923,14 @@ public class SimulationController {
                 )
         );
 
-        weatherLabel.setText(weather);
+        weatherLabel.setText(
+                weather
+        );
 
-        fieldWeatherBadge.setText(weather);
+        fieldWeatherBadge.setText(
+                weather
+        );
+
 
         waterLabel.setText(
                 String.format(
@@ -1450,6 +1940,7 @@ public class SimulationController {
                 )
         );
 
+
         fertilizerLabel.setText(
                 String.format(
                         Locale.US,
@@ -1457,6 +1948,7 @@ public class SimulationController {
                         resource.getFertilizer()
                 )
         );
+
 
         progressLabel.setText(
                 String.format(
@@ -1466,14 +1958,25 @@ public class SimulationController {
                 )
         );
 
+
         growthProgress.setProgress(
                 progress
         );
 
+
+        /*
+         * Only show the simulation status here.
+         *
+         * Video being paused is completely independent
+         * from simulation state.
+         */
         if (!playing) {
 
-            statusLabel.setText(status);
+            statusLabel.setText(
+                    status
+            );
         }
+
 
         careScoreLabel.setText(
                 String.valueOf(
@@ -1481,31 +1984,41 @@ public class SimulationController {
                 )
         );
 
+
         updateAdvisorPanel(
                 weather,
                 status
         );
 
-        updateSky(weather);
+
+        updateSky(
+                weather
+        );
+
 
         highlightActionCards(
                 recommendedAction
         );
 
-        /*
-         * Make sure the correct crop video is loaded.
-         */
-        loadCropVideo(crop);
+
+        loadCropVideo(
+                crop
+        );
+
 
         /*
-         * Keep the video at the same growth
-         * percentage as the simulation.
+         * Only synchronize if the media player is ready.
          */
         synchronizeVideoWithSimulation();
+
 
         updateReadyState();
     }
 
+
+    // =========================================================
+    // ADVISOR
+    // =========================================================
 
     private void updateAdvisorPanel(
             String weather,
@@ -1520,13 +2033,18 @@ public class SimulationController {
                         ? "C"
                         : advice.getPredictedGrade();
 
+
         String live =
                 GradePredictor.nudgeGrade(
                         plantGrade,
                         session.getCareScore()
                 );
 
-        liveGradeLabel.setText(live);
+
+        liveGradeLabel.setText(
+                live
+        );
+
 
         if (advice == null) {
 
@@ -1546,54 +2064,77 @@ public class SimulationController {
                     "No advisor result - irrigate carefully."
             );
 
-            recommendedAction = "Irrigate";
+            recommendedAction =
+                    "Irrigate";
 
             return;
         }
 
+
         predictedGradeSimLabel.setText(
                 "Plant-time grade: "
-                        + plantGrade
-                        + " -> live path "
-                        + live
+                        +
+                        plantGrade
+                        +
+                        " -> live path "
+                        +
+                        live
         );
+
 
         fertilizerPlanSimLabel.setText(
                 "Fertilizer: "
-                        + advice.getFertilizerPlan()
-                        + " - "
-                        + advice.getFertilizerKgTip()
+                        +
+                        advice.getFertilizerPlan()
+                        +
+                        " - "
+                        +
+                        advice.getFertilizerKgTip()
         );
+
 
         String tipWeather =
                 status != null
-                        && status.toLowerCase(
-                        Locale.ROOT
-                ).contains("paused")
+                        &&
+                        status.toLowerCase(
+                                Locale.ROOT
+                        ).contains(
+                                "low"
+                        )
                         ? "Heat"
                         : weather;
 
+
         WekaAdvisorService.GradeTip tip =
-                WekaAdvisorService.getInstance()
+                WekaAdvisorService
+                        .getInstance()
                         .gradeImprovementTip(
                                 advice,
-                                session.getFarm().getResource(),
+                                session.getFarm()
+                                        .getResource(),
                                 tipWeather,
                                 session.getCareScore()
                         );
 
+
         recommendedAction =
                 tip.action();
+
 
         recommendedActionLabel.setText(
                 tip.action()
         );
+
 
         dailyTipLabel.setText(
                 tip.message()
         );
     }
 
+
+    // =========================================================
+    // WEATHER VISUAL
+    // =========================================================
 
     private void updateSky(
             String weather
@@ -1603,51 +2144,41 @@ public class SimulationController {
                 switch (weather) {
 
                     case "Rain" ->
-                            Color.web("#b7c9d4");
+                            Color.web(
+                                    "#b7c9d4"
+                            );
 
                     case "Cloudy" ->
-                            Color.web("#c9d5cf");
+                            Color.web(
+                                    "#c9d5cf"
+                            );
 
                     case "Storm" ->
-                            Color.web("#8fa0ab");
+                            Color.web(
+                                    "#8fa0ab"
+                            );
 
                     case "Heat" ->
-                            Color.web("#f0d9a8");
+                            Color.web(
+                                    "#f0d9a8"
+                            );
 
                     default ->
-                            Color.web("#cfe6dc");
+                            Color.web(
+                                    "#cfe6dc"
+                            );
                 };
 
-        skyRect.setFill(fill);
-    }
 
-    /**
-     * Kept for compatibility with the original
-     * controller.
-     *
-     * It simply positions the video.
-     */
-    private void animatePlantTo(
-            double progress
-    ) {
-
-        double clamped =
-                Math.max(
-                        0.0,
-                        Math.min(
-                                1.0,
-                                progress
-                        )
-                );
-
-        positionVideoAtGrowth(
-                clamped
+        skyRect.setFill(
+                fill
         );
-        if (crop3dView != null) {
-            crop3dView.setGrowth(clamped, true);
-        }
     }
 
+
+    // =========================================================
+    // ACTION CARDS
+    // =========================================================
 
     private void highlightActionCards(
             String action
@@ -1655,22 +2186,33 @@ public class SimulationController {
 
         setCardStyle(
                 irrigateButton,
-                "Irrigate".equalsIgnoreCase(action)
+                "Irrigate".equalsIgnoreCase(
+                        action
+                )
         );
+
 
         setCardStyle(
                 conserveButton,
-                "Conserve".equalsIgnoreCase(action)
+                "Conserve".equalsIgnoreCase(
+                        action
+                )
         );
+
 
         setCardStyle(
                 fertilizeButton,
-                "Fertilize".equalsIgnoreCase(action)
+                "Fertilize".equalsIgnoreCase(
+                        action
+                )
         );
+
 
         setCardStyle(
                 protectButton,
-                "Protect".equalsIgnoreCase(action)
+                "Protect".equalsIgnoreCase(
+                        action
+                )
         );
     }
 
@@ -1687,6 +2229,7 @@ public class SimulationController {
                 "action-card-compact-recommended"
         );
 
+
         button.getStyleClass().add(
                 recommended
                         ? "action-card-compact-recommended"
@@ -1695,44 +2238,96 @@ public class SimulationController {
     }
 
 
+    // =========================================================
+    // READY STATE
+    // =========================================================
+
     private void updateReadyState() {
 
         boolean ready =
                 session.isCropReady();
 
-        harvestButton.setVisible(ready);
 
-        harvestButton.setManaged(ready);
+        harvestButton.setVisible(
+                ready
+        );
 
-        nextDayButton.setDisable(ready);
+        harvestButton.setManaged(
+                ready
+        );
 
-        playPauseButton.setDisable(ready);
 
-        irrigateButton.setDisable(ready);
+        nextDayButton.setDisable(
+                ready
+        );
 
-        conserveButton.setDisable(ready);
+        playPauseButton.setDisable(
+                ready
+        );
 
-        fertilizeButton.setDisable(ready);
+        irrigateButton.setDisable(
+                ready
+        );
 
-        protectButton.setDisable(ready);
+        conserveButton.setDisable(
+                ready
+        );
 
-        applyTipButton.setDisable(ready);
+        fertilizeButton.setDisable(
+                ready
+        );
+
+        protectButton.setDisable(
+                ready
+        );
+
+        applyTipButton.setDisable(
+                ready
+        );
+
 
         if (ready) {
 
             stopAutoPlay();
+
+            /*
+             * Make absolutely sure the final video frame
+             * corresponds to 100% crop growth.
+             */
+            positionVideoAtGrowth(
+                    VIDEO_END_FRACTION
+            );
         }
     }
 
 
+    // =========================================================
+    // GROWTH CALCULATION
+    // =========================================================
+
     private int growthPercent() {
 
-        return (int) Math.round(
-                growthPctFraction() * 100
-        );
+        return (int)
+                Math.round(
+                        growthPctFraction()
+                                * 100
+                );
     }
 
 
+    /**
+     * Calculates actual crop growth.
+     *
+     * This is the ONLY growth calculation.
+     *
+     * completedGrowthDays / crop.getGrowthDays()
+     *
+     * Therefore:
+     *
+     * 1 / 90 = 1.11%
+     * 45 / 90 = 50%
+     * 90 / 90 = 100%
+     */
     private double growthPctFraction() {
 
         Crop crop =
@@ -1740,7 +2335,8 @@ public class SimulationController {
 
         if (
                 crop == null
-                        || crop.getGrowthDays() <= 0
+                        ||
+                crop.getGrowthDays() <= 0
         ) {
 
             return 0;
@@ -1749,17 +2345,29 @@ public class SimulationController {
         return Math.min(
                 1.0,
                 session.getCompletedGrowthDays()
-                        / (double) crop.getGrowthDays()
+                        /
+                        (double)
+                                crop.getGrowthDays()
         );
     }
 
 
+    // =========================================================
+    // WEATHER
+    // =========================================================
+
     private String getRandomWeather() {
 
-        SmartHarvest360.Weather liveWeather = session.pollLiveWeather();
-        if (liveWeather != null) {
+        SmartHarvest360.Weather liveWeather =
+                session.pollLiveWeather();
+
+        if (
+                liveWeather != null
+        ) {
+
             return liveWeather.getLabel();
         }
+
 
         String[] options = {
                 "Sunny",
@@ -1768,6 +2376,7 @@ public class SimulationController {
                 "Storm",
                 "Heat"
         };
+
 
         return options[
                 random.nextInt(

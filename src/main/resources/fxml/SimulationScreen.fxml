@@ -20,7 +20,6 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.media.MediaView?>
 <?import javafx.scene.shape.Rectangle?>
-<?import SmartHarvest360.ui.Crop3DView?>
 
 <ScrollPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="SmartHarvest360.controllers.SimulationController"
@@ -329,7 +328,9 @@
                                            arcHeight="18"
                                            fill="#cfe6dc"
                                            managed="false"/>
-                                <!-- VIDEO CONTAINER -->
+
+
+                                <!-- VIDEO -->
 
                                 <StackPane prefWidth="266"
                                            minWidth="266"
@@ -339,7 +340,6 @@
                                            maxHeight="188"
                                            StackPane.alignment="TOP_CENTER">
 
-
                                     <MediaView fx:id="plantVideoView"
                                                fitWidth="266"
                                                fitHeight="188"
@@ -348,22 +348,8 @@
                                                managed="false"
                                                visible="false"/>
 
-
-                                    <Pane fx:id="plantLayer"
-                                          prefWidth="266"
-                                          minWidth="266"
-                                          maxWidth="266"
-                                          prefHeight="188"
-                                          minHeight="188"
-                                          maxHeight="188"
-                                          managed="false"
-                                          visible="false"/>
-
                                 </StackPane>
 
-                                <!-- Interactive 3D crop remains visible above the growth film. -->
-                                <Crop3DView fx:id="crop3dView"
-                                            StackPane.alignment="CENTER"/>
 
                                 <!-- SOIL -->
 
@@ -377,7 +363,7 @@
 
                                 <!-- WEATHER -->
 
-                                <Label text="3D + GROWTH FILM"
+                                <Label text="GROWTH VIDEO"
                                        styleClass="model-3d-badge"
                                        StackPane.alignment="BOTTOM_LEFT"
                                        translateX="10"
