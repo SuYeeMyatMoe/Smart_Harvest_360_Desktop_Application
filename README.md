@@ -1,7 +1,7 @@
 # SmartHarvest 360
 
 SmartHarvest 360 is a JavaFX desktop application that simulates crop growth with ML farm advice,
-compares market prices, records harvest sales, and shows a final season report with charts and CSV export.
+compares market prices, records harvest sales, and shows a final season report with 3D charts and CSV export.
 The simulation can use recent NASA POWER weather for the selected Malaysian state and automatically
 falls back to generated offline weather when the service is unavailable.
 
@@ -16,12 +16,44 @@ JDK's "JavaFX runtime components are missing" launcher check.
 
 ## Application flow
 
-1. **Farm Setup** – farm name, Malaysia state, soil, budget, water, fertilizer, land
-2. **Crop Selection** – browse/edit `data/crops.csv`, Weka ML advisor, plant crops (Back returns to setup)
-3. **Simulation** – day-by-day field actions, grade coach, activity log
-4. **Detailed Plan** – steps and recommendations from the season so far
-5. **Harvest & Market** – sell the crop
-6. **Season Report** – revenue/cost/profit/ROI, two charts, one full CSV download
+The app opens on a cinematic **Intro**, then follows a branded season path
+(Setup → Crops → Sim → Market → Report). **Detailed Plan** sits between Simulation and Market.
+
+**First launch** always starts at Intro. After a season finishes, **Start New Season** on the Season Report
+clears the in-memory session and returns to **Farm Setup** (not Intro) so you can run another season
+without restarting the app. Saved CSV files under `data/` stay on disk (`crops.csv`, harvest log,
+season history).
+
+```text
+[Launch]
+    │
+    ▼
+  Intro  ── Enter Smart Farm (first launch only)
+    │
+    ▼
+  Farm Setup ◄────────────── Start New Season (clears live session, keeps CSV files)
+    │
+    ▼
+  Crop Selection
+    │
+    ▼
+  Simulation → Detailed Plan → Harvest & Market → Season Report
+                                                    │
+                                                    ├── Start New Season → Farm Setup
+                                                    └── Exit Application → close the app
+```
+
+| # | Screen | FXML | What you do |
+|---|---|---|---|
+| 0 | **Intro** | `IntroScreen.fxml` | Cinematic splash. **Enter Smart Farm** continues; **Watch 30s Film** plays the bundled promo. |
+| 1 | **Farm Setup** | `FarmSetupScreen.fxml` | Farm name, Malaysia state, soil, budget, water, fertilizer, land. State later drives NASA weather and nearby shops. CSV / MySQL status badge. |
+| 2 | **Crop Selection** | `CropSelectionScreen.fxml` | Browse/edit `data/crops.csv`, Weka J48 advisor (recommended crop, fertilizer plan, grade), plant crops. Back returns to setup. |
+| 3 | **Simulation** | `SimulationScreen.fxml` | Day-by-day field: interactive 3D crop + growth film, NASA/offline weather, Irrigate / Conserve / Fertilize / Protect, grade coach, Play + speed, activity log. |
+| 4 | **Detailed Plan** | `PlanReportScreen.fxml` | Field steps, coaching notes, recommendations, download plan CSV. |
+| 5 | **Harvest & Market** | `HarvestMarketScreen.fxml` | Location-aware buyers with shop logos; score = 70% price + 30% demand; live sale overview; confirm sale. |
+| 6 | **Season Report** | `SeasonReportScreen.fxml` | Revenue / cost / profit / ROI, predicted vs actual grade, rotatable 3D pie + 3D bar charts, full CSV download. **Start New Season** resets the live session and opens Farm Setup again; **Exit Application** closes the window. |
+
+Season screens share the app logo header, step dots, card layout, and `style.css`. Scene changes fade in with a short leaf sweep (`SceneNavigator`).
 
 ## MySQL (optional)
 
@@ -77,6 +109,7 @@ Then delete `data/ml/*.model` and `data/ml/*.meta` so models retrain on next lau
 | Path | Purpose |
 |---|---|
 | `data/crops.csv` | Editable crop catalog |
+| `data/market_locations.csv` | State-based buyers / shops (names, types, logos, price multipliers) |
 | `data/harvest_log.csv` | Sale history |
 | `data/season_report.csv` | Auto-saved season summary + sales + activity |
 | `data/activity_log.csv` | Simulation day log |
@@ -88,11 +121,13 @@ Then delete `data/ml/*.model` and `data/ml/*.meta` so models retrain on next lau
 ## Supporting components
 
 - `AppSession` – shared farm, crop, simulation, sales, advisor result
-- `SceneNavigator` – JavaFX screen switching (keeps window size)
-- `CSVFileHandler` – load/save `data/crops.csv`
+- `SceneNavigator` – JavaFX screen switching with fade / leaf-sweep transitions (keeps window size)
+- `CSVFileHandler` – load/save `data/crops.csv` (`FruitCrop` / `VegetableCrop` / `GrainCrop`)
 - `CsvDataStore` – harvest / season / activity CSV export and season history
+- `MarketLocationDataStore` – nearby shops from `data/market_locations.csv`
 - `SeasonSimulator` – seeded multi-crop simulation, random events, and daily market-price drift
 - `NasaPowerClient` – free NASA POWER daily weather integration with offline fallback
+- `SmartHarvest360.ui` – intro promo player, 3D crop field, 3D revenue pie, 3D finance bars
 - `SmartHarvest360.db` – optional MySQL mirror
 - `SmartHarvest360.ml` – Weka crop / fertilizer / grade advice
 - `SmartHarvest360.plan` – detailed plan report after simulation
