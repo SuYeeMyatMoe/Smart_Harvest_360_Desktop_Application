@@ -1,106 +1,107 @@
 package SmartHarvest360;
 
+import java.util.NavigableMap;
 import java.util.Random;
+import java.util.TreeMap;
 
-/**
- * Drives the day-by-day crop simulation.
- * Simulation, Harvest & Market, and Season Report screens  calls startSimulation() once, then advanceDay() once per simulated day.
- */
+/** Day-by-day crop simulation with weather, resources, and random events. */
 public class SimulationEngine {
-
+    private static final double WATER_SHORTAGE_PENALTY = 0.30;
+    private static final double NO_FERTILIZER_PENALTY = 0.50;
+    private static final double FERTILIZER_BOOST = 0.10;
     private final Farm farm;
     private final Crop crop;
-
+    private final Random random;
     private int currentDay;
-    private double growthProgress; // 0.0 -> 1.0
+    private double growthProgress;
+    private double totalWaterUsed;
     private boolean ready;
 
-    private final Random random = new Random();
+    public SimulationEngine(Farm farm, Crop crop) { this(farm, crop, System.nanoTime()); }
 
-    public SimulationEngine(Farm farm, Crop crop) {
+    public SimulationEngine(Farm farm, Crop crop, long seed) {
+        if (farm == null || crop == null) throw new IllegalArgumentException("Farm and crop are required");
         this.farm = farm;
         this.crop = crop;
-        this.currentDay = 0;
-        this.growthProgress = 0.0;
-        this.ready = false;
+        this.random = new Random(seed);
     }
 
-    /**
-     * Call once at the start of a simulation run.
-     * Mirrors AppSession.getInstance().startSimulation(farm, selectedCrop)
-     */
     public static SimulationEngine startSimulation(Farm farm, Crop crop) {
         return new SimulationEngine(farm, crop);
     }
 
-    /**
-     * Advances the simulation by one day: generates weather, consumes
-     * resources, updates growth progress, and reports the day's result.
-     * Returns null if resources ran out and the day could not be simulated.
-     */
-    public DayResult advanceDay() {
+    public static SimulationEngine startSimulation(Farm farm, Crop crop, long seed) {
+        return new SimulationEngine(farm, crop, seed);
+    }
 
+    public String getCropName() { return crop.getName(); }
+    public Crop getCrop() { return crop; }
+    public boolean isReady() { return ready; }
+    public int getCurrentDay() { return currentDay; }
+    public double getGrowthProgress() { return growthProgress; }
+    public double getTotalWaterUsed() { return totalWaterUsed; }
+
+    public DayResult advanceDay() { return advanceDay(null, null); }
+
+    /** Accepts real external weather; null preserves the offline random fallback. */
+    public DayResult advanceDay(Weather externalWeather, RandomEvent forcedEvent) {
         currentDay++;
-
-        String weather = generateWeather();
-
-        // Water/fertilizer used this day, scaled by crop need and weather.
-        double waterUsed = crop.getWaterNeed() / crop.getGrowthDays() * weatherWaterFactor(weather);
-        double fertilizerUsed = crop.getFertilizerNeed() / crop.getGrowthDays();
-
+        Weather weather = externalWeather == null ? generateWeather() : externalWeather;
+        RandomEvent event = forcedEvent == null ? generateEvent() : forcedEvent;
         Resource resource = farm.getResource();
-
-        boolean gotWater = resource.consume("water", waterUsed);
-        boolean gotFertilizer = resource.consume("fertilizer", fertilizerUsed);
-
-        if (!gotWater || !gotFertilizer) {
-            // Not enough resources today; still report state, but growth stalls.
-            return new DayResult(currentDay, weather, 0, 0, growthProgress, ready, resource);
-        }
-
-        growthProgress = Math.min(1.0, (double) currentDay / crop.getGrowthDays());
+        double waterNeed = crop.getWaterNeed() / crop.getGrowthDays() * weather.getWaterFactor();
+        double fertilizerNeed = crop.getFertilizerNeed() / crop.getGrowthDays();
+        if (event == RandomEvent.DROUGHT) waterNeed *= 1.5;
+        boolean gotWater = resource.consume(ResourceType.WATER, waterNeed);
+        boolean gotFertilizer = resource.consume(ResourceType.FERTILIZER, fertilizerNeed);
+        double progress = (1.0 / crop.getGrowthDays()) * weather.getGrowthFactor();
+        if (!gotWater) progress *= WATER_SHORTAGE_PENALTY;
+        if (!gotFertilizer) progress *= NO_FERTILIZER_PENALTY;
+        else progress *= 1.0 + FERTILIZER_BOOST;
+        if (event == RandomEvent.PEST) progress *= 0.75;
+        if (event == RandomEvent.FROST) progress *= 0.70;
+        growthProgress = Math.min(1.0, growthProgress + progress);
         ready = growthProgress >= 1.0;
-
-        return new DayResult(currentDay, weather, waterUsed, fertilizerUsed, growthProgress, ready, resource);
+        double waterUsed = gotWater ? waterNeed : 0.0;
+        totalWaterUsed += waterUsed;
+        return new DayResult(currentDay, weather, event, waterUsed,
+                gotFertilizer ? fertilizerNeed : 0.0, growthProgress, ready, resource);
     }
 
-    public boolean isReady() {
-        return ready;
-    }
-
-    public int getCurrentDay() {
-        return currentDay;
-    }
-
-    private String generateWeather() {
-        String[] options = {"Sunny", "Rain", "Cloudy"};
-        return options[random.nextInt(options.length)];
-    }
-
-    private double weatherWaterFactor(String weather) {
-        switch (weather) {
-            case "Sunny": return 1.2;
-            case "Rain": return 0.6;
-            default: return 1.0; // Cloudy
+    private Weather generateWeather() {
+        NavigableMap<Double, Weather> weighted = new TreeMap<>();
+        double cumulative = 0.0;
+        for (Weather weather : Weather.values()) {
+            cumulative += weather.getProbability();
+            weighted.put(cumulative, weather);
         }
+        return weighted.higherEntry(random.nextDouble() * cumulative).getValue();
     }
 
-    /**
-     * Snapshot of one simulated day, for the UI to render directly.
-     */
+    private RandomEvent generateEvent() {
+        double roll = random.nextDouble();
+        if (roll < 0.05) return RandomEvent.PEST;
+        if (roll < 0.09) return RandomEvent.DROUGHT;
+        if (roll < 0.12) return RandomEvent.FROST;
+        return RandomEvent.NONE;
+    }
+
     public static class DayResult {
         public final int day;
-        public final String weather;
+        public final Weather weather;
+        public final RandomEvent event;
         public final double waterUsed;
         public final double fertilizerUsed;
-        public final double growthProgress; // 0.0 -> 1.0
+        public final double growthProgress;
         public final boolean ready;
         public final Resource updatedResource;
 
-        public DayResult(int day, String weather, double waterUsed, double fertilizerUsed,
-                          double growthProgress, boolean ready, Resource updatedResource) {
+        public DayResult(int day, Weather weather, RandomEvent event, double waterUsed,
+                         double fertilizerUsed, double growthProgress, boolean ready,
+                         Resource updatedResource) {
             this.day = day;
             this.weather = weather;
+            this.event = event;
             this.waterUsed = waterUsed;
             this.fertilizerUsed = fertilizerUsed;
             this.growthProgress = growthProgress;

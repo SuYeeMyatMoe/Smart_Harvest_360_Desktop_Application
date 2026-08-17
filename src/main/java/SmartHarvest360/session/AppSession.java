@@ -3,15 +3,19 @@ package SmartHarvest360.session;
 import SmartHarvest360.Crop;
 import SmartHarvest360.Farm;
 import SmartHarvest360.Resource;
+import SmartHarvest360.SeasonGoal;
+import SmartHarvest360.Weather;
 import SmartHarvest360.VegetableCrop;
 import SmartHarvest360.ml.AdvisorResult;
 import SmartHarvest360.ml.FarmProfile;
 import SmartHarvest360.model.SaleRecord;
 import SmartHarvest360.model.SimDayLog;
 import SmartHarvest360.plan.DetailedPlanReport;
+import SmartHarvest360.weather.NasaPowerClient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Keeps shared farm, crop, simulation, location,
@@ -34,6 +38,16 @@ public final class AppSession {
     private DetailedPlanReport detailedPlanReport;
 
     private Crop activeCrop;
+
+    private SeasonGoal seasonGoal = SeasonGoal.MAXIMIZE_ROI;
+
+    private CompletableFuture<List<NasaPowerClient.DailyWeather>> weatherFuture;
+
+    private List<NasaPowerClient.DailyWeather> liveWeather = List.of();
+
+    private int liveWeatherIndex;
+
+    private boolean seasonHistorySaved;
 
     private int currentDay;
 
@@ -110,6 +124,7 @@ public final class AppSession {
         dayLogs.clear();
 
         sales.clear();
+        seasonHistorySaved = false;
     }
 
     /**
@@ -120,6 +135,10 @@ public final class AppSession {
 
         farmProfile =
                 profile;
+
+        liveWeather = List.of();
+        liveWeatherIndex = 0;
+        weatherFuture = null;
     }
 
     public FarmProfile getFarmProfile() {
@@ -271,6 +290,9 @@ public final class AppSession {
 
         detailedPlanReport =
                 null;
+
+        beginWeatherLoad();
+        seasonHistorySaved = false;
     }
 
     /**
@@ -289,6 +311,10 @@ public final class AppSession {
 
         farmProfile =
                 null;
+
+        weatherFuture = null;
+        liveWeather = List.of();
+        liveWeatherIndex = 0;
 
         advisorResult =
                 null;
@@ -313,6 +339,7 @@ public final class AppSession {
         dayLogs.clear();
 
         sales.clear();
+        seasonHistorySaved = false;
     }
 
     public void resetDemoSeason() {
@@ -437,5 +464,58 @@ public final class AppSession {
         sales.add(
                 sale
         );
+    }
+
+    /** The season objective supplied by the archived backend; defaults safely to ROI. */
+    public SeasonGoal getSeasonGoal() {
+        return seasonGoal;
+    }
+
+    public void setSeasonGoal(SeasonGoal goal) {
+        seasonGoal = goal == null ? SeasonGoal.MAXIMIZE_ROI : goal;
+    }
+
+    public boolean isSeasonHistorySaved() {
+        return seasonHistorySaved;
+    }
+
+    public void markSeasonHistorySaved() {
+        seasonHistorySaved = true;
+    }
+
+    /**
+     * Returns the next NASA POWER weather reading when ready. The network call
+     * runs in the background, so the JavaFX interface never freezes; null tells
+     * the simulation screen to use its existing offline weather generator.
+     */
+    public Weather pollLiveWeather() {
+        if (weatherFuture != null && weatherFuture.isDone() && liveWeather.isEmpty()) {
+            try {
+                List<NasaPowerClient.DailyWeather> fetched = weatherFuture.getNow(List.of());
+                liveWeather = fetched == null ? List.of() : List.copyOf(fetched);
+            } catch (RuntimeException ignored) {
+                liveWeather = List.of();
+            } finally {
+                weatherFuture = null;
+            }
+        }
+        if (liveWeatherIndex >= liveWeather.size()) {
+            return null;
+        }
+        return liveWeather.get(liveWeatherIndex++).weather();
+    }
+
+    public boolean isUsingLiveWeather() {
+        return !liveWeather.isEmpty();
+    }
+
+    private void beginWeatherLoad() {
+        NasaPowerClient.Location coordinates = NasaPowerClient.forMalaysiaState(getFarmLocation());
+        if (coordinates == null || activeCrop == null) {
+            return;
+        }
+        int days = Math.max(14, activeCrop.getGrowthDays() + 5);
+        weatherFuture = CompletableFuture.supplyAsync(
+                () -> NasaPowerClient.fetchSeason(coordinates, days));
     }
 }

@@ -1756,6 +1756,11 @@ public class SimulationController {
 
     private String getRandomWeather() {
 
+        SmartHarvest360.Weather liveWeather = session.pollLiveWeather();
+        if (liveWeather != null) {
+            return liveWeather.getLabel();
+        }
+
         String[] options = {
                 "Sunny",
                 "Rain",

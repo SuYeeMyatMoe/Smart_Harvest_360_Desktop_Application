@@ -2,6 +2,8 @@
 
 SmartHarvest 360 is a JavaFX desktop application that simulates crop growth with ML farm advice,
 compares market prices, records harvest sales, and shows a final season report with charts and CSV export.
+The simulation can use recent NASA POWER weather for the selected Malaysian state and automatically
+falls back to generated offline weather when the service is unavailable.
 
 ## Run in VS Code
 
@@ -78,6 +80,7 @@ Then delete `data/ml/*.model` and `data/ml/*.meta` so models retrain on next lau
 | `data/harvest_log.csv` | Sale history |
 | `data/season_report.csv` | Auto-saved season summary + sales + activity |
 | `data/activity_log.csv` | Simulation day log |
+| `data/season_history.csv` | Append-only season results for future comparisons |
 | `data/detailed_plan_report.csv` | Post-sim plan export |
 | `data/ml/` | Cached Weka models |
 | `data/downloads/` | Optional download folder |
@@ -87,7 +90,9 @@ Then delete `data/ml/*.model` and `data/ml/*.meta` so models retrain on next lau
 - `AppSession` – shared farm, crop, simulation, sales, advisor result
 - `SceneNavigator` – JavaFX screen switching (keeps window size)
 - `CSVFileHandler` – load/save `data/crops.csv`
-- `CsvDataStore` – harvest / season / activity CSV export
+- `CsvDataStore` – harvest / season / activity CSV export and season history
+- `SeasonSimulator` – seeded multi-crop simulation, random events, and daily market-price drift
+- `NasaPowerClient` – free NASA POWER daily weather integration with offline fallback
 - `SmartHarvest360.db` – optional MySQL mirror
 - `SmartHarvest360.ml` – Weka crop / fertilizer / grade advice
 - `SmartHarvest360.plan` – detailed plan report after simulation
