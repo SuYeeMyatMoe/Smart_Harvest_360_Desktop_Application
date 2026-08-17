@@ -1,0 +1,2 @@
+goal,revenue,cost,profit,roi,yieldKg,waterShortageDays,pestDays,droughtDays,frostDays,endingWater,endingFertilizer,endingBudget,plantedCrops
+Maximize ROI,276.80,120.00,156.80,130.67,80.00,1,0,0,0,780.19,12.80,10000.00,Paddy
