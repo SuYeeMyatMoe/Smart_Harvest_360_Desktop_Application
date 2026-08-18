@@ -1170,12 +1170,23 @@ public class SimulationController {
         muteVideo();
 
         /*
-         * Start exactly at the current position.
+         * Start from the player's current position.
+         *
+         * IMPORTANT:
+         *
+         * Do NOT seek to currentTime immediately before play().
+         * MediaPlayer.seek() is asynchronous, so doing:
+         *
+         *     seek(currentTime);
+         *     play();
+         *
+         * can race with the seek operation and prevent the
+         * animation from starting reliably (especially when
+         * advancing the simulation one day at a time).
+         *
+         * The player is already at currentTime, so simply play
+         * from there.
          */
-        plantMediaPlayer.seek(
-                currentTime
-        );
-
         plantMediaPlayer.play();
 
         /*
