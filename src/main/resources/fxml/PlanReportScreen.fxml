@@ -95,6 +95,31 @@
                         </VBox>
                     </HBox>
 
+                    <VBox spacing="8" styleClass="card">
+                        <padding><Insets top="14" right="14" bottom="14" left="14"/></padding>
+                        <HBox alignment="CENTER_LEFT">
+                            <VBox spacing="1" HBox.hgrow="ALWAYS">
+                                <Label text="Action summary by day group" styleClass="section-title"/>
+                                <Label text="What you did in each stretch of the season after simulation ended."
+                                       styleClass="section-caption"/>
+                            </VBox>
+                            <Label fx:id="groupCountLabel" text="0 groups" styleClass="soft-badge"/>
+                        </HBox>
+                        <TableView fx:id="groupTable" styleClass="sim-log-table"
+                                   prefHeight="170" minHeight="140">
+                            <columns>
+                                <TableColumn fx:id="groupDaysCol" text="Days" prefWidth="90"/>
+                                <TableColumn fx:id="groupPhaseCol" text="Phase" prefWidth="110"/>
+                                <TableColumn fx:id="groupActionsCol" text="Actions" prefWidth="220"/>
+                                <TableColumn fx:id="groupDominantCol" text="Main action" prefWidth="110"/>
+                                <TableColumn fx:id="groupWeatherCol" text="Weather" prefWidth="90"/>
+                                <TableColumn fx:id="groupResourcesCol" text="Water / Fert" prefWidth="120"/>
+                                <TableColumn fx:id="groupGrowthCol" text="Growth" prefWidth="110"/>
+                                <TableColumn fx:id="groupNoteCol" text="Summary" prefWidth="280"/>
+                            </columns>
+                        </TableView>
+                    </VBox>
+
                     <HBox spacing="14" VBox.vgrow="ALWAYS">
                         <VBox spacing="8" styleClass="card" HBox.hgrow="ALWAYS">
                             <padding><Insets top="14" right="14" bottom="14" left="14"/></padding>
@@ -131,7 +156,7 @@
                                     <TableColumn fx:id="recAdviceCol" text="Advice" prefWidth="150"/>
                                 </columns>
                             </TableView>
-                            <Button fx:id="downloadPlanButton" text="Download plan CSV"
+                            <Button fx:id="downloadPlanButton" text="Download plan workbook"
                                     onAction="#handleDownloadPlan" styleClass="secondary-button"
                                     maxWidth="Infinity"/>
                             <Label fx:id="filePathLabel" text=""
@@ -144,7 +169,7 @@
             <bottom>
                 <HBox spacing="12" alignment="CENTER_RIGHT" styleClass="footer-bar">
                     <padding><Insets top="13" right="30" bottom="13" left="30"/></padding>
-                    <Label text="Review steps and recommendations, then continue to market."
+                    <Label text="Review the day-group action summary, then continue to market."
                            styleClass="section-caption"/>
                     <Region HBox.hgrow="ALWAYS"/>
                     <Button fx:id="continueButton" text="Continue to Market"

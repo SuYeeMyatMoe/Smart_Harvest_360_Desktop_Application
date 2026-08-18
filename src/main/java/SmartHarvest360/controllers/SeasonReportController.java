@@ -4,15 +4,18 @@ import SmartHarvest360.data.CsvDataStore;
 import SmartHarvest360.ml.AdvisorResult;
 import SmartHarvest360.ml.GradePredictor;
 import SmartHarvest360.model.SaleRecord;
+import SmartHarvest360.model.SimDayLog;
 import SmartHarvest360.navigation.SceneNavigator;
 import SmartHarvest360.session.AppSession;
-import SmartHarvest360.ui.FinanceBar3DChart;
-import SmartHarvest360.ui.RevenuePie3DChart;
 import javafx.application.Platform;
 import javafx.animation.KeyFrame;
 import javafx.animation.ScaleTransition;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
+import javafx.scene.chart.AreaChart;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -41,8 +44,10 @@ public class SeasonReportController {
     @FXML private Label actualGradeReportLabel;
     @FXML private Label gradeCoachLabel;
     @FXML private Label filePathLabel;
-    @FXML private RevenuePie3DChart revenueChart3d;
-    @FXML private FinanceBar3DChart financeChart3d;
+    @FXML private BarChart<String, Number> revenueByCropChart;
+    @FXML private BarChart<String, Number> financeChart;
+    @FXML private LineChart<Number, Number> growthChart;
+    @FXML private AreaChart<Number, Number> inputChart;
     @FXML private Button newSeasonButton;
     @FXML private Button downloadReportButton;
     @FXML private Button openFolderButton;
@@ -177,9 +182,60 @@ public class SeasonReportController {
         for (SaleRecord sale : sales) {
             revenueByCrop.merge(sale.cropName(), sale.revenue(), Double::sum);
         }
+        if (revenueByCrop.isEmpty()) {
+            revenueByCrop.put("No sales", 0.0);
+        }
 
-        revenueChart3d.setData(revenueByCrop);
-        financeChart3d.setValues(revenue, cost, profit);
+        XYChart.Series<String, Number> cropSeries = new XYChart.Series<>();
+        cropSeries.setName("Revenue");
+        for (Map.Entry<String, Double> entry : revenueByCrop.entrySet()) {
+            cropSeries.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+        }
+        revenueByCropChart.getData().setAll(cropSeries);
+
+        XYChart.Series<String, Number> revenueSeries = new XYChart.Series<>();
+        revenueSeries.setName("Revenue");
+        revenueSeries.getData().add(new XYChart.Data<>("Season", revenue));
+        XYChart.Series<String, Number> costSeries = new XYChart.Series<>();
+        costSeries.setName("Cost");
+        costSeries.getData().add(new XYChart.Data<>("Season", cost));
+        XYChart.Series<String, Number> profitSeries = new XYChart.Series<>();
+        profitSeries.setName("Profit");
+        profitSeries.getData().add(new XYChart.Data<>("Season", profit));
+        financeChart.getData().setAll(revenueSeries, costSeries, profitSeries);
+        financeChart.setLegendVisible(true);
+
+        XYChart.Series<Number, Number> growthSeries = new XYChart.Series<>();
+        growthSeries.setName("Growth %");
+        XYChart.Series<Number, Number> waterSeries = new XYChart.Series<>();
+        waterSeries.setName("Water (L)");
+        XYChart.Series<Number, Number> fertSeries = new XYChart.Series<>();
+        fertSeries.setName("Fertilizer (kg)");
+
+        List<SimDayLog> logs = session.getDayLogs();
+        if (logs == null || logs.isEmpty()) {
+            growthSeries.getData().add(new XYChart.Data<>(0, 0));
+            waterSeries.getData().add(new XYChart.Data<>(0, 0));
+            fertSeries.getData().add(new XYChart.Data<>(0, 0));
+        } else {
+            for (SimDayLog log : logs) {
+                if (log == null || "Setup".equalsIgnoreCase(log.getAction())) {
+                    continue;
+                }
+                int day = log.getDay();
+                growthSeries.getData().add(new XYChart.Data<>(day, log.getGrowthPercent()));
+                waterSeries.getData().add(new XYChart.Data<>(day, log.getWaterUsed()));
+                fertSeries.getData().add(new XYChart.Data<>(day, log.getFertilizerUsed()));
+            }
+            if (growthSeries.getData().isEmpty()) {
+                growthSeries.getData().add(new XYChart.Data<>(0, 0));
+                waterSeries.getData().add(new XYChart.Data<>(0, 0));
+                fertSeries.getData().add(new XYChart.Data<>(0, 0));
+            }
+        }
+
+        growthChart.getData().setAll(growthSeries);
+        inputChart.getData().setAll(waterSeries, fertSeries);
     }
 
     private static String money(double value) {
@@ -208,7 +264,7 @@ public class SeasonReportController {
     }
 
     private void animateCharts() {
-        for (javafx.scene.Node chart : List.of(revenueChart3d, financeChart3d)) {
+        for (javafx.scene.Node chart : List.of(revenueByCropChart, financeChart, growthChart, inputChart)) {
             chart.setScaleX(0.96);
             chart.setScaleY(0.96);
             chart.setOpacity(0.0);

@@ -1,6 +1,7 @@
 package SmartHarvest360.controllers;
 
 import SmartHarvest360.navigation.SceneNavigator;
+import SmartHarvest360.plan.ActionDayGroup;
 import SmartHarvest360.plan.DetailedPlanReport;
 import SmartHarvest360.plan.DetailedPlanReportBuilder;
 import SmartHarvest360.plan.PlanRecommendation;
@@ -38,6 +39,16 @@ public class PlanReportController {
     @FXML private Label careLabel;
     @FXML private Label fertilizerLabel;
     @FXML private Label filePathLabel;
+    @FXML private Label groupCountLabel;
+    @FXML private TableView<ActionDayGroup> groupTable;
+    @FXML private TableColumn<ActionDayGroup, String> groupDaysCol;
+    @FXML private TableColumn<ActionDayGroup, String> groupPhaseCol;
+    @FXML private TableColumn<ActionDayGroup, String> groupActionsCol;
+    @FXML private TableColumn<ActionDayGroup, String> groupDominantCol;
+    @FXML private TableColumn<ActionDayGroup, String> groupWeatherCol;
+    @FXML private TableColumn<ActionDayGroup, String> groupResourcesCol;
+    @FXML private TableColumn<ActionDayGroup, String> groupGrowthCol;
+    @FXML private TableColumn<ActionDayGroup, String> groupNoteCol;
     @FXML private TableView<PlanStep> stepsTable;
     @FXML private TableColumn<PlanStep, Number> stepNoCol;
     @FXML private TableColumn<PlanStep, String> stepActionCol;
@@ -68,7 +79,7 @@ public class PlanReportController {
 
         try {
             Path saved = PlanReportFileHandler.saveToDataFolder(report);
-            statusLabel.setText("Plan auto-saved");
+            statusLabel.setText("Plan auto-saved (Excel sheets + CSV)");
             filePathLabel.setText(saved.toString());
         } catch (IOException exception) {
             statusLabel.setText("Plan ready (auto-save failed)");
@@ -80,9 +91,12 @@ public class PlanReportController {
     private void handleDownloadPlan() {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Download Detailed Plan Report");
-        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV", "*.csv"));
+        chooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Excel workbook (sheets)", "*.xls"),
+                new FileChooser.ExtensionFilter("CSV (sheet sections)", "*.csv")
+        );
         String stamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-        chooser.setInitialFileName("SmartHarvest_DetailedPlan_" + stamp + ".csv");
+        chooser.setInitialFileName("SmartHarvest_DetailedPlan_" + stamp + ".xls");
 
         Window window = downloadPlanButton.getScene() == null
                 ? null : downloadPlanButton.getScene().getWindow();
@@ -107,6 +121,16 @@ public class PlanReportController {
     }
 
     private void configureTables() {
+        groupDaysCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getDaysLabel()));
+        groupPhaseCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getPhase()));
+        groupActionsCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getActionMix()));
+        groupDominantCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getDominantAction()));
+        groupWeatherCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getMainWeather()));
+        groupResourcesCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getResourcesLabel()));
+        groupGrowthCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getGrowthLabel()));
+        groupNoteCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getSummary()));
+        groupTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+
         stepNoCol.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().getStepNumber()));
         stepActionCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getAction()));
         stepWeatherCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getWeather()));
@@ -128,6 +152,9 @@ public class PlanReportController {
         liveGradeLabel.setText(plan.getLiveGrade());
         careLabel.setText(String.valueOf(plan.getCareScore()));
         fertilizerLabel.setText("Fertilizer plan: " + plan.getFertilizerPlan());
+        int groups = plan.getDayGroups().size();
+        groupCountLabel.setText(groups + (groups == 1 ? " group" : " groups"));
+        groupTable.setItems(FXCollections.observableArrayList(plan.getDayGroups()));
         stepsTable.setItems(FXCollections.observableArrayList(plan.getSteps()));
         recommendTable.setItems(FXCollections.observableArrayList(plan.getRecommendations()));
     }
