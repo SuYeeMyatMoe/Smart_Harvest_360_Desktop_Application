@@ -412,7 +412,7 @@
                                        wrapText="true"
                                        styleClass="section-caption"/>
 
-                                <Label text="5. Review profit, ROI, and the pie chart"
+                                <Label text="5. Review profit, ROI, and the season charts"
                                        wrapText="true"
                                        styleClass="section-caption"/>
 

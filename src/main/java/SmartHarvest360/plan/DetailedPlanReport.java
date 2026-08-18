@@ -20,6 +20,7 @@ public final class DetailedPlanReport {
     private final String summary;
     private final List<PlanStep> steps;
     private final List<PlanRecommendation> recommendations;
+    private final List<ActionDayGroup> dayGroups;
 
     public DetailedPlanReport(
             String farmName,
@@ -32,7 +33,8 @@ public final class DetailedPlanReport {
             String fertilizerPlan,
             String summary,
             List<PlanStep> steps,
-            List<PlanRecommendation> recommendations
+            List<PlanRecommendation> recommendations,
+            List<ActionDayGroup> dayGroups
     ) {
         this.farmName = farmName;
         this.location = location;
@@ -45,6 +47,7 @@ public final class DetailedPlanReport {
         this.summary = summary;
         this.steps = List.copyOf(steps == null ? List.of() : steps);
         this.recommendations = List.copyOf(recommendations == null ? List.of() : recommendations);
+        this.dayGroups = List.copyOf(dayGroups == null ? List.of() : dayGroups);
     }
 
     public String getFarmName() {
@@ -89,6 +92,10 @@ public final class DetailedPlanReport {
 
     public List<PlanRecommendation> getRecommendations() {
         return recommendations;
+    }
+
+    public List<ActionDayGroup> getDayGroups() {
+        return dayGroups;
     }
 
     /** Polymorphic view of all plan rows for export/UI. */

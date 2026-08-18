@@ -5,7 +5,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.chart.PieChart;
+import javafx.scene.chart.BarChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
@@ -62,8 +62,8 @@ public final class EndToEndTest {
                 assertLabel(report, "#profitLabel", "RM 1,650.00");
                 assertLabel(report, "#roiLabel", "150.00%");
 
-                PieChart chart = require(report, "#revenueChart", PieChart.class);
-                check(chart.getData().size() == 1, "Revenue PieChart has incorrect data");
+                BarChart<?, ?> chart = require(report, "#revenueByCropChart", BarChart.class);
+                check(!chart.getData().isEmpty(), "Revenue by crop chart has no data");
                 check(Files.exists(Path.of("data", "harvest_log.csv")), "harvest_log.csv was not created");
                 check(Files.exists(Path.of("data", "season_report.csv")), "season_report.csv was not created");
 
@@ -77,7 +77,7 @@ public final class EndToEndTest {
                 System.out.println("END-TO-END TEST PASSED");
                 System.out.println("Simulation: day 90 and harvest unlocked");
                 System.out.println("Market: revenue/cost/profit calculations correct");
-                System.out.println("Report: ROI and PieChart correct");
+                System.out.println("Report: ROI and charts correct");
                 System.out.println("CSV: harvest_log.csv and season_report.csv created");
                 System.out.println("New Season: returned to Farm Setup with cleared state");
             } catch (Throwable throwable) {

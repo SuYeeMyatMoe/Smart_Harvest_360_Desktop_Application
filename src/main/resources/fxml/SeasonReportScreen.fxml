@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.AreaChart?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
@@ -8,11 +13,12 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import SmartHarvest360.ui.RevenuePie3DChart?>
-<?import SmartHarvest360.ui.FinanceBar3DChart?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="SmartHarvest360.controllers.SeasonReportController"
@@ -62,7 +68,7 @@
                 <padding><Insets top="16" right="20" bottom="16" left="20"/></padding>
                 <VBox spacing="2">
                     <Label text="Season Performance" styleClass="page-title"/>
-                    <Label text="Your complete harvest outcome at a glance."
+                    <Label text="Financial outcome with standard charts for revenue, growth, and inputs."
                            styleClass="page-description, report-subtitle"/>
                 </VBox>
                 <Region HBox.hgrow="ALWAYS"/>
@@ -91,22 +97,57 @@
             </HBox>
 
             <HBox spacing="14" VBox.vgrow="ALWAYS">
-                <VBox spacing="12" HBox.hgrow="ALWAYS">
-                    <HBox spacing="12" VBox.vgrow="ALWAYS">
-                        <VBox spacing="4" styleClass="card, chart-card" HBox.hgrow="ALWAYS">
+                <VBox spacing="12" HBox.hgrow="ALWAYS" minWidth="0">
+                    <GridPane hgap="12" vgap="12">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+                            <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints vgrow="ALWAYS"/>
+                            <RowConstraints vgrow="ALWAYS"/>
+                        </rowConstraints>
+
+                        <VBox spacing="4" styleClass="card, chart-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
                             <padding><Insets top="12" right="14" bottom="8" left="14"/></padding>
                             <Label text="Revenue by Crop" styleClass="section-title"/>
-                            <RevenuePie3DChart fx:id="revenueChart3d"
-                                               prefHeight="285" maxHeight="300"/>
+                            <BarChart fx:id="revenueByCropChart" legendVisible="false" animated="true"
+                                      prefHeight="230" minHeight="200" styleClass="report-chart">
+                                <xAxis><CategoryAxis label="Crop"/></xAxis>
+                                <yAxis><NumberAxis label="RM"/></yAxis>
+                            </BarChart>
                         </VBox>
 
-                        <VBox spacing="4" styleClass="card, chart-card" HBox.hgrow="ALWAYS">
+                        <VBox spacing="4" styleClass="card, chart-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
                             <padding><Insets top="12" right="14" bottom="8" left="14"/></padding>
                             <Label text="Revenue vs Cost vs Profit" styleClass="section-title"/>
-                            <FinanceBar3DChart fx:id="financeChart3d"
-                                               prefHeight="285" maxHeight="300"/>
+                            <BarChart fx:id="financeChart" legendVisible="true" animated="true"
+                                      prefHeight="230" minHeight="200" styleClass="report-chart">
+                                <xAxis><CategoryAxis label="Season"/></xAxis>
+                                <yAxis><NumberAxis label="RM"/></yAxis>
+                            </BarChart>
                         </VBox>
-                    </HBox>
+
+                        <VBox spacing="4" styleClass="card, chart-card" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                            <padding><Insets top="12" right="14" bottom="8" left="14"/></padding>
+                            <Label text="Crop Growth by Day" styleClass="section-title"/>
+                            <LineChart fx:id="growthChart" createSymbols="false" animated="true"
+                                       prefHeight="230" minHeight="200" styleClass="report-chart">
+                                <xAxis><NumberAxis label="Day" forceZeroInRange="true"/></xAxis>
+                                <yAxis><NumberAxis label="Growth %"/></yAxis>
+                            </LineChart>
+                        </VBox>
+
+                        <VBox spacing="4" styleClass="card, chart-card" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <padding><Insets top="12" right="14" bottom="8" left="14"/></padding>
+                            <Label text="Water and Fertilizer by Day" styleClass="section-title"/>
+                            <AreaChart fx:id="inputChart" createSymbols="false" animated="true"
+                                       prefHeight="230" minHeight="200" styleClass="report-chart">
+                                <xAxis><NumberAxis label="Day" forceZeroInRange="true"/></xAxis>
+                                <yAxis><NumberAxis label="Used"/></yAxis>
+                            </AreaChart>
+                        </VBox>
+                    </GridPane>
                 </VBox>
 
                 <VBox spacing="12" prefWidth="300" minWidth="280" styleClass="card">

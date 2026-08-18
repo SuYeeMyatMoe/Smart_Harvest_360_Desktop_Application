@@ -965,6 +965,15 @@
 .axis:bottom { -fx-border-color: transparent transparent #cbdcd3 transparent; }
 .axis:left { -fx-border-color: transparent #cbdcd3 transparent transparent; }
 .chart-legend-item { -fx-text-fill: #2d5142; }
+.chart-series-line { -fx-stroke-width: 2.4px; }
+.default-color0.chart-series-line { -fx-stroke: #279468; }
+.default-color1.chart-series-line { -fx-stroke: #e3a54d; }
+.default-color0.chart-line-symbol { -fx-background-color: #279468, white; }
+.default-color1.chart-line-symbol { -fx-background-color: #e3a54d, white; }
+.default-color0.chart-series-area-line { -fx-stroke: #279468; }
+.default-color1.chart-series-area-line { -fx-stroke: #e3a54d; }
+.default-color0.chart-series-area-fill { -fx-fill: rgba(39, 148, 104, 0.28); }
+.default-color1.chart-series-area-fill { -fx-fill: rgba(227, 165, 77, 0.28); }
 .chart-pie-label { -fx-font-size: 13px; -fx-font-weight: 800; }
 .chart-pie:hover { -fx-scale-x: 1.035; -fx-scale-y: 1.035; }
 .default-color0.chart-bar { -fx-bar-fill: #279468; }
