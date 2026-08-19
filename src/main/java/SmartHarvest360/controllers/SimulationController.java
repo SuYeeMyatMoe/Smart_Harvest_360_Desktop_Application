@@ -817,15 +817,26 @@ public class SimulationController {
     }
 
     private String getVideoFileName(String cropName) {
-        return switch (cropName) {
-            case "chilli", "chili" -> "chilli.mp4";
-            case "paddy", "rice" -> "paddy.mp4";
-            case "corn", "maize" -> "corn.mp4";
-            case "durian" -> "durian.mp4";
-            case "tomato" -> "tomato.mp4";
-            case "papaya" -> "papaya.mp4";
-            default -> null;
-        };
+        String name = cropName == null ? "" : cropName.trim().toLowerCase(Locale.ROOT);
+        if (name.contains("chilli") || name.contains("chili")) {
+            return "chilli.mp4";
+        }
+        if (name.contains("paddy") || name.contains("rice")) {
+            return "paddy.mp4";
+        }
+        if (name.contains("corn") || name.contains("maize")) {
+            return "corn.mp4";
+        }
+        if (name.contains("durian")) {
+            return "durian.mp4";
+        }
+        if (name.contains("tomato")) {
+            return "tomato.mp4";
+        }
+        if (name.contains("papaya")) {
+            return "papaya.mp4";
+        }
+        return null;
     }
 
     /**
