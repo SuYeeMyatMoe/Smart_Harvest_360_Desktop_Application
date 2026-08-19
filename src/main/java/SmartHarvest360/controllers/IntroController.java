@@ -21,6 +21,9 @@ public final class IntroController {
     @FXML private VBox introContent;
     @FXML private Button enterButton;
 
+    private ScaleTransition cameraPush;
+    private TranslateTransition lightDrift;
+
     @FXML
     public void initialize() {
         heroImage.fitWidthProperty().bind(introRoot.widthProperty());
@@ -30,7 +33,7 @@ public final class IntroController {
         introContent.setTranslateY(24.0);
         enterButton.setOpacity(0.0);
 
-        ScaleTransition cameraPush = new ScaleTransition(Duration.seconds(7.5), heroImage);
+        cameraPush = new ScaleTransition(Duration.seconds(7.5), heroImage);
         cameraPush.setFromX(1.02);
         cameraPush.setFromY(1.02);
         cameraPush.setToX(1.10);
@@ -44,7 +47,7 @@ public final class IntroController {
         javafx.animation.FadeTransition buttonReveal = new javafx.animation.FadeTransition(Duration.millis(650), enterButton);
         buttonReveal.setToValue(1.0);
 
-        TranslateTransition lightDrift = new TranslateTransition(Duration.seconds(5.0), glowOrb);
+        lightDrift = new TranslateTransition(Duration.seconds(5.0), glowOrb);
         lightDrift.setFromX(-70);
         lightDrift.setToX(70);
         lightDrift.setAutoReverse(true);
@@ -73,6 +76,16 @@ public final class IntroController {
 
     @FXML
     private void handleWatchFilm() {
-        PromoVideoPlayer.show(introRoot.getScene().getWindow());
+        if (cameraPush != null) {
+            cameraPush.pause();
+        }
+        if (lightDrift != null) {
+            lightDrift.pause();
+        }
+        PromoVideoPlayer.show(introRoot.getScene().getWindow(), () -> {
+            if (lightDrift != null) {
+                lightDrift.play();
+            }
+        });
     }
 }

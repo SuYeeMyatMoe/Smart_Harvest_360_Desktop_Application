@@ -39,7 +39,7 @@
             <HBox spacing="12" alignment="CENTER_LEFT">
                 <Button fx:id="enterButton" text="Enter Smart Farm  →"
                         onAction="#handleEnter" styleClass="intro-primary-button"/>
-                <Button text="▶  Watch 30s Film" onAction="#handleWatchFilm"
+                <Button text="▶  Watch Film" onAction="#handleWatchFilm"
                         styleClass="intro-film-button"/>
                 <VBox spacing="1">
                     <Label text="6-STAGE DECISION JOURNEY" styleClass="intro-meta-title"/>

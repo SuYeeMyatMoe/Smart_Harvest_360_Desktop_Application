@@ -45,7 +45,7 @@ season history).
 
 | # | Screen | FXML | What you do |
 |---|---|---|---|
-| 0 | **Intro** | `IntroScreen.fxml` | Cinematic splash. **Enter Smart Farm** continues; **Watch 30s Film** plays the bundled promo. |
+| 0 | **Intro** | `IntroScreen.fxml` | Cinematic splash. **Enter Smart Farm** continues; **Watch Film** plays the bundled promo. |
 | 1 | **Farm Setup** | `FarmSetupScreen.fxml` | Farm name, Malaysia state, soil, budget, water, fertilizer, land. State later drives NASA weather and nearby shops. CSV / MySQL status badge. |
 | 2 | **Crop Selection** | `CropSelectionScreen.fxml` | Browse/edit `data/crops.csv`, Weka J48 advisor (recommended crop, fertilizer plan, grade), plant crops. Back returns to setup. |
 | 3 | **Simulation** | `SimulationScreen.fxml` | Day-by-day field: interactive 3D crop + growth film, NASA/offline weather, Irrigate / Conserve / Fertilize / Protect, grade coach, Play + speed, activity log. **Fields Overview** opens a live command center, then returns here. |

@@ -4,15 +4,15 @@
 
 [SHEET] Summary
 key,value
-farm,Green
+farm,Hello
 location,Selangor
-soil,Loam
+soil,Clay
 crop,Corn
 careScore,100
 plantGrade,A
 liveGrade,S
 fertilizerPlan,Medium
-overview,"Corn on Selangor/Loam finished care 100 with live grade path S (plant-time A). 15 day-group action summaries, 100 field steps, and 5 recommendations are ready before market."
+overview,"Corn on Selangor/Clay finished care 100 with live grade path S (plant-time A). 15 day-group action summaries, 100 field steps, and 5 recommendations are ready before market."
 
 [SHEET] ActionByDayGroup
 fromDay,toDay,phase,dominantAction,mainWeather,irrigate,conserve,fertilize,protect,other,waterL,fertilizerKg,growthFrom,growthTo,actionMix,summary
