@@ -16,6 +16,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
 import javafx.stage.Stage;
@@ -53,6 +55,7 @@ public final class SceneNavigator {
                 FadeTransition fadeOut = new FadeTransition(Duration.millis(160), currentRoot);
                 fadeOut.setToValue(0.0);
                 fadeOut.setOnFinished(event -> {
+                    releaseMedia(currentRoot);
                     currentRoot.setOpacity(1.0);
                     StackPane animatedRoot = createAnimatedRoot(root, scene);
                     animatedRoot.setOpacity(0.0);
@@ -89,6 +92,32 @@ public final class SceneNavigator {
             alert.setHeaderText("Unable to open the next screen");
             alert.setContentText(exception.getMessage());
             alert.showAndWait();
+        }
+    }
+
+    private static void releaseMedia(Parent root) {
+        if (root == null) {
+            return;
+        }
+        for (Node node : root.lookupAll(".media-view")) {
+            if (node instanceof MediaView mediaView) {
+                MediaPlayer player = mediaView.getMediaPlayer();
+                mediaView.setMediaPlayer(null);
+                if (player == null) {
+                    continue;
+                }
+                try {
+                    player.setOnReady(null);
+                    player.setOnError(null);
+                    player.setOnEndOfMedia(null);
+                    player.setOnStalled(null);
+                    player.pause();
+                    player.stop();
+                    player.dispose();
+                } catch (Exception ignored) {
+                    // Leaving a live decoder open is what freezes the next crop video.
+                }
+            }
         }
     }
 

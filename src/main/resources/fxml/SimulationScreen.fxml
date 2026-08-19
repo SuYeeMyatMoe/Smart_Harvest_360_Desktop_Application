@@ -20,6 +20,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.media.MediaView?>
 <?import javafx.scene.shape.Rectangle?>
+<?import SmartHarvest360.ui.Crop3DView?>
 
 <ScrollPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="SmartHarvest360.controllers.SimulationController"
@@ -335,39 +336,36 @@
                                            height="230"
                                            arcWidth="18"
                                            arcHeight="18"
-                                           fill="#cfe6dc"
+                                           fill="TRANSPARENT"
+                                           visible="false"
                                            managed="false"/>
 
 
-                                <!-- VIDEO -->
+                                <!-- 3D FALLBACK + VIDEO -->
 
-                                <StackPane prefWidth="266"
-                                           minWidth="266"
-                                           maxWidth="266"
-                                           prefHeight="188"
-                                           minHeight="188"
-                                           maxHeight="188"
-                                           StackPane.alignment="TOP_CENTER">
+                                <Crop3DView fx:id="crop3dView"
+                                            prefWidth="266"
+                                            prefHeight="230"
+                                            minWidth="266"
+                                            minHeight="230"
+                                            maxWidth="266"
+                                            maxHeight="230"
+                                            visible="false"/>
 
-                                    <MediaView fx:id="plantVideoView"
-                                               fitWidth="266"
-                                               fitHeight="188"
-                                               preserveRatio="false"
-                                               smooth="true"
-                                               managed="false"
-                                               visible="false"/>
+                                <MediaView fx:id="plantVideoView"
+                                           fitWidth="266"
+                                           fitHeight="230"
+                                           preserveRatio="true"
+                                           smooth="true"
+                                           visible="false"/>
 
-                                </StackPane>
-
-
-                                <!-- SOIL -->
 
                                 <Rectangle fx:id="soilRect"
                                            width="266"
                                            height="42"
-                                           fill="#7a4f2a"
-                                           managed="false"
-                                           StackPane.alignment="BOTTOM_CENTER"/>
+                                           fill="TRANSPARENT"
+                                           visible="false"
+                                           managed="false"/>
 
 
                                 <!-- WEATHER -->

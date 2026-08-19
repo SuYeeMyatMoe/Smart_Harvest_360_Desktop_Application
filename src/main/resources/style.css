@@ -635,7 +635,7 @@
 }
 
 .sim-field {
-    -fx-background-color: #cfe6dc;
+    -fx-background-color: #10241c;
     -fx-background-radius: 18;
     -fx-border-color: #8fb5a3;
     -fx-border-width: 2;
@@ -859,8 +859,8 @@
     -fx-border-radius: 20;
 }
 .sim-field {
-    -fx-background-color: linear-gradient(to bottom, #dff2e8, #c7e3d5);
-    -fx-effect: innershadow(gaussian, rgba(8, 56, 40, 0.18), 16, 0.10, 0, 3);
+    -fx-background-color: #10241c;
+    -fx-effect: dropshadow(gaussian, rgba(8, 56, 40, 0.18), 12, 0.10, 0, 3);
 }
 
 /* Readable presentation sizing ------------------------------------------- */

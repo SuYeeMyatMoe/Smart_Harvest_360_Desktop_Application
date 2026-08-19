@@ -10,6 +10,7 @@ import SmartHarvest360.model.SimDayLog;
 import SmartHarvest360.navigation.SceneNavigator;
 import SmartHarvest360.plan.DetailedPlanReportBuilder;
 import SmartHarvest360.session.AppSession;
+import SmartHarvest360.ui.Crop3DView;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
@@ -46,7 +47,11 @@ import javafx.scene.shape.Rectangle;
 
 import javafx.util.Duration;
 
+import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Locale;
 import java.util.Random;
 
@@ -230,6 +235,9 @@ public class SimulationController {
     private MediaView plantVideoView;
 
     @FXML
+    private Crop3DView crop3dView;
+
+    @FXML
     private Button irrigateButton;
 
     @FXML
@@ -289,6 +297,15 @@ public class SimulationController {
      * Name of currently loaded crop video.
      */
     private String loadedVideoCrop;
+
+    /**
+     * Invalidates stale MediaPlayer callbacks after dispose/reload.
+     */
+    private int videoGeneration;
+
+    private boolean videoReady;
+
+    private boolean videoLifecycleHooked;
 
     /**
      * Transition used to stop video at exact simulation position.
@@ -464,6 +481,7 @@ public class SimulationController {
     @FXML
     private void handleFieldsOverview(ActionEvent event) {
         stopAutoPlay();
+        stopPlantVideo();
         Node source = event.getSource() instanceof Node node ? node : fieldsOverviewButton;
         SceneNavigator.switchTo(source, "/fxml/FieldsOverviewScreen.fxml");
     }
@@ -531,59 +549,18 @@ public class SimulationController {
     // =========================================================
 
     private void configureField() {
-
+        skyRect.setVisible(false);
         skyRect.setManaged(false);
-
+        soilRect.setVisible(false);
         soilRect.setManaged(false);
 
-        skyRect.setWidth(
-                FIELD_W
-        );
-
-        skyRect.setHeight(
-                FIELD_H
-        );
-
-        skyRect.setArcWidth(18);
-
-        skyRect.setArcHeight(18);
-
-        skyRect.setLayoutX(0);
-
-        skyRect.setLayoutY(0);
-
-        soilRect.setWidth(
-                FIELD_W
-        );
-
-        soilRect.setHeight(
-                SOIL_H
-        );
-
-        soilRect.setLayoutX(0);
-
-        soilRect.setLayoutY(
-                FIELD_H - SOIL_H
-        );
-
-        fieldClip =
-                new Rectangle(
-                        FIELD_W,
-                        FIELD_H
-                );
-
+        fieldClip = new Rectangle(FIELD_W, FIELD_H);
         fieldClip.setArcWidth(18);
-
         fieldClip.setArcHeight(18);
-
-        fieldPane.setClip(
-                fieldClip
-        );
+        fieldPane.setClip(fieldClip);
 
         if (plantLayer != null) {
-
             plantLayer.setVisible(false);
-
             plantLayer.setManaged(false);
         }
     }
@@ -594,784 +571,358 @@ public class SimulationController {
     // =========================================================
 
     private void configureVideo() {
+        plantVideoView.setFitWidth(FIELD_W);
+        plantVideoView.setFitHeight(FIELD_H);
+        plantVideoView.setPreserveRatio(true);
+        plantVideoView.setSmooth(true);
+        plantVideoView.setManaged(true);
+        plantVideoView.setVisible(false);
 
-        plantVideoView.setFitWidth(
-                FIELD_W
-        );
+        if (crop3dView != null) {
+            crop3dView.setVisible(true);
+            Crop crop = session.getActiveCrop();
+            if (crop != null) {
+                crop3dView.setCrop(crop.getName());
+                crop3dView.setGrowth(Math.max(0.08, growthPctFraction()), false);
+            }
+        }
 
-        plantVideoView.setFitHeight(
-                FIELD_H - SOIL_H
-        );
-
-        /*
-         * Keep the existing field dimensions.
-         *
-         * The video fills the crop area.
-         */
-        plantVideoView.setPreserveRatio(
-                false
-        );
-
-        plantVideoView.setSmooth(
-                true
-        );
-
-        plantVideoView.setManaged(
-                false
-        );
-
-        plantVideoView.setLayoutX(0);
-
-        plantVideoView.setLayoutY(0);
-
-        plantVideoView.setVisible(
-                false
-        );
-
-        loadCropVideo(
-                session.getActiveCrop()
-        );
+        hookVideoLifecycle();
     }
 
+    /**
+     * Scales the clip to cover the rounded field with no letterbox bars.
+     */
+    private void sizeVideoToFillFrame(MediaPlayer player) {
+        if (plantVideoView == null || player == null || player.getMedia() == null) {
+            return;
+        }
+        double videoW = player.getMedia().getWidth();
+        double videoH = player.getMedia().getHeight();
+        if (videoW <= 0 || videoH <= 0) {
+            plantVideoView.setPreserveRatio(false);
+            plantVideoView.setFitWidth(FIELD_W);
+            plantVideoView.setFitHeight(FIELD_H);
+            return;
+        }
+        plantVideoView.setPreserveRatio(true);
+        double scaleX = FIELD_W / videoW;
+        double scaleY = FIELD_H / videoH;
+        if (scaleX >= scaleY) {
+            plantVideoView.setFitWidth(FIELD_W);
+            plantVideoView.setFitHeight(0);
+        } else {
+            plantVideoView.setFitWidth(0);
+            plantVideoView.setFitHeight(FIELD_H);
+        }
+    }
+
+    private void hookVideoLifecycle() {
+        if (videoLifecycleHooked || plantVideoView == null) {
+            return;
+        }
+        videoLifecycleHooked = true;
+        plantVideoView.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene == null) {
+                stopPlantVideo();
+                return;
+            }
+            PauseTransition wait = new PauseTransition(Duration.millis(80));
+            wait.setOnFinished(event -> {
+                if (plantVideoView.getScene() == null) {
+                    return;
+                }
+                loadCropVideo(session.getActiveCrop());
+            });
+            wait.play();
+        });
+        if (plantVideoView.getScene() != null) {
+            loadCropVideo(session.getActiveCrop());
+        }
+    }
+
+    private void refreshCropVisual(Crop crop, double progress) {
+        if (crop3dView != null && crop != null) {
+            crop3dView.setCrop(crop.getName());
+            crop3dView.setGrowth(Math.max(0.08, progress), playing);
+            crop3dView.setVisible(!videoReady);
+        }
+        if (crop != null
+                && loadedVideoCrop != null
+                && !crop.getName().trim().toLowerCase(Locale.ROOT).equals(loadedVideoCrop)) {
+            loadCropVideo(crop);
+        }
+    }
 
     /**
-     * Loads the correct video for the active crop.
-     *
-     * Supported crops:
-     *
-     * tomato
-     * paddy / rice
-     * corn / maize
-     * durian
-     * chilli / chili
-     * papaya
+     * Loads the growth video for the active crop once.
+     * Recreating MediaPlayer on the same file is what freezes Windows GStreamer
+     * (ERROR_MEDIA_INVALID) and leaves a stuck last frame.
      */
-    private void loadCropVideo(
-            Crop crop
-    ) {
-
+    private void loadCropVideo(Crop crop) {
         if (crop == null) {
-
             return;
         }
 
-        String cropName =
-                crop.getName()
-                        .trim()
-                        .toLowerCase(
-                                Locale.ROOT
-                        );
-
-        /*
-         * Do not recreate the media player when
-         * the same crop is already loaded.
-         */
-        if (
-                cropName.equals(
-                        loadedVideoCrop
-                )
-                        &&
-                plantMediaPlayer != null
-        ) {
-
-            /*
-             * Make absolutely sure the existing player
-             * remains muted.
-             */
+        String cropName = crop.getName().trim().toLowerCase(Locale.ROOT);
+        if (cropName.equals(loadedVideoCrop) && isPlayerUsable()) {
             muteVideo();
+            return;
+        }
 
+        String videoFile = getVideoFileName(cropName);
+        if (videoFile == null) {
+            showVideoFallback();
+            statusLabel.setText("No growth video for " + crop.getName());
+            return;
+        }
+
+        URL videoUrl = getClass().getResource("/videos/" + videoFile);
+        if (videoUrl == null) {
+            showVideoFallback();
+            statusLabel.setText("Video not found: " + videoFile);
             return;
         }
 
         stopPlantVideo();
 
-        String videoFile =
-                getVideoFileName(
-                        cropName
-                );
-
-        if (videoFile == null) {
-
-            statusLabel.setText(
-                    "No growth video for "
-                            + crop.getName()
-            );
-
-            return;
-        }
-
-        URL videoUrl =
-                getClass().getResource(
-                        "/videos/" + videoFile
-                );
-
-        if (videoUrl == null) {
-
-            statusLabel.setText(
-                    "Video not found: "
-                            + videoFile
-            );
-
-            System.err.println(
-                    "SmartHarvest 360: Could not find video: "
-                            + "/videos/"
-                            + videoFile
-            );
-
-            return;
-        }
-
         try {
+            String playableUri = playableVideoUri(videoFile, videoUrl);
+            System.out.println("Loading crop video: " + cropName + " -> " + videoFile);
 
-            System.out.println(
-                    "Loading crop video: "
-                            + cropName
-                            + " -> "
-                            + videoFile
-            );
+            Media media = new Media(playableUri);
+            MediaPlayer player = new MediaPlayer(media);
+            plantMediaPlayer = player;
+            loadedVideoCrop = cropName;
+            videoReady = false;
+            int generation = videoGeneration;
 
-            Media media =
-                    new Media(
-                            videoUrl.toExternalForm()
-                    );
-
-            plantMediaPlayer =
-                    new MediaPlayer(
-                            media
-                    );
-
-            /*
-             * Video plays only once.
-             */
-            plantMediaPlayer.setCycleCount(1);
-
-            /*
-             * The simulation controls when the video moves.
-             */
-            plantMediaPlayer.setAutoPlay(false);
-
-            /*
-             * =================================================
-             * AUDIO OFF
-             * =================================================
-             *
-             * Completely mute crop videos.
-             */
+            player.setCycleCount(1);
+            player.setAutoPlay(false);
             muteVideo();
 
-            plantVideoView.setMediaPlayer(
-                    plantMediaPlayer
-            );
+            player.setOnReady(() -> {
+                if (generation != videoGeneration || plantMediaPlayer != player) {
+                    return;
+                }
+                muteVideo();
+                videoReady = true;
+                if (crop3dView != null) {
+                    crop3dView.setVisible(false);
+                }
+                plantVideoView.setMediaPlayer(player);
+                plantVideoView.setVisible(true);
+                sizeVideoToFillFrame(player);
+                player.setRate(playing ? getSimulationSpeed() : 1.0);
+                System.out.println("Video READY: " + cropName
+                        + " (" + player.getTotalDuration().toMillis() + " ms)");
+                positionVideoAtGrowth(growthPctFraction() * VIDEO_END_FRACTION);
+                if (playing) {
+                    player.play();
+                }
+            });
 
-            plantVideoView.setVisible(
-                    true
-            );
+            player.setOnEndOfMedia(() -> {
+                if (generation != videoGeneration || plantMediaPlayer != player) {
+                    return;
+                }
+                player.pause();
+                muteVideo();
+                Duration total = player.getTotalDuration();
+                if (total != null && !total.isUnknown()) {
+                    player.seek(total.multiply(VIDEO_END_FRACTION));
+                }
+            });
 
-            loadedVideoCrop =
-                    cropName;
+            player.setOnError(() -> {
+                if (generation != videoGeneration) {
+                    return;
+                }
+                System.err.println("SmartHarvest 360 video error: " + player.getError());
+                showVideoFallback();
+            });
 
-            plantMediaPlayer.setOnReady(
-                    () -> {
-
-                        System.out.println(
-                                "Video READY: "
-                                        + cropName
-                        );
-
-                        /*
-                         * Keep audio permanently disabled.
-                         */
-                        muteVideo();
-
-                        /*
-                         * Make the video speed match the
-                         * currently selected simulation speed.
-                         *
-                         * When not autoplaying, we still keep
-                         * the normal rate.
-                         */
-                        if (playing) {
-
-                            plantMediaPlayer.setRate(
-                                    getSimulationSpeed()
-                            );
-
-                        } else {
-
-                            plantMediaPlayer.setRate(
-                                    1.0
-                            );
-                        }
-
-                        Duration duration =
-                                plantMediaPlayer
-                                        .getTotalDuration();
-
-                        if (duration != null) {
-
-                            System.out.println(
-                                    "Video duration: "
-                                            + duration.toMillis()
-                                            + " ms"
-                            );
-                        }
-
-                        /*
-                         * Position immediately at the current
-                         * simulation growth.
-                         */
-                        positionVideoAtGrowth(
-                                growthPctFraction()
-                                        * VIDEO_END_FRACTION
-                        );
-                    }
-            );
-
-            plantMediaPlayer.setOnEndOfMedia(
-                    () -> {
-
-                        /*
-                         * Video reaching its end is NOT the
-                         * same thing as crop readiness.
-                         */
-                        if (plantMediaPlayer != null) {
-
-                            plantMediaPlayer.pause();
-
-                            muteVideo();
-
-                            Duration total =
-                                    plantMediaPlayer
-                                            .getTotalDuration();
-
-                            if (
-                                    total != null
-                            ) {
-
-                                plantMediaPlayer.seek(
-                                        total.multiply(
-                                                VIDEO_END_FRACTION
-                                        )
-                                );
-                            }
-                        }
-                    }
-            );
-
-            plantMediaPlayer.setOnError(
-                    () -> {
-
-                        if (
-                                plantMediaPlayer != null
-                        ) {
-
-                            System.err.println(
-                                    "SmartHarvest 360 video error: "
-                                            + plantMediaPlayer.getError()
-                            );
-                        }
-
-                        System.err.println(
-                                "Crop video could not be played."
-                        );
-                    }
-            );
-
+            player.setOnStalled(() -> {
+                if (generation != videoGeneration || plantMediaPlayer != player) {
+                    return;
+                }
+                player.pause();
+                positionVideoAtGrowth(growthPctFraction() * VIDEO_END_FRACTION);
+            });
         } catch (Exception ex) {
-
-            System.err.println(
-                    "Could not load crop video: "
-                            + ex.getMessage()
-            );
-
-            ex.printStackTrace();
-
-            statusLabel.setText(
-                    "Unable to load crop video"
-            );
+            System.err.println("Could not load crop video: " + ex.getMessage());
+            showVideoFallback();
+            statusLabel.setText("Unable to load crop video");
         }
     }
 
+    private String playableVideoUri(String videoFile, URL resource) throws Exception {
+        if ("file".equalsIgnoreCase(resource.getProtocol())) {
+            return resource.toExternalForm();
+        }
+        Path directory = Path.of(System.getProperty("java.io.tmpdir"), "smartharvest-videos");
+        Files.createDirectories(directory);
+        Path target = directory.resolve(videoFile);
+        if (Files.notExists(target) || Files.size(target) == 0) {
+            try (InputStream input = resource.openStream()) {
+                Files.copy(input, target, StandardCopyOption.REPLACE_EXISTING);
+            }
+        }
+        return target.toUri().toString();
+    }
 
-    /**
-     * Completely disables video audio.
-     */
-    private void muteVideo() {
+    private void showVideoFallback() {
+        videoReady = false;
+        if (plantVideoView != null) {
+            plantVideoView.setVisible(false);
+        }
+        if (crop3dView != null) {
+            crop3dView.setVisible(true);
+        }
+    }
 
+    private boolean isPlayerUsable() {
         if (plantMediaPlayer == null) {
+            return false;
+        }
+        MediaPlayer.Status status = plantMediaPlayer.getStatus();
+        return status == MediaPlayer.Status.READY
+                || status == MediaPlayer.Status.PAUSED
+                || status == MediaPlayer.Status.PLAYING
+                || status == MediaPlayer.Status.STOPPED
+                || status == MediaPlayer.Status.STALLED;
+    }
 
+    private void muteVideo() {
+        if (plantMediaPlayer == null) {
             return;
         }
-
         try {
-
             plantMediaPlayer.setMute(true);
-
             plantMediaPlayer.setVolume(0.0);
-
         } catch (Exception ignored) {
-
-            // Video audio is not required by the simulation.
+            // Audio is not required.
         }
     }
 
-
-    /**
-     * Maps crop names to files inside:
-     *
-     * src/main/resources/videos/
-     */
-    private String getVideoFileName(
-            String cropName
-    ) {
-
+    private String getVideoFileName(String cropName) {
         return switch (cropName) {
-
-            case "chilli",
-                 "chili" ->
-                    "chilli.mp4";
-
-            case "paddy",
-                 "rice" ->
-                    "paddy.mp4";
-
-            case "corn",
-                 "maize" ->
-                    "corn.mp4";
-
-            case "durian" ->
-                    "durian.mp4";
-
-            case "tomato" ->
-                    "tomato.mp4";
-
-            case "papaya" ->
-                    "papaya.mp4";
-
-            default ->
-                    null;
+            case "chilli", "chili" -> "chilli.mp4";
+            case "paddy", "rice" -> "paddy.mp4";
+            case "corn", "maize" -> "corn.mp4";
+            case "durian" -> "durian.mp4";
+            case "tomato" -> "tomato.mp4";
+            case "papaya" -> "papaya.mp4";
+            default -> null;
         };
     }
 
-
     /**
-     * Synchronizes video with simulation growth.
-     *
-     * Example for 90-day corn:
-     *
-     * Day 0  -> 0%
-     * Day 1  -> 1.11%
-     * Day 45 -> 50%
-     * Day 90 -> 100%
-     *
-     * Video uses only 95% of its duration.
+     * Keeps the growth video aligned with simulation progress.
+     * Autoplay lets the clip run at the selected rate.
+     * Manual days seek to the matching frame instead of play/pause racing.
      */
     private void synchronizeVideoWithSimulation() {
-
-        if (plantMediaPlayer == null) {
-
+        if (!isPlayerUsable()) {
             return;
         }
 
-        MediaPlayer.Status status =
-                plantMediaPlayer.getStatus();
-
-        if (
-                status == MediaPlayer.Status.UNKNOWN
-                        ||
-                status == MediaPlayer.Status.DISPOSED
-                        ||
-                status == MediaPlayer.Status.HALTED
-        ) {
-
-            return;
-        }
-
-        Duration totalDuration =
-                plantMediaPlayer.getTotalDuration();
-
-        if (
-                totalDuration == null
-                        ||
-                totalDuration.isUnknown()
-                        ||
-                totalDuration.isIndefinite()
-                        ||
-                totalDuration.lessThanOrEqualTo(
-                                Duration.ZERO
-                        )
-        ) {
-
-            return;
-        }
-
-        double simulationProgress =
-                growthPctFraction();
-
-        double videoProgress =
-                Math.min(
-                        VIDEO_END_FRACTION,
-                        simulationProgress
-                                * VIDEO_END_FRACTION
-                );
-
-        /*
-         * When autoplay is active, video rate must match
-         * simulation rate.
-         */
+        double videoProgress = Math.min(VIDEO_END_FRACTION, growthPctFraction() * VIDEO_END_FRACTION);
+        muteVideo();
         if (playing) {
-
-            plantMediaPlayer.setRate(
-                    getSimulationSpeed()
-            );
-
-            muteVideo();
-
+            plantMediaPlayer.setRate(getSimulationSpeed());
+            correctPlayingVideo(videoProgress);
         } else {
-
-            plantMediaPlayer.setRate(
-                    1.0
-            );
-
-            muteVideo();
+            plantMediaPlayer.setRate(1.0);
+            positionVideoAtGrowth(videoProgress);
         }
-
-        animateVideoToGrowth(
-                videoProgress
-        );
     }
 
-
-    /**
-     * Moves video from its current position to the
-     * current simulation position.
-     *
-     * IMPORTANT:
-     *
-     * Video playback rate follows the simulation speed.
-     *
-     * At:
-     *
-     * 1x -> normal
-     * 2x -> 2x video
-     * 5x -> 5x video
-     * 10x -> 10x video
-     */
-    private void animateVideoToGrowth(
-            double targetProgress
-    ) {
-
-        if (plantMediaPlayer == null) {
-
+    private void correctPlayingVideo(double targetProgress) {
+        Duration totalDuration = plantMediaPlayer.getTotalDuration();
+        Duration currentTime = plantMediaPlayer.getCurrentTime();
+        if (totalDuration == null || totalDuration.isUnknown() || totalDuration.toMillis() <= 0) {
             return;
         }
-
-        Duration totalDuration =
-                plantMediaPlayer.getTotalDuration();
-
-        if (
-                totalDuration == null
-                        ||
-                totalDuration.isUnknown()
-                        ||
-                totalDuration.isIndefinite()
-                        ||
-                totalDuration.lessThanOrEqualTo(
-                                Duration.ZERO
-                        )
-        ) {
-
+        Duration targetTime = totalDuration.multiply(Math.max(0.0, Math.min(VIDEO_END_FRACTION, targetProgress)));
+        double drift = 0.0;
+        if (currentTime != null && !currentTime.isUnknown()) {
+            drift = Math.abs(currentTime.toMillis() - targetTime.toMillis());
+        }
+        if (plantMediaPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
+            plantMediaPlayer.seek(targetTime);
+            plantMediaPlayer.play();
             return;
         }
-
-        double clampedTarget =
-                Math.max(
-                        0.0,
-                        Math.min(
-                                VIDEO_END_FRACTION,
-                                targetProgress
-                        )
-                );
-
-        Duration targetTime =
-                totalDuration.multiply(
-                        clampedTarget
-                );
-
-        Duration currentTime =
-                plantMediaPlayer.getCurrentTime();
-
-        if (
-                currentTime == null
-                        ||
-                        currentTime.isUnknown()
-                        ||
-                        currentTime.isIndefinite()
-        ) {
-
-            currentTime =
-                    Duration.ZERO;
+        if (drift > 400.0) {
+            plantMediaPlayer.seek(targetTime);
         }
-
-        stopVideoTransitionOnly();
-
-        double currentMillis =
-                currentTime.toMillis();
-
-        double targetMillis =
-                targetTime.toMillis();
-
-        /*
-         * If video has somehow moved ahead, immediately
-         * correct it.
-         */
-        if (
-                currentMillis
-                        >
-                        targetMillis + 25
-        ) {
-
-            plantMediaPlayer.pause();
-
-            plantMediaPlayer.seek(
-                    targetTime
-            );
-
-            muteVideo();
-
-            return;
-        }
-
-        double distanceMillis =
-                targetMillis
-                        -
-                        currentMillis;
-
-        /*
-         * Nothing meaningful to animate.
-         */
-        if (distanceMillis <= 15) {
-
-            plantMediaPlayer.pause();
-
-            plantMediaPlayer.seek(
-                    targetTime
-            );
-
-            muteVideo();
-
-            return;
-        }
-
-        /*
-         * =====================================================
-         * VIDEO SPEED
-         * =====================================================
-         *
-         * Use exactly the same speed as the simulation.
-         */
-        double speed =
-                playing
-                        ? getSimulationSpeed()
-                        : 1.0;
-
-        plantMediaPlayer.setRate(
-                speed
-        );
-
-        muteVideo();
-
-        /*
-         * Start from the player's current position.
-         *
-         * IMPORTANT:
-         *
-         * Do NOT seek to currentTime immediately before play().
-         * MediaPlayer.seek() is asynchronous, so doing:
-         *
-         *     seek(currentTime);
-         *     play();
-         *
-         * can race with the seek operation and prevent the
-         * animation from starting reliably (especially when
-         * advancing the simulation one day at a time).
-         *
-         * The player is already at currentTime, so simply play
-         * from there.
-         */
-        plantMediaPlayer.play();
-
-        /*
-         * Because MediaPlayer is running at the selected
-         * playback rate, the real-world time needed to cover
-         * this portion of the video is:
-         *
-         * distance / playbackRate
-         *
-         * This is what makes 2x actually twice as fast.
-         */
-        double stopAfterMillis =
-                Math.max(
-                        25.0,
-                        (
-                                distanceMillis
-                                        /
-                                        speed
-                        )
-                                + VIDEO_EXTRA_DELAY_MS
-                );
-
-        videoStopTransition =
-                new PauseTransition(
-                        Duration.millis(
-                                stopAfterMillis
-                        )
-                );
-
-        videoStopTransition.setOnFinished(
-                event -> {
-
-                    if (plantMediaPlayer == null) {
-
-                        return;
-                    }
-
-                    plantMediaPlayer.pause();
-
-                    /*
-                     * Always return to the exact simulation
-                     * position after the visual movement.
-                     */
-                    plantMediaPlayer.seek(
-                            targetTime
-                    );
-
-                    muteVideo();
-
-                    videoStopTransition = null;
-                }
-        );
-
-        videoStopTransition.play();
     }
 
+    private void animateVideoToGrowth(double targetProgress) {
+        positionVideoAtGrowth(targetProgress);
+    }
 
-    /**
-     * Positions video without animation.
-     */
-    private void positionVideoAtGrowth(
-            double progress
-    ) {
-
-        if (plantMediaPlayer == null) {
-
+    private void positionVideoAtGrowth(double progress) {
+        if (!isPlayerUsable()) {
             return;
         }
-
-        Duration totalDuration =
-                plantMediaPlayer.getTotalDuration();
-
-        if (
-                totalDuration == null
-                        ||
-                        totalDuration.isUnknown()
-                        ||
-                        totalDuration.isIndefinite()
-                        ||
-                        totalDuration.lessThanOrEqualTo(
-                                Duration.ZERO
-                        )
-        ) {
-
+        Duration totalDuration = plantMediaPlayer.getTotalDuration();
+        if (totalDuration == null || totalDuration.isUnknown() || totalDuration.toMillis() <= 0) {
             return;
         }
-
-        double clamped =
-                Math.max(
-                        0.0,
-                        Math.min(
-                                VIDEO_END_FRACTION,
-                                progress
-                        )
-                );
-
-        Duration target =
-                totalDuration.multiply(
-                        clamped
-                );
-
+        double clamped = Math.max(0.0, Math.min(VIDEO_END_FRACTION, progress));
+        Duration target = totalDuration.multiply(clamped);
         stopVideoTransitionOnly();
-
+        if (playing) {
+            plantMediaPlayer.setRate(getSimulationSpeed());
+            muteVideo();
+            if (plantMediaPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
+                plantMediaPlayer.seek(target);
+                plantMediaPlayer.play();
+            }
+            return;
+        }
         plantMediaPlayer.pause();
-
-        plantMediaPlayer.setRate(
-                1.0
-        );
-
+        plantMediaPlayer.setRate(1.0);
         muteVideo();
-
-        plantMediaPlayer.seek(
-                target
-        );
+        plantMediaPlayer.seek(target);
     }
 
-
-    /**
-     * Stops only the video transition.
-     */
     private void stopVideoTransitionOnly() {
-
-        if (
-                videoStopTransition != null
-        ) {
-
+        if (videoStopTransition != null) {
             videoStopTransition.stop();
-
             videoStopTransition = null;
         }
     }
 
-
-    /**
-     * Fully disposes crop video.
-     */
     private void stopPlantVideo() {
-
         stopVideoTransitionOnly();
-
-        if (
-                plantMediaPlayer != null
-        ) {
-
-            try {
-
-                plantMediaPlayer.pause();
-
-                plantMediaPlayer.stop();
-
-                plantMediaPlayer.dispose();
-
-            } catch (Exception ignored) {
-
-                // Nothing else required.
-            }
-
-            plantMediaPlayer = null;
-        }
-
+        videoGeneration++;
+        videoReady = false;
+        MediaPlayer player = plantMediaPlayer;
+        plantMediaPlayer = null;
         loadedVideoCrop = null;
-
-        if (
-                plantVideoView != null
-        ) {
-
-            plantVideoView.setMediaPlayer(
-                    null
-            );
-
-            plantVideoView.setVisible(
-                    false
-            );
+        if (plantVideoView != null) {
+            plantVideoView.setMediaPlayer(null);
+            plantVideoView.setVisible(false);
+        }
+        if (crop3dView != null) {
+            crop3dView.setVisible(true);
+        }
+        if (player == null) {
+            return;
+        }
+        try {
+            player.setOnReady(null);
+            player.setOnError(null);
+            player.setOnEndOfMedia(null);
+            player.setOnStalled(null);
+            player.pause();
+            player.stop();
+            player.dispose();
+        } catch (Exception ignored) {
+            // Previous decoder must still be released before a new one opens.
         }
     }
 
@@ -1681,15 +1232,12 @@ public class SimulationController {
         /*
          * Make video use the same speed.
          */
-        if (
-                plantMediaPlayer != null
-        ) {
-
-            plantMediaPlayer.setRate(
-                    speed
-            );
-
+        if (isPlayerUsable()) {
+            plantMediaPlayer.setRate(speed);
             muteVideo();
+            if (plantMediaPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
+                plantMediaPlayer.play();
+            }
         }
 
         autoPlay =
@@ -2319,17 +1867,7 @@ public class SimulationController {
                 recommendedAction
         );
 
-
-        loadCropVideo(
-                crop
-        );
-
-
-        /*
-         * Synchronize video after UI state has been updated.
-         */
-        synchronizeVideoWithSimulation();
-
+        refreshCropVisual(crop, progress);
 
         updateReadyState();
     }
