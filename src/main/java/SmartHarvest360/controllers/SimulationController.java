@@ -15,6 +15,8 @@ import SmartHarvest360.ui.Crop3DView;
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.geometry.Pos;
 
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -307,6 +309,8 @@ public class SimulationController {
 
     private boolean videoLifecycleHooked;
 
+    private int videoLoadAttempts;
+
     /**
      * Transition used to stop video at exact simulation position.
      */
@@ -573,10 +577,12 @@ public class SimulationController {
     private void configureVideo() {
         plantVideoView.setFitWidth(FIELD_W);
         plantVideoView.setFitHeight(FIELD_H);
-        plantVideoView.setPreserveRatio(true);
+        plantVideoView.setPreserveRatio(false);
         plantVideoView.setSmooth(true);
+        plantVideoView.setCache(false);
         plantVideoView.setManaged(true);
         plantVideoView.setVisible(false);
+        StackPane.setAlignment(plantVideoView, Pos.CENTER);
 
         if (crop3dView != null) {
             crop3dView.setVisible(true);
@@ -591,30 +597,15 @@ public class SimulationController {
     }
 
     /**
-     * Scales the clip to cover the rounded field with no letterbox bars.
+     * Fills the rounded crop-field frame with no letterbox bars.
      */
     private void sizeVideoToFillFrame(MediaPlayer player) {
-        if (plantVideoView == null || player == null || player.getMedia() == null) {
+        if (plantVideoView == null) {
             return;
         }
-        double videoW = player.getMedia().getWidth();
-        double videoH = player.getMedia().getHeight();
-        if (videoW <= 0 || videoH <= 0) {
-            plantVideoView.setPreserveRatio(false);
-            plantVideoView.setFitWidth(FIELD_W);
-            plantVideoView.setFitHeight(FIELD_H);
-            return;
-        }
-        plantVideoView.setPreserveRatio(true);
-        double scaleX = FIELD_W / videoW;
-        double scaleY = FIELD_H / videoH;
-        if (scaleX >= scaleY) {
-            plantVideoView.setFitWidth(FIELD_W);
-            plantVideoView.setFitHeight(0);
-        } else {
-            plantVideoView.setFitWidth(0);
-            plantVideoView.setFitHeight(FIELD_H);
-        }
+        plantVideoView.setPreserveRatio(false);
+        plantVideoView.setFitWidth(FIELD_W);
+        plantVideoView.setFitHeight(FIELD_H);
     }
 
     private void hookVideoLifecycle() {
@@ -624,17 +615,18 @@ public class SimulationController {
         videoLifecycleHooked = true;
         plantVideoView.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene == null) {
-                stopPlantVideo();
+                Platform.runLater(() -> {
+                    if (plantVideoView.getScene() == null) {
+                        stopPlantVideo();
+                    }
+                });
                 return;
             }
-            PauseTransition wait = new PauseTransition(Duration.millis(80));
-            wait.setOnFinished(event -> {
-                if (plantVideoView.getScene() == null) {
-                    return;
-                }
-                loadCropVideo(session.getActiveCrop());
+            Platform.runLater(() -> {
+                PauseTransition wait = new PauseTransition(Duration.millis(120));
+                wait.setOnFinished(event -> loadCropVideo(session.getActiveCrop()));
+                wait.play();
             });
-            wait.play();
         });
         if (plantVideoView.getScene() != null) {
             loadCropVideo(session.getActiveCrop());
@@ -660,13 +652,21 @@ public class SimulationController {
      * (ERROR_MEDIA_INVALID) and leaves a stuck last frame.
      */
     private void loadCropVideo(Crop crop) {
-        if (crop == null) {
+        if (crop == null || plantVideoView == null) {
+            return;
+        }
+        if (plantVideoView.getScene() == null) {
             return;
         }
 
         String cropName = crop.getName().trim().toLowerCase(Locale.ROOT);
         if (cropName.equals(loadedVideoCrop) && isPlayerUsable()) {
             muteVideo();
+            videoReady = true;
+            plantVideoView.setVisible(true);
+            if (crop3dView != null) {
+                crop3dView.setVisible(false);
+            }
             return;
         }
 
@@ -688,7 +688,7 @@ public class SimulationController {
 
         try {
             String playableUri = playableVideoUri(videoFile, videoUrl);
-            System.out.println("Loading crop video: " + cropName + " -> " + videoFile);
+            System.out.println("Loading crop video: " + cropName + " -> " + playableUri);
 
             Media media = new Media(playableUri);
             MediaPlayer player = new MediaPlayer(media);
@@ -699,7 +699,8 @@ public class SimulationController {
 
             player.setCycleCount(1);
             player.setAutoPlay(false);
-            muteVideo();
+            plantVideoView.setMediaPlayer(player);
+            sizeVideoToFillFrame(player);
 
             player.setOnReady(() -> {
                 if (generation != videoGeneration || plantMediaPlayer != player) {
@@ -707,16 +708,20 @@ public class SimulationController {
                 }
                 muteVideo();
                 videoReady = true;
+                videoLoadAttempts = 0;
                 if (crop3dView != null) {
                     crop3dView.setVisible(false);
                 }
-                plantVideoView.setMediaPlayer(player);
-                plantVideoView.setVisible(true);
                 sizeVideoToFillFrame(player);
+                plantVideoView.setVisible(true);
                 player.setRate(playing ? getSimulationSpeed() : 1.0);
                 System.out.println("Video READY: " + cropName
                         + " (" + player.getTotalDuration().toMillis() + " ms)");
-                positionVideoAtGrowth(growthPctFraction() * VIDEO_END_FRACTION);
+                double startProgress = Math.max(
+                        0.002,
+                        growthPctFraction() * VIDEO_END_FRACTION
+                );
+                positionVideoAtGrowth(startProgress);
                 if (playing) {
                     player.play();
                 }
@@ -740,6 +745,13 @@ public class SimulationController {
                 }
                 System.err.println("SmartHarvest 360 video error: " + player.getError());
                 showVideoFallback();
+                if (videoLoadAttempts < 2 && plantVideoView.getScene() != null) {
+                    videoLoadAttempts++;
+                    loadedVideoCrop = null;
+                    PauseTransition retry = new PauseTransition(Duration.millis(400));
+                    retry.setOnFinished(event -> loadCropVideo(crop));
+                    retry.play();
+                }
             });
 
             player.setOnStalled(() -> {
@@ -757,18 +769,17 @@ public class SimulationController {
     }
 
     private String playableVideoUri(String videoFile, URL resource) throws Exception {
-        if ("file".equalsIgnoreCase(resource.getProtocol())) {
-            return resource.toExternalForm();
-        }
         Path directory = Path.of(System.getProperty("java.io.tmpdir"), "smartharvest-videos");
         Files.createDirectories(directory);
         Path target = directory.resolve(videoFile);
-        if (Files.notExists(target) || Files.size(target) == 0) {
+        long sourceSize = resource.openConnection().getContentLengthLong();
+        if (Files.notExists(target) || Files.size(target) == 0
+                || (sourceSize > 0 && Files.size(target) != sourceSize)) {
             try (InputStream input = resource.openStream()) {
                 Files.copy(input, target, StandardCopyOption.REPLACE_EXISTING);
             }
         }
-        return target.toUri().toString();
+        return target.toAbsolutePath().toUri().toString();
     }
 
     private void showVideoFallback() {

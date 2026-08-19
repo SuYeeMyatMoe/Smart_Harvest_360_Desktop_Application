@@ -352,12 +352,12 @@
                                             maxHeight="230"
                                             visible="false"/>
 
-                                <MediaView fx:id="plantVideoView"
-                                           fitWidth="266"
-                                           fitHeight="230"
-                                           preserveRatio="true"
-                                           smooth="true"
-                                           visible="false"/>
+                    <MediaView fx:id="plantVideoView"
+                               fitWidth="266"
+                               fitHeight="230"
+                               preserveRatio="false"
+                               smooth="true"
+                               visible="false"/>
 
 
                                 <Rectangle fx:id="soilRect"
