@@ -5,140 +5,128 @@
 [SHEET] Summary
 key,value
 farm,Hello
-location,Selangor
-soil,Clay
-crop,Corn
+location,Melaka
+soil,Silty
+crop,Tomato
 careScore,100
 plantGrade,A
 liveGrade,S
 fertilizerPlan,Medium
-overview,"Corn on Selangor/Clay finished care 100 with live grade path S (plant-time A). 15 day-group action summaries, 100 field steps, and 5 recommendations are ready before market."
+overview,"Tomato on Melaka/Silty finished care 100 with live grade path S (plant-time A). 13 day-group action summaries, 90 field steps, and 5 recommendations are ready before market."
 
 [SHEET] ActionByDayGroup
 fromDay,toDay,phase,dominantAction,mainWeather,irrigate,conserve,fertilize,protect,other,waterL,fertilizerKg,growthFrom,growthTo,actionMix,summary
-2,8,Early growth,Fertilize,Rain,1,0,6,0,0,2.81,2.40,2,8,"Irrigate 1, Fertilize 6","Early growth: Irrigate 1, Fertilize 6. Main weather Rain. Water 2.8 L, fertilizer 2.4 kg. Growth 2% to 8%."
-9,15,Early growth,Fertilize,Rain,0,0,7,0,0,2.76,2.80,9,15,Fertilize 7,"Early growth: Fertilize 7. Main weather Rain. Water 2.8 L, fertilizer 2.8 kg. Growth 9% to 15%."
-16,22,Early growth,Fertilize,Rain,0,0,7,0,0,3.72,2.80,16,22,Fertilize 7,"Early growth: Fertilize 7. Main weather Rain. Water 3.7 L, fertilizer 2.8 kg. Growth 16% to 22%."
-23,29,Early growth,Fertilize,Rain,1,0,6,0,0,3.29,2.40,23,29,"Irrigate 1, Fertilize 6","Early growth: Irrigate 1, Fertilize 6. Main weather Rain. Water 3.3 L, fertilizer 2.4 kg. Growth 23% to 29%."
-30,36,Early growth,Fertilize,Rain,0,0,7,0,0,3.00,2.80,30,36,Fertilize 7,"Early growth: Fertilize 7. Main weather Rain. Water 3.0 L, fertilizer 2.8 kg. Growth 30% to 36%."
-37,43,Mid season,Fertilize,Rain,0,0,7,0,0,2.52,2.80,37,43,Fertilize 7,"Mid season: Fertilize 7. Main weather Rain. Water 2.5 L, fertilizer 2.8 kg. Growth 37% to 43%."
-44,50,Mid season,Fertilize,Rain,0,0,7,0,0,2.76,2.80,44,50,Fertilize 7,"Mid season: Fertilize 7. Main weather Rain. Water 2.8 L, fertilizer 2.8 kg. Growth 44% to 50%."
-51,57,Mid season,Irrigate,Rain,6,0,1,0,0,3.64,0.40,51,57,"Irrigate 6, Fertilize 1","Mid season: Irrigate 6, Fertilize 1. Main weather Rain. Water 3.6 L, fertilizer 0.4 kg. Growth 51% to 57%."
-58,64,Mid season,Irrigate,Rain,7,0,0,0,0,3.73,0.00,58,64,Irrigate 7,"Mid season: Irrigate 7. Main weather Rain. Water 3.7 L, fertilizer 0.0 kg. Growth 58% to 64%."
-65,71,Pre-harvest,Irrigate,Rain,7,0,0,0,0,3.17,0.00,65,71,Irrigate 7,"Pre-harvest: Irrigate 7. Main weather Rain. Water 3.2 L, fertilizer 0.0 kg. Growth 65% to 71%."
-72,78,Pre-harvest,Irrigate,Rain,7,0,0,0,0,2.90,0.00,72,78,Irrigate 7,"Pre-harvest: Irrigate 7. Main weather Rain. Water 2.9 L, fertilizer 0.0 kg. Growth 72% to 78%."
-79,85,Pre-harvest,Irrigate,Rain,7,0,0,0,0,2.90,0.00,79,85,Irrigate 7,"Pre-harvest: Irrigate 7. Main weather Rain. Water 2.9 L, fertilizer 0.0 kg. Growth 79% to 85%."
-86,92,Pre-harvest,Irrigate,Rain,7,0,0,0,0,2.90,0.00,86,92,Irrigate 7,"Pre-harvest: Irrigate 7. Main weather Rain. Water 2.9 L, fertilizer 0.0 kg. Growth 86% to 92%."
-93,99,Pre-harvest,Irrigate,Rain,7,0,0,0,0,2.90,0.00,93,99,Irrigate 7,"Pre-harvest: Irrigate 7. Main weather Rain. Water 2.9 L, fertilizer 0.0 kg. Growth 93% to 99%."
-100,100,Pre-harvest,Irrigate,Rain,1,0,0,0,0,0.41,0.00,100,100,Irrigate 1,"Pre-harvest: Irrigate 1. Main weather Rain. Water 0.4 L, fertilizer 0.0 kg. Growth 100% to 100%."
+2,8,Early growth,Fertilize,Rain,1,0,6,0,0,1.95,2.40,2,9,"Irrigate 1, Fertilize 6","Early growth: Irrigate 1, Fertilize 6. Main weather Rain. Water 2.0 L, fertilizer 2.4 kg. Growth 2% to 9%."
+9,15,Early growth,Fertilize,Rain,0,0,7,0,0,1.75,2.80,10,17,Fertilize 7,"Early growth: Fertilize 7. Main weather Rain. Water 1.8 L, fertilizer 2.8 kg. Growth 10% to 17%."
+16,22,Early growth,Fertilize,Rain,0,0,7,0,0,1.75,2.80,18,24,Fertilize 7,"Early growth: Fertilize 7. Main weather Rain. Water 1.8 L, fertilizer 2.8 kg. Growth 18% to 24%."
+23,29,Early growth,Fertilize,Rain,0,0,7,0,0,1.75,2.80,26,32,Fertilize 7,"Early growth: Fertilize 7. Main weather Rain. Water 1.8 L, fertilizer 2.8 kg. Growth 26% to 32%."
+30,36,Mid season,Fertilize,Rain,0,0,7,0,0,1.75,2.80,33,40,Fertilize 7,"Mid season: Fertilize 7. Main weather Rain. Water 1.8 L, fertilizer 2.8 kg. Growth 33% to 40%."
+37,43,Mid season,Fertilize,Rain,0,0,7,0,0,1.75,2.80,41,48,Fertilize 7,"Mid season: Fertilize 7. Main weather Rain. Water 1.8 L, fertilizer 2.8 kg. Growth 41% to 48%."
+44,50,Mid season,Fertilize,Rain,0,0,7,0,0,1.75,2.80,49,56,Fertilize 7,"Mid season: Fertilize 7. Main weather Rain. Water 1.8 L, fertilizer 2.8 kg. Growth 49% to 56%."
+51,57,Mid season,Irrigate,Rain,7,0,0,0,0,2.01,0.00,57,63,Irrigate 7,"Mid season: Irrigate 7. Main weather Rain. Water 2.0 L, fertilizer 0.0 kg. Growth 57% to 63%."
+58,64,Pre-harvest,Irrigate,Rain,7,0,0,0,0,2.01,0.00,64,71,Irrigate 7,"Pre-harvest: Irrigate 7. Main weather Rain. Water 2.0 L, fertilizer 0.0 kg. Growth 64% to 71%."
+65,71,Pre-harvest,Irrigate,Rain,7,0,0,0,0,2.01,0.00,72,79,Irrigate 7,"Pre-harvest: Irrigate 7. Main weather Rain. Water 2.0 L, fertilizer 0.0 kg. Growth 72% to 79%."
+72,78,Pre-harvest,Irrigate,Rain,7,0,0,0,0,2.01,0.00,80,87,Irrigate 7,"Pre-harvest: Irrigate 7. Main weather Rain. Water 2.0 L, fertilizer 0.0 kg. Growth 80% to 87%."
+79,85,Pre-harvest,Irrigate,Rain,7,0,0,0,0,2.01,0.00,88,94,Irrigate 7,"Pre-harvest: Irrigate 7. Main weather Rain. Water 2.0 L, fertilizer 0.0 kg. Growth 88% to 94%."
+86,90,Pre-harvest,Irrigate,Rain,5,0,0,0,0,1.44,0.00,96,100,Irrigate 5,"Pre-harvest: Irrigate 5. Main weather Rain. Water 1.4 L, fertilizer 0.0 kg. Growth 96% to 100%."
 
 [SHEET] DailySteps
 stepNumber,action,weather,outcome,note
 1,Setup,Sunny,Season started at 1%,Baseline day - later actions move care and grade.
 2,Irrigate,Rain,Growing - growth 2%,Irrigation supports growth on dry/sunny days.
 3,Fertilize,Rain,Growing - growth 3%,Fertilizer day - keep stock aligned with the ML plan band.
-4,Fertilize,Rain,Growing - growth 4%,Fertilizer day - keep stock aligned with the ML plan band.
-5,Fertilize,Cloudy,Growing - growth 5%,Fertilizer day - keep stock aligned with the ML plan band.
-6,Fertilize,Rain,Growing - growth 6%,Fertilizer day - keep stock aligned with the ML plan band.
-7,Fertilize,Rain,Growing - growth 7%,Fertilizer day - keep stock aligned with the ML plan band.
-8,Fertilize,Rain,Growing - growth 8%,Fertilizer day - keep stock aligned with the ML plan band.
-9,Fertilize,Rain,Growing - growth 9%,Fertilizer day - keep stock aligned with the ML plan band.
-10,Fertilize,Rain,Growing - growth 10%,Fertilizer day - keep stock aligned with the ML plan band.
-11,Fertilize,Rain,Growing - growth 11%,Fertilizer day - keep stock aligned with the ML plan band.
-12,Fertilize,Rain,Growing - growth 12%,Fertilizer day - keep stock aligned with the ML plan band.
-13,Fertilize,Rain,Growing - growth 13%,Fertilizer day - keep stock aligned with the ML plan band.
-14,Fertilize,Cloudy,Growing - growth 14%,Fertilizer day - keep stock aligned with the ML plan band.
-15,Fertilize,Rain,Growing - growth 15%,Fertilizer day - keep stock aligned with the ML plan band.
-16,Fertilize,Rain,Growing - growth 16%,Fertilizer day - keep stock aligned with the ML plan band.
-17,Fertilize,Rain,Growing - growth 17%,Fertilizer day - keep stock aligned with the ML plan band.
-18,Fertilize,Cloudy,Growing - growth 18%,Fertilizer day - keep stock aligned with the ML plan band.
-19,Fertilize,Rain,Growing - growth 19%,Fertilizer day - keep stock aligned with the ML plan band.
-20,Fertilize,Cloudy,Growing - growth 20%,Fertilizer day - keep stock aligned with the ML plan band.
-21,Fertilize,Cloudy,Growing - growth 21%,Fertilizer day - keep stock aligned with the ML plan band.
-22,Fertilize,Sunny,Growing - growth 22%,Fertilizer day - keep stock aligned with the ML plan band.
-23,Irrigate,Rain,Growing - growth 23%,Irrigation supports growth on dry/sunny days.
-24,Fertilize,Rain,Growing - growth 24%,Fertilizer day - keep stock aligned with the ML plan band.
-25,Fertilize,Rain,Growing - growth 25%,Fertilizer day - keep stock aligned with the ML plan band.
-26,Fertilize,Rain,Growing - growth 26%,Fertilizer day - keep stock aligned with the ML plan band.
-27,Fertilize,Cloudy,Growing - growth 27%,Fertilizer day - keep stock aligned with the ML plan band.
-28,Fertilize,Cloudy,Growing - growth 28%,Fertilizer day - keep stock aligned with the ML plan band.
-29,Fertilize,Cloudy,Growing - growth 29%,Fertilizer day - keep stock aligned with the ML plan band.
-30,Fertilize,Cloudy,Growing - growth 30%,Fertilizer day - keep stock aligned with the ML plan band.
-31,Fertilize,Rain,Growing - growth 31%,Fertilizer day - keep stock aligned with the ML plan band.
-32,Fertilize,Rain,Growing - growth 32%,Fertilizer day - keep stock aligned with the ML plan band.
-33,Fertilize,Rain,Growing - growth 33%,Fertilizer day - keep stock aligned with the ML plan band.
-34,Fertilize,Cloudy,Growing - growth 34%,Fertilizer day - keep stock aligned with the ML plan band.
-35,Fertilize,Rain,Growing - growth 35%,Fertilizer day - keep stock aligned with the ML plan band.
-36,Fertilize,Rain,Growing - growth 36%,Fertilizer day - keep stock aligned with the ML plan band.
-37,Fertilize,Rain,Growing - growth 37%,Fertilizer day - keep stock aligned with the ML plan band.
-38,Fertilize,Rain,Growing - growth 38%,Fertilizer day - keep stock aligned with the ML plan band.
-39,Fertilize,Rain,Growing - growth 39%,Fertilizer day - keep stock aligned with the ML plan band.
-40,Fertilize,Rain,Growing - growth 40%,Fertilizer day - keep stock aligned with the ML plan band.
-41,Fertilize,Rain,Growing - growth 41%,Fertilizer day - keep stock aligned with the ML plan band.
-42,Fertilize,Rain,Growing - growth 42%,Fertilizer day - keep stock aligned with the ML plan band.
-43,Fertilize,Rain,Growing - growth 43%,Fertilizer day - keep stock aligned with the ML plan band.
-44,Fertilize,Rain,Growing - growth 44%,Fertilizer day - keep stock aligned with the ML plan band.
-45,Fertilize,Rain,Growing - growth 45%,Fertilizer day - keep stock aligned with the ML plan band.
-46,Fertilize,Rain,Growing - growth 46%,Fertilizer day - keep stock aligned with the ML plan band.
-47,Fertilize,Rain,Growing - growth 47%,Fertilizer day - keep stock aligned with the ML plan band.
-48,Fertilize,Rain,Growing - growth 48%,Fertilizer day - keep stock aligned with the ML plan band.
-49,Fertilize,Rain,Growing - growth 49%,Fertilizer day - keep stock aligned with the ML plan band.
-50,Fertilize,Cloudy,Growing - growth 50%,Fertilizer day - keep stock aligned with the ML plan band.
-51,Fertilize,Cloudy,Growing - growth 51%,Fertilizer day - keep stock aligned with the ML plan band.
-52,Irrigate,Rain,Growing - growth 52%,Irrigation supports growth on dry/sunny days.
-53,Irrigate,Rain,Growing - growth 53%,Irrigation supports growth on dry/sunny days.
-54,Irrigate,Rain,Growing - growth 54%,Irrigation supports growth on dry/sunny days.
-55,Irrigate,Rain,Growing - growth 55%,Irrigation supports growth on dry/sunny days.
-56,Irrigate,Rain,Growing - growth 56%,Irrigation supports growth on dry/sunny days.
-57,Irrigate,Sunny,Growing - growth 57%,Irrigation supports growth on dry/sunny days.
-58,Irrigate,Sunny,Growing - growth 58%,Irrigation supports growth on dry/sunny days.
-59,Irrigate,Rain,Growing - growth 59%,Irrigation supports growth on dry/sunny days.
-60,Irrigate,Rain,Growing - growth 60%,Irrigation supports growth on dry/sunny days.
-61,Irrigate,Cloudy,Growing - growth 61%,Irrigation supports growth on dry/sunny days.
-62,Irrigate,Rain,Growing - growth 62%,Irrigation supports growth on dry/sunny days.
-63,Irrigate,Rain,Growing - growth 63%,Irrigation supports growth on dry/sunny days.
-64,Irrigate,Rain,Growing - growth 64%,Irrigation supports growth on dry/sunny days.
-65,Irrigate,Rain,Growing - growth 65%,Irrigation supports growth on dry/sunny days.
-66,Irrigate,Rain,Growing - growth 66%,Irrigation supports growth on dry/sunny days.
-67,Irrigate,Rain,Growing - growth 67%,Irrigation supports growth on dry/sunny days.
-68,Irrigate,Rain,Growing - growth 68%,Irrigation supports growth on dry/sunny days.
-69,Irrigate,Rain,Growing - growth 69%,Irrigation supports growth on dry/sunny days.
-70,Irrigate,Cloudy,Growing - growth 70%,Irrigation supports growth on dry/sunny days.
-71,Irrigate,Rain,Growing - growth 71%,Irrigation supports growth on dry/sunny days.
-72,Irrigate,Rain,Growing - growth 72%,Irrigation supports growth on dry/sunny days.
-73,Irrigate,Rain,Growing - growth 73%,Irrigation supports growth on dry/sunny days.
-74,Irrigate,Rain,Growing - growth 74%,Irrigation supports growth on dry/sunny days.
-75,Irrigate,Rain,Growing - growth 75%,Irrigation supports growth on dry/sunny days.
-76,Irrigate,Rain,Growing - growth 76%,Irrigation supports growth on dry/sunny days.
-77,Irrigate,Rain,Growing - growth 77%,Irrigation supports growth on dry/sunny days.
-78,Irrigate,Rain,Growing - growth 78%,Irrigation supports growth on dry/sunny days.
-79,Irrigate,Rain,Growing - growth 79%,Irrigation supports growth on dry/sunny days.
-80,Irrigate,Rain,Growing - growth 80%,Irrigation supports growth on dry/sunny days.
-81,Irrigate,Rain,Growing - growth 81%,Irrigation supports growth on dry/sunny days.
-82,Irrigate,Rain,Growing - growth 82%,Irrigation supports growth on dry/sunny days.
-83,Irrigate,Rain,Growing - growth 83%,Irrigation supports growth on dry/sunny days.
-84,Irrigate,Rain,Growing - growth 84%,Irrigation supports growth on dry/sunny days.
-85,Irrigate,Rain,Growing - growth 85%,Irrigation supports growth on dry/sunny days.
-86,Irrigate,Rain,Growing - growth 86%,Irrigation supports growth on dry/sunny days.
-87,Irrigate,Rain,Growing - growth 87%,Irrigation supports growth on dry/sunny days.
-88,Irrigate,Rain,Growing - growth 88%,Irrigation supports growth on dry/sunny days.
-89,Irrigate,Rain,Growing - growth 89%,Irrigation supports growth on dry/sunny days.
-90,Irrigate,Rain,Growing - growth 90%,Irrigation supports growth on dry/sunny days.
-91,Irrigate,Rain,Growing - growth 91%,Irrigation supports growth on dry/sunny days.
-92,Irrigate,Rain,Growing - growth 92%,Irrigation supports growth on dry/sunny days.
-93,Irrigate,Rain,Growing - growth 93%,Irrigation supports growth on dry/sunny days.
-94,Irrigate,Rain,Growing - growth 94%,Irrigation supports growth on dry/sunny days.
-95,Irrigate,Rain,Growing - growth 95%,Irrigation supports growth on dry/sunny days.
-96,Irrigate,Rain,Growing - growth 96%,Irrigation supports growth on dry/sunny days.
-97,Irrigate,Rain,Growing - growth 97%,Irrigation supports growth on dry/sunny days.
-98,Irrigate,Rain,Growing - growth 98%,Irrigation supports growth on dry/sunny days.
-99,Irrigate,Rain,Growing - growth 99%,Irrigation supports growth on dry/sunny days.
-100,Irrigate,Rain,Ready to harvest - growth 100%,Irrigation supports growth on dry/sunny days.
+4,Fertilize,Cloudy,Growing - growth 4%,Fertilizer day - keep stock aligned with the ML plan band.
+5,Fertilize,Rain,Growing - growth 6%,Fertilizer day - keep stock aligned with the ML plan band.
+6,Fertilize,Rain,Growing - growth 7%,Fertilizer day - keep stock aligned with the ML plan band.
+7,Fertilize,Rain,Growing - growth 8%,Fertilizer day - keep stock aligned with the ML plan band.
+8,Fertilize,Rain,Growing - growth 9%,Fertilizer day - keep stock aligned with the ML plan band.
+9,Fertilize,Rain,Growing - growth 10%,Fertilizer day - keep stock aligned with the ML plan band.
+10,Fertilize,Rain,Growing - growth 11%,Fertilizer day - keep stock aligned with the ML plan band.
+11,Fertilize,Rain,Growing - growth 12%,Fertilizer day - keep stock aligned with the ML plan band.
+12,Fertilize,Rain,Growing - growth 13%,Fertilizer day - keep stock aligned with the ML plan band.
+13,Fertilize,Rain,Growing - growth 14%,Fertilizer day - keep stock aligned with the ML plan band.
+14,Fertilize,Rain,Growing - growth 16%,Fertilizer day - keep stock aligned with the ML plan band.
+15,Fertilize,Rain,Growing - growth 17%,Fertilizer day - keep stock aligned with the ML plan band.
+16,Fertilize,Rain,Growing - growth 18%,Fertilizer day - keep stock aligned with the ML plan band.
+17,Fertilize,Rain,Growing - growth 19%,Fertilizer day - keep stock aligned with the ML plan band.
+18,Fertilize,Rain,Growing - growth 20%,Fertilizer day - keep stock aligned with the ML plan band.
+19,Fertilize,Rain,Growing - growth 21%,Fertilizer day - keep stock aligned with the ML plan band.
+20,Fertilize,Rain,Growing - growth 22%,Fertilizer day - keep stock aligned with the ML plan band.
+21,Fertilize,Rain,Growing - growth 23%,Fertilizer day - keep stock aligned with the ML plan band.
+22,Fertilize,Rain,Growing - growth 24%,Fertilizer day - keep stock aligned with the ML plan band.
+23,Fertilize,Rain,Growing - growth 26%,Fertilizer day - keep stock aligned with the ML plan band.
+24,Fertilize,Rain,Growing - growth 27%,Fertilizer day - keep stock aligned with the ML plan band.
+25,Fertilize,Rain,Growing - growth 28%,Fertilizer day - keep stock aligned with the ML plan band.
+26,Fertilize,Rain,Growing - growth 29%,Fertilizer day - keep stock aligned with the ML plan band.
+27,Fertilize,Rain,Growing - growth 30%,Fertilizer day - keep stock aligned with the ML plan band.
+28,Fertilize,Rain,Growing - growth 31%,Fertilizer day - keep stock aligned with the ML plan band.
+29,Fertilize,Rain,Growing - growth 32%,Fertilizer day - keep stock aligned with the ML plan band.
+30,Fertilize,Rain,Growing - growth 33%,Fertilizer day - keep stock aligned with the ML plan band.
+31,Fertilize,Rain,Growing - growth 34%,Fertilizer day - keep stock aligned with the ML plan band.
+32,Fertilize,Rain,Growing - growth 36%,Fertilizer day - keep stock aligned with the ML plan band.
+33,Fertilize,Rain,Growing - growth 37%,Fertilizer day - keep stock aligned with the ML plan band.
+34,Fertilize,Rain,Growing - growth 38%,Fertilizer day - keep stock aligned with the ML plan band.
+35,Fertilize,Rain,Growing - growth 39%,Fertilizer day - keep stock aligned with the ML plan band.
+36,Fertilize,Rain,Growing - growth 40%,Fertilizer day - keep stock aligned with the ML plan band.
+37,Fertilize,Rain,Growing - growth 41%,Fertilizer day - keep stock aligned with the ML plan band.
+38,Fertilize,Rain,Growing - growth 42%,Fertilizer day - keep stock aligned with the ML plan band.
+39,Fertilize,Rain,Growing - growth 43%,Fertilizer day - keep stock aligned with the ML plan band.
+40,Fertilize,Rain,Growing - growth 44%,Fertilizer day - keep stock aligned with the ML plan band.
+41,Fertilize,Rain,Growing - growth 46%,Fertilizer day - keep stock aligned with the ML plan band.
+42,Fertilize,Rain,Growing - growth 47%,Fertilizer day - keep stock aligned with the ML plan band.
+43,Fertilize,Rain,Growing - growth 48%,Fertilizer day - keep stock aligned with the ML plan band.
+44,Fertilize,Rain,Growing - growth 49%,Fertilizer day - keep stock aligned with the ML plan band.
+45,Fertilize,Rain,Growing - growth 50%,Fertilizer day - keep stock aligned with the ML plan band.
+46,Fertilize,Rain,Growing - growth 51%,Fertilizer day - keep stock aligned with the ML plan band.
+47,Fertilize,Rain,Growing - growth 52%,Fertilizer day - keep stock aligned with the ML plan band.
+48,Fertilize,Rain,Growing - growth 53%,Fertilizer day - keep stock aligned with the ML plan band.
+49,Fertilize,Rain,Growing - growth 54%,Fertilizer day - keep stock aligned with the ML plan band.
+50,Fertilize,Rain,Growing - growth 56%,Fertilizer day - keep stock aligned with the ML plan band.
+51,Irrigate,Rain,Growing - growth 57%,Irrigation supports growth on dry/sunny days.
+52,Irrigate,Rain,Growing - growth 58%,Irrigation supports growth on dry/sunny days.
+53,Irrigate,Rain,Growing - growth 59%,Irrigation supports growth on dry/sunny days.
+54,Irrigate,Rain,Growing - growth 60%,Irrigation supports growth on dry/sunny days.
+55,Irrigate,Rain,Growing - growth 61%,Irrigation supports growth on dry/sunny days.
+56,Irrigate,Rain,Growing - growth 62%,Irrigation supports growth on dry/sunny days.
+57,Irrigate,Rain,Growing - growth 63%,Irrigation supports growth on dry/sunny days.
+58,Irrigate,Rain,Growing - growth 64%,Irrigation supports growth on dry/sunny days.
+59,Irrigate,Rain,Growing - growth 66%,Irrigation supports growth on dry/sunny days.
+60,Irrigate,Rain,Growing - growth 67%,Irrigation supports growth on dry/sunny days.
+61,Irrigate,Rain,Growing - growth 68%,Irrigation supports growth on dry/sunny days.
+62,Irrigate,Rain,Growing - growth 69%,Irrigation supports growth on dry/sunny days.
+63,Irrigate,Rain,Growing - growth 70%,Irrigation supports growth on dry/sunny days.
+64,Irrigate,Rain,Growing - growth 71%,Irrigation supports growth on dry/sunny days.
+65,Irrigate,Rain,Growing - growth 72%,Irrigation supports growth on dry/sunny days.
+66,Irrigate,Rain,Growing - growth 73%,Irrigation supports growth on dry/sunny days.
+67,Irrigate,Rain,Growing - growth 74%,Irrigation supports growth on dry/sunny days.
+68,Irrigate,Rain,Growing - growth 76%,Irrigation supports growth on dry/sunny days.
+69,Irrigate,Rain,Growing - growth 77%,Irrigation supports growth on dry/sunny days.
+70,Irrigate,Rain,Growing - growth 78%,Irrigation supports growth on dry/sunny days.
+71,Irrigate,Rain,Growing - growth 79%,Irrigation supports growth on dry/sunny days.
+72,Irrigate,Rain,Growing - growth 80%,Irrigation supports growth on dry/sunny days.
+73,Irrigate,Rain,Growing - growth 81%,Irrigation supports growth on dry/sunny days.
+74,Irrigate,Rain,Growing - growth 82%,Irrigation supports growth on dry/sunny days.
+75,Irrigate,Rain,Growing - growth 83%,Irrigation supports growth on dry/sunny days.
+76,Irrigate,Rain,Growing - growth 84%,Irrigation supports growth on dry/sunny days.
+77,Irrigate,Rain,Growing - growth 86%,Irrigation supports growth on dry/sunny days.
+78,Irrigate,Rain,Growing - growth 87%,Irrigation supports growth on dry/sunny days.
+79,Irrigate,Rain,Growing - growth 88%,Irrigation supports growth on dry/sunny days.
+80,Irrigate,Rain,Growing - growth 89%,Irrigation supports growth on dry/sunny days.
+81,Irrigate,Rain,Growing - growth 90%,Irrigation supports growth on dry/sunny days.
+82,Irrigate,Rain,Growing - growth 91%,Irrigation supports growth on dry/sunny days.
+83,Irrigate,Rain,Growing - growth 92%,Irrigation supports growth on dry/sunny days.
+84,Irrigate,Rain,Growing - growth 93%,Irrigation supports growth on dry/sunny days.
+85,Irrigate,Rain,Growing - growth 94%,Irrigation supports growth on dry/sunny days.
+86,Irrigate,Rain,Growing - growth 96%,Irrigation supports growth on dry/sunny days.
+87,Irrigate,Rain,Growing - growth 97%,Irrigation supports growth on dry/sunny days.
+88,Irrigate,Rain,Growing - growth 98%,Irrigation supports growth on dry/sunny days.
+89,Irrigate,Rain,Growing - growth 99%,Irrigation supports growth on dry/sunny days.
+90,Irrigate,Rain,Ready to harvest - growth 100%,Irrigation supports growth on dry/sunny days.
 
 [SHEET] Recommendations
 priority,topic,advice
 High,Next action habit,On Storm/Heat days always choose Protect first - that is the fastest grade saver.
-High,Fertilizer plan,Follow Medium plan: Apply about 4.0 kg split early/mid season (1.0× need).
+High,Fertilizer plan,Follow Medium plan: Apply about 2.0 kg split early/mid season (1.0× need).
 Medium,Keep momentum,Care 100 supports live grade S. Keep following coach tips through harvest.
 Low,Grade upside,You improved the path to S from A. Sell promptly at the best market to lock results.
 Medium,Market next,"Continue to Harvest & Market, sell at the best buyer, then download the season CSV on Report."

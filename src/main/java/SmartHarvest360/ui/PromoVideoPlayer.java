@@ -1,14 +1,9 @@
 package SmartHarvest360.ui;
 
-import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.CacheHint;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -31,7 +26,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Opens the official SmartHarvest 360 promo
@@ -47,8 +41,6 @@ public final class PromoVideoPlayer {
 
     private static Stage openStage;
     private static MediaPlayer openPlayer;
-    private static Timeline stallWatch;
-    private static Parent cachedOwnerRoot;
 
     private PromoVideoPlayer() {
     }
@@ -71,13 +63,14 @@ public final class PromoVideoPlayer {
         }
 
         disposePlayer();
-        cacheOwner(owner);
 
         MediaView view = new MediaView();
         view.setPreserveRatio(true);
-        view.setSmooth(false);
+        view.setSmooth(true);
         view.setCache(false);
         view.setMouseTransparent(true);
+        view.setFitWidth(1080);
+        view.setFitHeight(608);
 
         Label title = new Label("SmartHarvest 360 — Official Film");
         title.getStyleClass().add("video-title");
@@ -122,14 +115,10 @@ public final class PromoVideoPlayer {
         }
         stage.setTitle("SmartHarvest 360 — Official Film");
         stage.setScene(scene);
-        stage.setWidth(1120);
-        stage.setHeight(700);
-        stage.setMinWidth(1120);
-        stage.setMinHeight(700);
-        stage.setResizable(false);
+        stage.setMinWidth(760);
+        stage.setMinHeight(500);
 
         AtomicBoolean started = new AtomicBoolean(false);
-        AtomicBoolean prepared = new AtomicBoolean(false);
 
         playPause.setOnAction(event -> {
             MediaPlayer player = openPlayer;
@@ -146,24 +135,23 @@ public final class PromoVideoPlayer {
             }
         });
 
-        replay.setOnAction(event -> restart(playPause, started));
+        replay.setOnAction(event -> beginPlayback(openPlayer, playPause, started, true));
         close.setOnAction(event -> stage.close());
 
-        stage.setOnShown(event -> {
-            PauseTransition settle = new PauseTransition(Duration.millis(220));
-            settle.setOnFinished(ready -> whenViewportReady(viewport, () ->
-                    prepareAndStart(view, viewport, playPause, started, prepared)));
-            settle.play();
-        });
+        stage.setOnShown(event -> Platform.runLater(() -> {
+            if (viewport.getWidth() > 1 && viewport.getHeight() > 1) {
+                view.setFitWidth(viewport.getWidth());
+                view.setFitHeight(viewport.getHeight());
+            }
+            prepareAndStart(view, playPause, started);
+        }));
 
         stage.setOnHidden(event -> {
-            stopWatch();
             view.setMediaPlayer(null);
             if (openStage == stage) {
                 openStage = null;
             }
             disposePlayer();
-            restoreOwner();
             if (onClosed != null) {
                 Platform.runLater(onClosed);
             }
@@ -172,65 +160,14 @@ public final class PromoVideoPlayer {
         stage.show();
     }
 
-    /**
-     * Wait until the window has a real size, then create the decoder.
-     * Changing MediaView size after play starts is what freezes GStreamer
-     * on Windows — even when the user never presses Replay.
-     */
-    private static void whenViewportReady(StackPane viewport, Runnable action) {
-        AtomicBoolean ran = new AtomicBoolean(false);
-        Runnable runOnce = () -> {
-            if (!ran.compareAndSet(false, true)) {
-                return;
-            }
-            action.run();
-        };
-        if (viewport.getWidth() > 80 && viewport.getHeight() > 80) {
-            runOnce.run();
-            return;
-        }
-        ChangeListener<Number> listener = new ChangeListener<>() {
-            @Override
-            public void changed(
-                    javafx.beans.value.ObservableValue<? extends Number> observable,
-                    Number oldValue,
-                    Number newValue
-            ) {
-                if (viewport.getWidth() > 80 && viewport.getHeight() > 80) {
-                    viewport.widthProperty().removeListener(this);
-                    viewport.heightProperty().removeListener(this);
-                    runOnce.run();
-                }
-            }
-        };
-        viewport.widthProperty().addListener(listener);
-        viewport.heightProperty().addListener(listener);
-        PauseTransition timeout = new PauseTransition(Duration.millis(500));
-        timeout.setOnFinished(event -> {
-            viewport.widthProperty().removeListener(listener);
-            viewport.heightProperty().removeListener(listener);
-            runOnce.run();
-        });
-        timeout.play();
-    }
-
     private static void prepareAndStart(
             MediaView view,
-            StackPane viewport,
             Button playPause,
-            AtomicBoolean started,
-            AtomicBoolean prepared
+            AtomicBoolean started
     ) {
-        if (!prepared.compareAndSet(false, true)) {
-            return;
-        }
         if (openStage == null || !openStage.isShowing()) {
-            prepared.set(false);
             return;
         }
-
-        view.setFitWidth(Math.max(viewport.getWidth(), 1));
-        view.setFitHeight(Math.max(viewport.getHeight(), 1));
 
         URL resource = PromoVideoPlayer.class.getResource(PROMO_RESOURCE);
         if (resource == null) {
@@ -249,6 +186,7 @@ public final class PromoVideoPlayer {
         player.setCycleCount(1);
         player.setRate(1.0);
         openPlayer = player;
+        view.setMediaPlayer(player);
 
         player.setOnReady(() -> Platform.runLater(() -> {
             if (openPlayer != player) {
@@ -259,21 +197,22 @@ public final class PromoVideoPlayer {
             if (total != null && !total.isUnknown()) {
                 System.out.println("Promo duration: " + total.toSeconds() + " seconds");
             }
-            if (view.getMediaPlayer() != player) {
-                view.setMediaPlayer(player);
-            }
-            PauseTransition start = new PauseTransition(Duration.millis(120));
-            start.setOnFinished(event -> {
+            view.setMediaPlayer(player);
+            beginPlayback(player, playPause, started, true);
+            // Windows GStreamer often paints black on the first play()
+            // until a seek(0)+play, which is what Replay already did.
+            PauseTransition kick = new PauseTransition(Duration.millis(250));
+            kick.setOnFinished(event -> {
                 if (openPlayer != player) {
                     return;
                 }
-                if (started.compareAndSet(false, true)) {
-                    player.play();
-                    playPause.setText("Pause");
-                    watchForStall(player);
+                Duration now = player.getCurrentTime();
+                boolean stillAtStart = now == null || now.isUnknown() || now.lessThan(Duration.millis(80));
+                if (stillAtStart && player.getStatus() != MediaPlayer.Status.PAUSED) {
+                    beginPlayback(player, playPause, started, true);
                 }
             });
-            start.play();
+            kick.play();
         }));
 
         player.setOnError(() -> {
@@ -283,67 +222,42 @@ public final class PromoVideoPlayer {
             }
             playPause.setText("Play");
             started.set(false);
-            stopWatch();
         });
 
         player.setOnEndOfMedia(() -> {
             playPause.setText("Replay");
             started.set(false);
-            stopWatch();
+            player.pause();
         });
 
         player.setOnStalled(() -> Platform.runLater(() -> {
-            if (openPlayer == player && started.get()) {
-                player.play();
+            if (openPlayer == player) {
+                beginPlayback(player, playPause, started, true);
             }
         }));
     }
 
     /**
-     * If the decoder reports PLAYING but time stops, nudge it forward a
-     * single frame. Never seek back to the start unless Replay is clicked.
+     * Replay works because it seeks to 0 and then plays. First open
+     * must do the same, otherwise Windows shows a black frame.
      */
-    private static void watchForStall(MediaPlayer player) {
-        stopWatch();
-        AtomicReference<Duration> lastTime = new AtomicReference<>(Duration.UNKNOWN);
-        AtomicBoolean grace = new AtomicBoolean(true);
-        PauseTransition gracePeriod = new PauseTransition(Duration.seconds(1.2));
-        gracePeriod.setOnFinished(event -> grace.set(false));
-        gracePeriod.play();
-
-        Timeline watch = new Timeline(new KeyFrame(Duration.millis(400), event -> {
-            if (openPlayer != player || !usable(player) || grace.get()) {
-                return;
-            }
-            MediaPlayer.Status status = player.getStatus();
-            if (status == MediaPlayer.Status.STALLED) {
-                player.play();
-                return;
-            }
-            if (status != MediaPlayer.Status.PLAYING) {
-                return;
-            }
-            Duration now = player.getCurrentTime();
-            Duration total = player.getTotalDuration();
-            if (now == null || now.isUnknown()) {
-                return;
-            }
-            if (total != null && !total.isUnknown()
-                    && total.subtract(now).lessThanOrEqualTo(Duration.millis(350))) {
-                return;
-            }
-            Duration previous = lastTime.getAndSet(now);
-            if (previous == null || previous.isUnknown()) {
-                return;
-            }
-            if (now.greaterThan(previous)) {
-                return;
-            }
-            player.play();
-        }));
-        watch.setCycleCount(Timeline.INDEFINITE);
-        stallWatch = watch;
-        watch.play();
+    private static void beginPlayback(
+            MediaPlayer player,
+            Button playPause,
+            AtomicBoolean started,
+            boolean forceSeek
+    ) {
+        if (player == null) {
+            return;
+        }
+        started.set(true);
+        if (forceSeek
+                || player.getStatus() == MediaPlayer.Status.STOPPED
+                || player.getStatus() == MediaPlayer.Status.READY) {
+            player.seek(Duration.ZERO);
+        }
+        player.play();
+        playPause.setText("Pause");
     }
 
     private static String playableUri(URL resource) throws Exception {
@@ -372,52 +286,7 @@ public final class PromoVideoPlayer {
                 || status == MediaPlayer.Status.STALLED;
     }
 
-    private static void restart(Button playPause, AtomicBoolean started) {
-        MediaPlayer player = openPlayer;
-        if (!usable(player)) {
-            return;
-        }
-        started.set(true);
-        player.seek(Duration.ZERO);
-        Platform.runLater(() -> {
-            if (!usable(openPlayer)) {
-                return;
-            }
-            openPlayer.play();
-            playPause.setText("Pause");
-            watchForStall(openPlayer);
-        });
-    }
-
-    private static void cacheOwner(Window owner) {
-        restoreOwner();
-        if (owner == null || owner.getScene() == null || owner.getScene().getRoot() == null) {
-            return;
-        }
-        cachedOwnerRoot = owner.getScene().getRoot();
-        cachedOwnerRoot.setCache(true);
-        cachedOwnerRoot.setCacheHint(CacheHint.SPEED);
-    }
-
-    private static void restoreOwner() {
-        if (cachedOwnerRoot == null) {
-            return;
-        }
-        cachedOwnerRoot.setCache(false);
-        cachedOwnerRoot.setCacheHint(CacheHint.DEFAULT);
-        cachedOwnerRoot = null;
-    }
-
-    private static void stopWatch() {
-        Timeline watch = stallWatch;
-        stallWatch = null;
-        if (watch != null) {
-            watch.stop();
-        }
-    }
-
     private static void disposePlayer() {
-        stopWatch();
         MediaPlayer player = openPlayer;
         openPlayer = null;
         if (player == null) {

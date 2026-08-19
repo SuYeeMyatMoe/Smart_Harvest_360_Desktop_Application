@@ -91,17 +91,9 @@ import java.util.Random;
  *
  * SPEED:
  *
- * The speed slider controls BOTH:
- *
- * 1. Simulation day frequency
- * 2. Video playback rate
- *
- * Therefore:
- *
- * 1x -> normal
- * 2x -> twice as fast
- * 5x -> five times as fast
- * 10x -> ten times as fast
+ * The speed slider controls simulation day frequency.
+ * The growth clip plays forward once to the last frame,
+ * then holds. It is never restarted from the beginning.
  */
 public class SimulationController {
 
@@ -110,9 +102,11 @@ public class SimulationController {
     private static final double SOIL_H = 42;
 
     /**
-     * Crop video intentionally stops at 95%.
+     * Use the full clip. A small tail is kept so the last
+     * visible frame is shown instead of a black end-of-stream.
      */
-    private static final double VIDEO_END_FRACTION = 0.95;
+    private static final double VIDEO_END_FRACTION = 1.0;
+    private static final double VIDEO_LAST_FRAME_MS = 80.0;
 
     /**
      * Small amount of extra time used to make the final
@@ -306,6 +300,12 @@ public class SimulationController {
     private int videoGeneration;
 
     private boolean videoReady;
+
+    /**
+     * True after the clip has reached its last visible frame.
+     * Prevents seeking back to the start (the old loop).
+     */
+    private boolean videoFinished;
 
     private boolean videoLifecycleHooked;
 
@@ -575,6 +575,7 @@ public class SimulationController {
     // =========================================================
 
     private void configureVideo() {
+        plantVideoView.getStyleClass().add("media-view");
         plantVideoView.setFitWidth(FIELD_W);
         plantVideoView.setFitHeight(FIELD_H);
         plantVideoView.setPreserveRatio(false);
@@ -699,7 +700,9 @@ public class SimulationController {
 
             player.setCycleCount(1);
             player.setAutoPlay(false);
+            videoFinished = false;
             plantVideoView.setMediaPlayer(player);
+            plantVideoView.setVisible(true);
             sizeVideoToFillFrame(player);
 
             player.setOnReady(() -> {
@@ -708,35 +711,26 @@ public class SimulationController {
                 }
                 muteVideo();
                 videoReady = true;
+                videoFinished = false;
                 videoLoadAttempts = 0;
                 if (crop3dView != null) {
                     crop3dView.setVisible(false);
                 }
                 sizeVideoToFillFrame(player);
                 plantVideoView.setVisible(true);
-                player.setRate(playing ? getSimulationSpeed() : 1.0);
+                player.setRate(1.0);
                 System.out.println("Video READY: " + cropName
                         + " (" + player.getTotalDuration().toMillis() + " ms)");
-                double startProgress = Math.max(
-                        0.002,
-                        growthPctFraction() * VIDEO_END_FRACTION
-                );
-                positionVideoAtGrowth(startProgress);
-                if (playing) {
-                    player.play();
-                }
+                ensureGrowthVideoPlaying();
             });
 
             player.setOnEndOfMedia(() -> {
                 if (generation != videoGeneration || plantMediaPlayer != player) {
                     return;
                 }
+                videoFinished = true;
                 player.pause();
                 muteVideo();
-                Duration total = player.getTotalDuration();
-                if (total != null && !total.isUnknown()) {
-                    player.seek(total.multiply(VIDEO_END_FRACTION));
-                }
             });
 
             player.setOnError(() -> {
@@ -758,8 +752,12 @@ public class SimulationController {
                 if (generation != videoGeneration || plantMediaPlayer != player) {
                     return;
                 }
-                player.pause();
-                positionVideoAtGrowth(growthPctFraction() * VIDEO_END_FRACTION);
+                if (videoFinished) {
+                    player.pause();
+                    return;
+                }
+                muteVideo();
+                player.play();
             });
         } catch (Exception ex) {
             System.err.println("Could not load crop video: " + ex.getMessage());
@@ -840,75 +838,35 @@ public class SimulationController {
     }
 
     /**
-     * Keeps the growth video aligned with simulation progress.
-     * Autoplay lets the clip run at the selected rate.
-     * Manual days seek to the matching frame instead of play/pause racing.
+     * Play the growth clip once through. Seeking or pausing to match
+     * each simulation day is what froze it on a single frame.
      */
     private void synchronizeVideoWithSimulation() {
-        if (!isPlayerUsable()) {
-            return;
-        }
-
-        double videoProgress = Math.min(VIDEO_END_FRACTION, growthPctFraction() * VIDEO_END_FRACTION);
-        muteVideo();
-        if (playing) {
-            plantMediaPlayer.setRate(getSimulationSpeed());
-            correctPlayingVideo(videoProgress);
-        } else {
-            plantMediaPlayer.setRate(1.0);
-            positionVideoAtGrowth(videoProgress);
-        }
+        ensureGrowthVideoPlaying();
     }
 
-    private void correctPlayingVideo(double targetProgress) {
-        Duration totalDuration = plantMediaPlayer.getTotalDuration();
-        Duration currentTime = plantMediaPlayer.getCurrentTime();
-        if (totalDuration == null || totalDuration.isUnknown() || totalDuration.toMillis() <= 0) {
-            return;
-        }
-        Duration targetTime = totalDuration.multiply(Math.max(0.0, Math.min(VIDEO_END_FRACTION, targetProgress)));
-        double drift = 0.0;
-        if (currentTime != null && !currentTime.isUnknown()) {
-            drift = Math.abs(currentTime.toMillis() - targetTime.toMillis());
-        }
-        if (plantMediaPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
-            plantMediaPlayer.seek(targetTime);
-            plantMediaPlayer.play();
-            return;
-        }
-        if (drift > 400.0) {
-            plantMediaPlayer.seek(targetTime);
-        }
-    }
-
-    private void animateVideoToGrowth(double targetProgress) {
-        positionVideoAtGrowth(targetProgress);
+    private void playOnceTowardEnd() {
+        ensureGrowthVideoPlaying();
     }
 
     private void positionVideoAtGrowth(double progress) {
-        if (!isPlayerUsable()) {
+        ensureGrowthVideoPlaying();
+    }
+
+    private void ensureGrowthVideoPlaying() {
+        if (!isPlayerUsable() || videoFinished) {
             return;
         }
-        Duration totalDuration = plantMediaPlayer.getTotalDuration();
-        if (totalDuration == null || totalDuration.isUnknown() || totalDuration.toMillis() <= 0) {
-            return;
-        }
-        double clamped = Math.max(0.0, Math.min(VIDEO_END_FRACTION, progress));
-        Duration target = totalDuration.multiply(clamped);
         stopVideoTransitionOnly();
-        if (playing) {
-            plantMediaPlayer.setRate(getSimulationSpeed());
-            muteVideo();
-            if (plantMediaPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
-                plantMediaPlayer.seek(target);
-                plantMediaPlayer.play();
-            }
-            return;
-        }
-        plantMediaPlayer.pause();
-        plantMediaPlayer.setRate(1.0);
         muteVideo();
-        plantMediaPlayer.seek(target);
+        plantMediaPlayer.setRate(1.0);
+        if (plantMediaPlayer.getStatus() == MediaPlayer.Status.READY
+                || plantMediaPlayer.getStatus() == MediaPlayer.Status.STOPPED) {
+            plantMediaPlayer.seek(Duration.ZERO);
+        }
+        if (plantMediaPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
+            plantMediaPlayer.play();
+        }
     }
 
     private void stopVideoTransitionOnly() {
@@ -922,6 +880,7 @@ public class SimulationController {
         stopVideoTransitionOnly();
         videoGeneration++;
         videoReady = false;
+        videoFinished = false;
         MediaPlayer player = plantMediaPlayer;
         plantMediaPlayer = null;
         loadedVideoCrop = null;
@@ -1149,24 +1108,6 @@ public class SimulationController {
                             );
 
                             /*
-                             * Immediately change video playback
-                             * rate when the slider moves.
-                             */
-                            if (
-                                    plantMediaPlayer != null
-                            ) {
-
-                                if (playing) {
-
-                                    plantMediaPlayer.setRate(
-                                            speed
-                                    );
-
-                                    muteVideo();
-                                }
-                            }
-
-                            /*
                              * If autoplay is already running,
                              * restart timer using the new speed.
                              */
@@ -1251,15 +1192,8 @@ public class SimulationController {
                         1500.0 / speed
                 );
 
-        /*
-         * Make video use the same speed.
-         */
         if (isPlayerUsable()) {
-            plantMediaPlayer.setRate(speed);
-            muteVideo();
-            if (plantMediaPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
-                plantMediaPlayer.play();
-            }
+            playOnceTowardEnd();
         }
 
         autoPlay =
@@ -1347,29 +1281,7 @@ public class SimulationController {
         );
 
         stopAutoPlayTimerOnly();
-
-        /*
-         * Return video to normal playback rate while paused.
-         */
-        if (
-                plantMediaPlayer != null
-        ) {
-
-            plantMediaPlayer.pause();
-
-            plantMediaPlayer.setRate(
-                    1.0
-            );
-
-            muteVideo();
-        }
-
-        /*
-         * Do not reset crop video.
-         *
-         * Keep it exactly where simulation is.
-         */
-        synchronizeVideoWithSimulation();
+        ensureGrowthVideoPlaying();
     }
 
 
@@ -1658,7 +1570,6 @@ public class SimulationController {
 
             positionVideoAtGrowth(
                     growthPctFraction()
-                            * VIDEO_END_FRACTION
             );
         }
 
@@ -1668,10 +1579,6 @@ public class SimulationController {
         ) {
 
             stopAutoPlay();
-
-            positionVideoAtGrowth(
-                    VIDEO_END_FRACTION
-            );
 
             statusLabel.setText(
                     crop.getName()
@@ -2168,14 +2075,6 @@ public class SimulationController {
         if (ready) {
 
             stopAutoPlay();
-
-            /*
-             * Make absolutely sure final video frame corresponds
-             * to 100% crop growth.
-             */
-            positionVideoAtGrowth(
-                    VIDEO_END_FRACTION
-            );
         }
     }
 
