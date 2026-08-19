@@ -327,6 +327,7 @@
                                 <!-- ================================= -->
 
                                 <VBox spacing="6"
+                                      minHeight="86"
                                       GridPane.columnIndex="0"
                                       GridPane.rowIndex="3">
 
@@ -335,6 +336,8 @@
 
                                     <ComboBox fx:id="locationCombo"
                                               maxWidth="Infinity"
+                                              prefHeight="48"
+                                              minHeight="48"
                                               styleClass="form-field"/>
 
                                     <Label fx:id="locationError"
@@ -349,6 +352,7 @@
                                 <!-- ================================= -->
 
                                 <VBox spacing="6"
+                                      minHeight="86"
                                       GridPane.columnIndex="1"
                                       GridPane.rowIndex="3">
 
@@ -357,6 +361,8 @@
 
                                     <ComboBox fx:id="soilCombo"
                                               maxWidth="Infinity"
+                                              prefHeight="48"
+                                              minHeight="48"
                                               styleClass="form-field"/>
 
                                     <Label fx:id="soilError"

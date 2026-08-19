@@ -197,6 +197,7 @@
                                                styleClass="form-field" maxWidth="Infinity"/>
                                     <Label text="Type" styleClass="field-label"/>
                                     <ComboBox fx:id="editTypeCombo" maxWidth="Infinity"
+                                              prefHeight="48" minHeight="48"
                                               promptText="Select type" styleClass="form-field"/>
                                 </VBox>
 

@@ -576,7 +576,8 @@
     -fx-border-color: #d8e2dd;
     -fx-border-radius: 8;
     -fx-padding: 10 12 10 12;
-    -fx-pref-height: 40;
+    -fx-pref-height: 48;
+    -fx-min-height: 48;
 }
 
 .form-field:focused {
@@ -883,6 +884,35 @@
 .form-field,
 .text-field,
 .combo-box { -fx-font-size: 16px; -fx-min-height: 48; }
+
+/* ComboBox cannot use TextField padding — that clips the selected value. */
+.combo-box,
+.combo-box.form-field {
+    -fx-padding: 0;
+    -fx-pref-height: 48;
+    -fx-min-height: 48;
+    -fx-background-color: #f8faf9;
+    -fx-background-radius: 8;
+    -fx-border-color: #d8e2dd;
+    -fx-border-radius: 8;
+    -fx-background-insets: 0;
+}
+.combo-box:focused,
+.combo-box.form-field:focused {
+    -fx-border-color: #3c9872;
+    -fx-background-color: white;
+}
+.combo-box > .list-cell,
+.combo-box.form-field > .list-cell {
+    -fx-background-color: transparent;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 8 12 8 12;
+    -fx-font-size: 16px;
+}
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 12 0 10;
+}
 .crop-table { -fx-font-size: 15px; }
 .crop-table .column-header .label { -fx-font-size: 13px; }
 .crop-table .table-row-cell { -fx-cell-size: 38px; }
