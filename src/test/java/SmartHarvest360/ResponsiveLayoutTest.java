@@ -32,6 +32,7 @@ public final class ResponsiveLayoutTest {
                 verify("FarmSetupScreen.fxml", "#nextButton");
                 verify("CropSelectionScreen.fxml", "#startButton");
                 verify("SimulationScreen.fxml", "#nextDayButton");
+                verify("FieldsOverviewScreen.fxml", "#backButton");
                 verify("HarvestMarketScreen.fxml", "#sellButton");
                 verify("SeasonReportScreen.fxml", "#newSeasonButton");
                 System.out.println("RESPONSIVE LAYOUT TEST PASSED (640x480)");

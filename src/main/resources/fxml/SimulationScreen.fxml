@@ -77,6 +77,10 @@
                     <Label text="LIVE SEASON"
                            styleClass="screen-badge"/>
 
+                    <Button text="FIELDS OVERVIEW"
+                            onAction="#handleFieldsOverview"
+                            styleClass="fields-header-button"/>
+
                 </HBox>
 
             </top>
@@ -161,6 +165,11 @@
                                    styleClass="page-description"/>
 
                         </VBox>
+
+                        <Button fx:id="fieldsOverviewButton"
+                                text="Fields Overview"
+                                onAction="#handleFieldsOverview"
+                                styleClass="primary-button"/>
 
                         <Label fx:id="statusLabel"
                                text="Ready"
@@ -656,6 +665,11 @@
 
                             <Region VBox.vgrow="ALWAYS"/>
 
+
+                            <Button text="Fields Overview"
+                                    onAction="#handleFieldsOverview"
+                                    styleClass="secondary-button"
+                                    maxWidth="Infinity"/>
 
                             <Button fx:id="harvestButton"
                                     text="View Detailed Plan"

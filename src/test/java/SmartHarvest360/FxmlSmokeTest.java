@@ -23,6 +23,7 @@ public final class FxmlSmokeTest {
                         "/fxml/FarmSetupScreen.fxml",
                         "/fxml/CropSelectionScreen.fxml",
                         "/fxml/SimulationScreen.fxml",
+                        "/fxml/FieldsOverviewScreen.fxml",
                         "/fxml/HarvestMarketScreen.fxml",
                         "/fxml/SeasonReportScreen.fxml"
                 )) {

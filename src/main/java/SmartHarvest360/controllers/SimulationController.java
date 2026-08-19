@@ -22,8 +22,10 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -251,6 +253,9 @@ public class SimulationController {
     @FXML
     private Button harvestButton;
 
+    @FXML
+    private Button fieldsOverviewButton;
+
 
     // =========================================================
     // STATE
@@ -455,6 +460,13 @@ public class SimulationController {
         }
     }
 
+
+    @FXML
+    private void handleFieldsOverview(ActionEvent event) {
+        stopAutoPlay();
+        Node source = event.getSource() instanceof Node node ? node : fieldsOverviewButton;
+        SceneNavigator.switchTo(source, "/fxml/FieldsOverviewScreen.fxml");
+    }
 
     @FXML
     private void handleGoToHarvest() {

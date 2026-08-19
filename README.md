@@ -37,7 +37,7 @@ season history).
   Crop Selection
     │
     ▼
-  Simulation → Detailed Plan → Harvest & Market → Season Report
+  Simulation ⇄ Fields Overview → Detailed Plan → Harvest & Market → Season Report
                                                     │
                                                     ├── Start New Season → Farm Setup
                                                     └── Exit Application → close the app
@@ -48,7 +48,8 @@ season history).
 | 0 | **Intro** | `IntroScreen.fxml` | Cinematic splash. **Enter Smart Farm** continues; **Watch 30s Film** plays the bundled promo. |
 | 1 | **Farm Setup** | `FarmSetupScreen.fxml` | Farm name, Malaysia state, soil, budget, water, fertilizer, land. State later drives NASA weather and nearby shops. CSV / MySQL status badge. |
 | 2 | **Crop Selection** | `CropSelectionScreen.fxml` | Browse/edit `data/crops.csv`, Weka J48 advisor (recommended crop, fertilizer plan, grade), plant crops. Back returns to setup. |
-| 3 | **Simulation** | `SimulationScreen.fxml` | Day-by-day field: interactive 3D crop + growth film, NASA/offline weather, Irrigate / Conserve / Fertilize / Protect, grade coach, Play + speed, activity log. |
+| 3 | **Simulation** | `SimulationScreen.fxml` | Day-by-day field: interactive 3D crop + growth film, NASA/offline weather, Irrigate / Conserve / Fertilize / Protect, grade coach, Play + speed, activity log. **Fields Overview** opens a live command center, then returns here. |
+| 3a | **Fields Overview** | `FieldsOverviewScreen.fxml` | Live KPIs, generated tasks, season calendar, and a card per planted crop with growth, water, yield, and best-buyer estimate. |
 | 4 | **Detailed Plan** | `PlanReportScreen.fxml` | Field steps, coaching notes, recommendations, download plan CSV. |
 | 5 | **Harvest & Market** | `HarvestMarketScreen.fxml` | Location-aware buyers with shop logos; score = 70% price + 30% demand; live sale overview; confirm sale. |
 | 6 | **Season Report** | `SeasonReportScreen.fxml` | Revenue / cost / profit / ROI, predicted vs actual grade, four standard charts (crop revenue, totals, growth, water/fertilizer), full CSV download. **Start New Season** resets the live session and opens Farm Setup again; **Exit Application** closes the window. |

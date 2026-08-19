@@ -979,3 +979,164 @@
 .default-color0.chart-bar { -fx-bar-fill: #279468; }
 .default-color1.chart-bar { -fx-bar-fill: #e3a54d; }
 .default-color2.chart-bar { -fx-bar-fill: #48a49b; }
+
+/* Live fields command center --------------------------------------------- */
+.fields-header-button,
+.fields-nav-button {
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(255, 222, 160, 0.35);
+    -fx-border-radius: 12;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: 900;
+    -fx-padding: 9 14 9 14;
+    -fx-cursor: hand;
+}
+.fields-header-button:hover,
+.fields-nav-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.22);
+    -fx-translate-y: -1;
+}
+.fields-hero {
+    -fx-padding: 23 26 23 26;
+    -fx-background-color: linear-gradient(to right, #073b2d, #176549 70%, #a9782e 145%);
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(7, 52, 39, 0.25), 24, 0.12, 0, 8);
+}
+.fields-hero-title {
+    -fx-text-fill: white;
+    -fx-font-size: 31px;
+    -fx-font-weight: 900;
+}
+.fields-hero-subtitle { -fx-text-fill: #cce7db; -fx-font-size: 15px; }
+.fields-live-badge {
+    -fx-padding: 9 15 9 15;
+    -fx-background-color: rgba(255, 221, 151, 0.16);
+    -fx-background-radius: 999;
+    -fx-border-color: rgba(255, 221, 151, 0.45);
+    -fx-border-radius: 999;
+    -fx-text-fill: #ffe2a6;
+    -fx-font-size: 12px;
+    -fx-font-weight: 900;
+}
+.fields-kpi,
+.fields-panel,
+.fields-card {
+    -fx-background-color: linear-gradient(to bottom right, #ffffff, #f5faf7);
+    -fx-background-radius: 17;
+    -fx-border-color: rgba(44, 116, 85, 0.14);
+    -fx-border-radius: 17;
+    -fx-effect: dropshadow(gaussian, rgba(20, 70, 50, 0.11), 17, 0.08, 0, 5);
+}
+.fields-kpi { -fx-padding: 16 18 16 18; -fx-min-height: 82; }
+.fields-kpi-gold {
+    -fx-background-color: linear-gradient(to bottom right, #fff3d9, #fffaf0);
+    -fx-border-color: #edcb88;
+}
+.fields-kpi-value { -fx-text-fill: #0c4937; -fx-font-size: 22px; -fx-font-weight: 900; }
+.fields-panel { -fx-padding: 17 18 17 18; }
+.fields-task-card {
+    -fx-padding: 11 12 11 12;
+    -fx-background-color: linear-gradient(to right, #f2f8f5, #fbfdfc);
+    -fx-background-radius: 13;
+    -fx-border-color: rgba(51, 126, 94, 0.14);
+    -fx-border-radius: 13;
+}
+.fields-task-card:hover { -fx-background-color: #eaf6f0; -fx-translate-x: 2; }
+.fields-task-icon {
+    -fx-alignment: center;
+    -fx-min-width: 43;
+    -fx-min-height: 43;
+    -fx-background-color: #dff2e9;
+    -fx-background-radius: 13;
+    -fx-font-size: 21px;
+}
+.fields-task-title { -fx-text-fill: #123f31; -fx-font-size: 15px; -fx-font-weight: 900; }
+.fields-task-subtitle { -fx-text-fill: #71847b; -fx-font-size: 12px; }
+.fields-pill {
+    -fx-padding: 6 9 6 9;
+    -fx-background-color: #e3f3eb;
+    -fx-background-radius: 999;
+    -fx-text-fill: #19724f;
+    -fx-font-size: 10px;
+    -fx-font-weight: 900;
+}
+.fields-pill-attention, .fields-pill-improve { -fx-background-color: #fff0d7; -fx-text-fill: #a06118; }
+.fields-pill-ready, .fields-pill-excellent { -fx-background-color: #d7f3e4; -fx-text-fill: #087348; }
+.fields-pill-sold { -fx-background-color: #e8eef2; -fx-text-fill: #4a6270; }
+.fields-pill-next, .fields-pill-on-track { -fx-background-color: #e3f3eb; -fx-text-fill: #19724f; }
+.fields-pill-ready-soon { -fx-background-color: #fff0d7; -fx-text-fill: #a06118; }
+.fields-calendar-day {
+    -fx-alignment: center;
+    -fx-min-width: 31;
+    -fx-min-height: 27;
+    -fx-background-radius: 7;
+    -fx-font-size: 10px;
+    -fx-font-weight: 800;
+}
+.fields-calendar-done { -fx-background-color: #d6eee2; -fx-text-fill: #287151; }
+.fields-calendar-today {
+    -fx-background-color: linear-gradient(to bottom right, #ecb454, #d18e2f);
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(184, 115, 30, 0.28), 8, 0.15, 0, 2);
+}
+.fields-calendar-future { -fx-background-color: #f0f3f1; -fx-text-fill: #9aaba3; }
+.fields-card { -fx-padding: 13 13 15 13; }
+.fields-card:hover { -fx-translate-y: -3; -fx-effect: dropshadow(gaussian, rgba(17, 82, 57, 0.20), 22, 0.12, 0, 8); }
+.fields-map {
+    -fx-min-height: 126;
+    -fx-padding: 10;
+    -fx-background-color: linear-gradient(to bottom right, #e5f3ea, #f5ead0);
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(37, 116, 80, 0.16);
+    -fx-border-radius: 14;
+}
+.fields-plot { -fx-fill: #afd5bb; -fx-stroke: rgba(255,255,255,0.8); -fx-stroke-width: 2; }
+.fields-plot-accent { -fx-fill: #d6b56d; -fx-stroke: rgba(255,255,255,0.85); -fx-stroke-width: 2; }
+.fields-center-plot {
+    -fx-fill: linear-gradient(to bottom right, #2f9b6c, #1f7354);
+    -fx-stroke: white;
+    -fx-stroke-width: 3;
+}
+.fields-crop-icon {
+    -fx-font-size: 47px;
+    -fx-effect: dropshadow(gaussian, rgba(12, 63, 43, 0.22), 10, 0.10, 0, 4);
+}
+.fields-map-badge {
+    -fx-padding: 6 9 6 9;
+    -fx-background-color: rgba(255,255,255,0.90);
+    -fx-background-radius: 999;
+    -fx-text-fill: #176449;
+    -fx-font-size: 10px;
+    -fx-font-weight: 900;
+}
+.fields-margin-badge { -fx-text-fill: #94601d; }
+.fields-card-title { -fx-text-fill: #0e4434; -fx-font-size: 21px; -fx-font-weight: 900; }
+.fields-card-type { -fx-text-fill: #7a8d84; -fx-font-size: 11px; -fx-font-weight: 800; }
+.fields-progress-copy { -fx-text-fill: #557269; -fx-font-size: 12px; -fx-font-weight: 800; }
+.fields-progress { -fx-accent: #258b63; -fx-min-height: 9; -fx-pref-height: 9; }
+.fields-progress .track { -fx-background-color: #e1ece6; -fx-background-radius: 999; }
+.fields-progress .bar { -fx-background-color: linear-gradient(to right, #2a9b6b, #d3a044); -fx-background-radius: 999; }
+.fields-mini-metric {
+    -fx-padding: 8 9 8 9;
+    -fx-background-color: #f1f7f4;
+    -fx-background-radius: 10;
+}
+.fields-mini-key { -fx-text-fill: #82948b; -fx-font-size: 9px; -fx-font-weight: 900; }
+.fields-mini-value { -fx-text-fill: #204f3e; -fx-font-size: 12px; -fx-font-weight: 900; }
+.fields-market-strip {
+    -fx-padding: 9 11 9 11;
+    -fx-background-color: linear-gradient(to right, #e4f3eb, #fff1d8);
+    -fx-background-radius: 10;
+    -fx-text-fill: #245641;
+    -fx-font-size: 11px;
+    -fx-font-weight: 900;
+}
+.fields-empty-state {
+    -fx-padding: 45;
+    -fx-background-color: #f2f8f5;
+    -fx-background-radius: 16;
+    -fx-text-fill: #668177;
+    -fx-font-size: 16px;
+}

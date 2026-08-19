@@ -1,5 +1,6 @@
 package SmartHarvest360.navigation;
 
+import SmartHarvest360.SmartHarvestApp;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.PauseTransition;
@@ -21,6 +22,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
+import java.net.URL;
 
 /** Centralizes JavaFX scene changes for the application. */
 public final class SceneNavigator {
@@ -29,7 +31,14 @@ public final class SceneNavigator {
 
     public static void switchTo(Node source, String fxmlResource) {
         try {
-            FXMLLoader loader = new FXMLLoader(SceneNavigator.class.getResource(fxmlResource));
+            URL resource = SceneNavigator.class.getResource(fxmlResource);
+            if (resource == null) {
+                resource = SmartHarvestApp.class.getResource(fxmlResource);
+            }
+            if (resource == null) {
+                throw new IOException("Missing screen resource: " + fxmlResource);
+            }
+            FXMLLoader loader = new FXMLLoader(resource);
             Parent root = loader.load();
             Stage stage = (Stage) source.getScene().getWindow();
 
@@ -39,6 +48,7 @@ public final class SceneNavigator {
             if (scene == null) {
                 stage.setScene(new Scene(root));
             } else {
+                scene.setFill(Color.web("#eef5f0"));
                 Parent currentRoot = scene.getRoot();
                 FadeTransition fadeOut = new FadeTransition(Duration.millis(160), currentRoot);
                 fadeOut.setToValue(0.0);
@@ -88,6 +98,7 @@ public final class SceneNavigator {
         leafLayer.setPickOnBounds(false);
         leafLayer.setMinSize(0, 0);
         StackPane wrapper = new StackPane(page, leafLayer);
+        wrapper.setStyle("-fx-background-color: #eef5f0;");
         wrapper.setPickOnBounds(false);
         leafLayer.prefWidthProperty().bind(wrapper.widthProperty());
         leafLayer.prefHeightProperty().bind(wrapper.heightProperty());
