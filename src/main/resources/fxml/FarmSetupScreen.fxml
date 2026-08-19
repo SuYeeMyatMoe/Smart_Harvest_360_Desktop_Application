@@ -151,7 +151,7 @@
                         <Region HBox.hgrow="ALWAYS"/>
 
                         <Label fx:id="connectionStatusLabel"
-                               text="CSV ready · MySQL offline"
+                               text="Local autosave ready"
                                styleClass="soft-badge"/>
 
                     </HBox>

@@ -5,7 +5,6 @@ import SmartHarvest360.Crop;
 import SmartHarvest360.Farm;
 import SmartHarvest360.Resource;
 import SmartHarvest360.db.CropRepository;
-import SmartHarvest360.db.Database;
 import SmartHarvest360.ml.AdvisorResult;
 import SmartHarvest360.ml.FarmProfile;
 import SmartHarvest360.ml.WekaAdvisorService;
@@ -35,6 +34,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 
 /** Browse/edit crops.csv, plant multiple crops, and apply Weka advice. */
 public class CropSelectionController {
@@ -102,7 +102,7 @@ public class CropSelectionController {
                 "%s · %s · Budget RM %,.2f · Water %.0f L · Fertilizer %.0f kg",
                 farmName, place, resource.getBudget(), resource.getWater(), resource.getFertilizer()
         ));
-        dbStatusLabel.setText("CSV ready · " + Database.statusLabel());
+        dbStatusLabel.setText("Local crop catalog ready");
 
         editTypeCombo.setItems(FXCollections.observableArrayList("Vegetable", "Fruit"));
         configureTable();
@@ -225,7 +225,7 @@ public class CropSelectionController {
             cropTable.getSelectionModel().select(updated);
             cropTable.refresh();
             fillEditor(updated);
-            statusLabel.setText("Row updated in memory. Click Save catalog to write CSV + MySQL.");
+            statusLabel.setText("Row updated. Click Save catalog to write it locally.");
         } catch (NumberFormatException exception) {
             statusLabel.setText("Enter valid numbers in the edit fields.");
         }
@@ -250,10 +250,9 @@ public class CropSelectionController {
             }
             catalog.setAll(rebuilt);
             csvFileHandler.saveCrops(CROPS_CSV.toString(), rebuilt);
-            CropRepository.upsertAll(rebuilt);
-            dbStatusLabel.setText("CSV saved · " + Database.statusLabel());
-            statusLabel.setText("Catalog saved to data/crops.csv"
-                    + (Database.isAvailable() ? " and upserted to MySQL crops table." : " (MySQL offline)."));
+            CompletableFuture.runAsync(() -> CropRepository.upsertAll(List.copyOf(rebuilt)));
+            dbStatusLabel.setText("Local crop catalog saved");
+            statusLabel.setText("Catalog saved to data/crops.csv.");
             cropTable.refresh();
             refreshAdvice(false);
         } catch (IOException exception) {
@@ -477,13 +476,13 @@ public class CropSelectionController {
         try {
             List<Crop> loaded = csvFileHandler.loadCrops(CROPS_CSV.toString());
             catalog.setAll(loaded);
-            CropRepository.upsertAll(loaded);
-            dbStatusLabel.setText("CSV ready · " + Database.statusLabel());
+            CompletableFuture.runAsync(() -> CropRepository.upsertAll(List.copyOf(loaded)));
+            dbStatusLabel.setText("Local crop catalog ready");
             if (!catalog.isEmpty()) {
                 cropTable.getSelectionModel().selectFirst();
                 fillEditor(catalog.get(0));
             }
-            statusLabel.setText("Loaded " + catalog.size() + " crops from CSV · " + Database.statusLabel());
+            statusLabel.setText("Loaded " + catalog.size() + " crops from the local catalog.");
         } catch (IOException exception) {
             statusLabel.setText("Could not load crops.csv: " + exception.getMessage());
             addButton.setDisable(true);

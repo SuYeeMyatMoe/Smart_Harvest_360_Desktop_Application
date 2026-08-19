@@ -2,7 +2,6 @@ package SmartHarvest360.controllers;
 
 import SmartHarvest360.Farm;
 import SmartHarvest360.Resource;
-import SmartHarvest360.db.Database;
 import SmartHarvest360.db.FarmRepository;
 import SmartHarvest360.ml.FarmProfile;
 import SmartHarvest360.navigation.SceneNavigator;
@@ -14,6 +13,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Collects starting farm resources, location and soil type,
@@ -75,10 +76,7 @@ public class FarmSetupController {
     @FXML
     public void initialize() {
 
-        connectionStatusLabel.setText(
-                "CSV ready · "
-                        + Database.statusLabel()
-        );
+        connectionStatusLabel.setText("Local autosave ready");
 
         /*
          * Load Malaysian states.
@@ -295,14 +293,9 @@ public class FarmSetupController {
         /*
          * Save farm to MySQL if available.
          */
-        FarmRepository
-                .insert(
-                        farmName,
-                        farm
-                )
-                .ifPresent(
-                        session::setFarmId
-                );
+        CompletableFuture.runAsync(() -> FarmRepository
+                .insert(farmName, farm)
+                .ifPresent(session::setFarmId));
 
         statusLabel.setText(
                 "Farm ready in "
@@ -310,10 +303,7 @@ public class FarmSetupController {
                         + ". Opening crop selection..."
         );
 
-        connectionStatusLabel.setText(
-                "CSV ready · "
-                        + Database.statusLabel()
-        );
+        connectionStatusLabel.setText("Farm saved locally");
 
         SceneNavigator.switchTo(
                 nextButton,

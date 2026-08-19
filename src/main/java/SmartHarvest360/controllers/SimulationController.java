@@ -384,6 +384,11 @@ public class SimulationController {
         }
     }
 
+    @FXML
+    private void handleFieldsOverview() {
+        SceneNavigator.switchTo(nextDayButton, "/fxml/FieldsOverviewScreen.fxml");
+    }
+
 
     private void runActionNow(String action) {
 

@@ -35,6 +35,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Harvest & Market screen.
@@ -555,10 +556,10 @@ public class HarvestMarketController {
                     sale
             );
 
-            SaleRepository.insert(
+            CompletableFuture.runAsync(() -> SaleRepository.insert(
                     session.getFarmId(),
                     sale
-            );
+            ));
 
             refreshSalesSnapshot();
 

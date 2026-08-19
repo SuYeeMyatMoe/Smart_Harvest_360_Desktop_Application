@@ -133,7 +133,7 @@
                                     <VBox spacing="1" HBox.hgrow="ALWAYS" minWidth="0">
                                         <Label text="Crop Catalog" styleClass="section-title"/>
                                     </VBox>
-                                    <Label fx:id="dbStatusLabel" text="CSV / MySQL" styleClass="soft-badge"/>
+                                    <Label fx:id="dbStatusLabel" text="Local crop catalog ready" styleClass="soft-badge"/>
                                 </HBox>
 
                                 <TableView fx:id="cropTable" editable="true"

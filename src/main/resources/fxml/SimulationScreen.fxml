@@ -75,6 +75,10 @@
 
                     <Region HBox.hgrow="ALWAYS"/>
 
+                    <Button text="FIELD OVERVIEW"
+                            onAction="#handleFieldsOverview"
+                            styleClass="fields-nav-button"/>
+
                     <Label text="LIVE SEASON"
                            styleClass="screen-badge"/>
 

@@ -39,16 +39,17 @@ public final class SceneNavigator {
             if (scene == null) {
                 stage.setScene(new Scene(root));
             } else {
+                scene.setFill(Color.web("#eef5f0"));
                 Parent currentRoot = scene.getRoot();
                 FadeTransition fadeOut = new FadeTransition(Duration.millis(160), currentRoot);
-                fadeOut.setToValue(0.0);
+                fadeOut.setToValue(0.72);
                 fadeOut.setOnFinished(event -> {
                     currentRoot.setOpacity(1.0);
                     StackPane animatedRoot = createAnimatedRoot(root, scene);
-                    animatedRoot.setOpacity(0.0);
-                    animatedRoot.setTranslateY(12.0);
-                    animatedRoot.setScaleX(0.992);
-                    animatedRoot.setScaleY(0.992);
+                    root.setOpacity(0.0);
+                    root.setTranslateY(10.0);
+                    root.setScaleX(0.995);
+                    root.setScaleY(0.995);
                     scene.setRoot(animatedRoot);
                     resetPagePosition(root);
                     Platform.runLater(() -> resetPagePosition(root));
@@ -56,11 +57,11 @@ public final class SceneNavigator {
                     layoutReset.setOnFinished(reset -> resetPagePosition(root));
                     layoutReset.play();
 
-                    FadeTransition fadeIn = new FadeTransition(Duration.millis(420), animatedRoot);
+                    FadeTransition fadeIn = new FadeTransition(Duration.millis(280), root);
                     fadeIn.setToValue(1.0);
-                    TranslateTransition riseIn = new TranslateTransition(Duration.millis(420), animatedRoot);
+                    TranslateTransition riseIn = new TranslateTransition(Duration.millis(280), root);
                     riseIn.setToY(0.0);
-                    ScaleTransition settle = new ScaleTransition(Duration.millis(420), animatedRoot);
+                    ScaleTransition settle = new ScaleTransition(Duration.millis(280), root);
                     settle.setToX(1.0);
                     settle.setToY(1.0);
                     new ParallelTransition(fadeIn, riseIn, settle).play();
@@ -88,6 +89,7 @@ public final class SceneNavigator {
         leafLayer.setPickOnBounds(false);
         leafLayer.setMinSize(0, 0);
         StackPane wrapper = new StackPane(page, leafLayer);
+        wrapper.setStyle("-fx-background-color: #eef5f0;");
         wrapper.setPickOnBounds(false);
         leafLayer.prefWidthProperty().bind(wrapper.widthProperty());
         leafLayer.prefHeightProperty().bind(wrapper.heightProperty());
