@@ -56,6 +56,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Locale;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
@@ -315,6 +316,11 @@ public class SimulationController {
      * Transition used to stop video at exact simulation position.
      */
     private PauseTransition videoStopTransition;
+
+    /**
+     * Keeps a stalled GStreamer pipeline moving without seeking to 0.
+     */
+    private Timeline videoWatchdog;
 
 
     // =========================================================
@@ -728,7 +734,11 @@ public class SimulationController {
                 if (generation != videoGeneration || plantMediaPlayer != player) {
                     return;
                 }
+                if (resumeIfNotReallyEnded(player)) {
+                    return;
+                }
                 videoFinished = true;
+                stopVideoWatchdog();
                 player.pause();
                 muteVideo();
             });
@@ -753,11 +763,9 @@ public class SimulationController {
                     return;
                 }
                 if (videoFinished) {
-                    player.pause();
                     return;
                 }
-                muteVideo();
-                player.play();
+                nudgePlayback(player);
             });
         } catch (Exception ex) {
             System.err.println("Could not load crop video: " + ex.getMessage());
@@ -854,7 +862,11 @@ public class SimulationController {
     }
 
     private void ensureGrowthVideoPlaying() {
-        if (!isPlayerUsable() || videoFinished) {
+        if (plantMediaPlayer == null || videoFinished) {
+            return;
+        }
+        if (plantMediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+            startVideoWatchdog(plantMediaPlayer, videoGeneration);
             return;
         }
         stopVideoTransitionOnly();
@@ -864,8 +876,94 @@ public class SimulationController {
                 || plantMediaPlayer.getStatus() == MediaPlayer.Status.STOPPED) {
             plantMediaPlayer.seek(Duration.ZERO);
         }
-        if (plantMediaPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
-            plantMediaPlayer.play();
+        plantMediaPlayer.play();
+        startVideoWatchdog(plantMediaPlayer, videoGeneration);
+    }
+
+    /**
+     * Windows often reports END_OF_MEDIA or STALLED in the middle of a
+     * time-lapse. Resume a little ahead of the stuck frame — never from 0.
+     */
+    private boolean resumeIfNotReallyEnded(MediaPlayer player) {
+        if (player == null || videoFinished) {
+            return false;
+        }
+        Duration now = player.getCurrentTime();
+        Duration total = player.getTotalDuration();
+        if (total == null || total.isUnknown() || total.toMillis() <= 0) {
+            nudgePlayback(player);
+            return true;
+        }
+        if (now == null || now.isUnknown() || now.toMillis() < total.toMillis() * 0.90) {
+            nudgePlayback(player);
+            return true;
+        }
+        return false;
+    }
+
+    private void nudgePlayback(MediaPlayer player) {
+        if (player == null || videoFinished || plantMediaPlayer != player) {
+            return;
+        }
+        Duration now = player.getCurrentTime();
+        Duration total = player.getTotalDuration();
+        if (now != null && !now.isUnknown()
+                && total != null && !total.isUnknown()
+                && total.subtract(now).lessThanOrEqualTo(Duration.millis(180))) {
+            videoFinished = true;
+            stopVideoWatchdog();
+            player.pause();
+            return;
+        }
+        Duration resume = (now == null || now.isUnknown())
+                ? Duration.ZERO
+                : now.add(Duration.millis(50));
+        try {
+            player.seek(resume);
+        } catch (Exception ignored) {
+            // Decoder may reject seek while stalled; play() still unsticks it.
+        }
+        player.play();
+    }
+
+    private void startVideoWatchdog(MediaPlayer player, int generation) {
+        if (videoWatchdog != null || player == null) {
+            return;
+        }
+        AtomicReference<Duration> lastTime = new AtomicReference<>(Duration.UNKNOWN);
+        Timeline watch = new Timeline(new KeyFrame(Duration.millis(500), event -> {
+            if (generation != videoGeneration || plantMediaPlayer != player || videoFinished) {
+                return;
+            }
+            Duration now = player.getCurrentTime();
+            Duration total = player.getTotalDuration();
+            if (total != null && !total.isUnknown() && now != null && !now.isUnknown()
+                    && total.subtract(now).lessThanOrEqualTo(Duration.millis(200))) {
+                return;
+            }
+            MediaPlayer.Status status = player.getStatus();
+            boolean stuckClock = now != null && !now.isUnknown()
+                    && lastTime.get() != null && !lastTime.get().isUnknown()
+                    && !now.greaterThan(lastTime.get());
+            if (now != null && !now.isUnknown()) {
+                lastTime.set(now);
+            }
+            if (status == MediaPlayer.Status.STALLED
+                    || status == MediaPlayer.Status.HALTED
+                    || stuckClock) {
+                nudgePlayback(player);
+            }
+        }));
+        watch.setCycleCount(Timeline.INDEFINITE);
+        videoWatchdog = watch;
+        watch.play();
+    }
+
+    private void stopVideoWatchdog() {
+        Timeline watch = videoWatchdog;
+        videoWatchdog = null;
+        if (watch != null) {
+            watch.stop();
         }
     }
 
@@ -878,6 +976,7 @@ public class SimulationController {
 
     private void stopPlantVideo() {
         stopVideoTransitionOnly();
+        stopVideoWatchdog();
         videoGeneration++;
         videoReady = false;
         videoFinished = false;
