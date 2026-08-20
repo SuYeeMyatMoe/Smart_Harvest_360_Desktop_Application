@@ -762,7 +762,7 @@ public class SimulationController {
                 if (generation != videoGeneration || plantMediaPlayer != player) {
                     return;
                 }
-                if (videoFinished) {
+                if (videoFinished || !playing) {
                     return;
                 }
                 nudgePlayback(player);
@@ -865,6 +865,10 @@ public class SimulationController {
         if (plantMediaPlayer == null || videoFinished) {
             return;
         }
+        if (!playing || session.isCropReady()) {
+            pauseGrowthVideo();
+            return;
+        }
         if (plantMediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
             startVideoWatchdog(plantMediaPlayer, videoGeneration);
             return;
@@ -880,12 +884,26 @@ public class SimulationController {
         startVideoWatchdog(plantMediaPlayer, videoGeneration);
     }
 
+    private void pauseGrowthVideo() {
+        stopVideoWatchdog();
+        stopVideoTransitionOnly();
+        if (plantMediaPlayer == null) {
+            return;
+        }
+        MediaPlayer.Status status = plantMediaPlayer.getStatus();
+        if (status == MediaPlayer.Status.PLAYING
+                || status == MediaPlayer.Status.STALLED) {
+            plantMediaPlayer.pause();
+        }
+        muteVideo();
+    }
+
     /**
      * Windows often reports END_OF_MEDIA or STALLED in the middle of a
      * time-lapse. Resume a little ahead of the stuck frame — never from 0.
      */
     private boolean resumeIfNotReallyEnded(MediaPlayer player) {
-        if (player == null || videoFinished) {
+        if (player == null || videoFinished || !playing) {
             return false;
         }
         Duration now = player.getCurrentTime();
@@ -902,7 +920,7 @@ public class SimulationController {
     }
 
     private void nudgePlayback(MediaPlayer player) {
-        if (player == null || videoFinished || plantMediaPlayer != player) {
+        if (player == null || videoFinished || plantMediaPlayer != player || !playing) {
             return;
         }
         Duration now = player.getCurrentTime();
@@ -932,7 +950,8 @@ public class SimulationController {
         }
         AtomicReference<Duration> lastTime = new AtomicReference<>(Duration.UNKNOWN);
         Timeline watch = new Timeline(new KeyFrame(Duration.millis(500), event -> {
-            if (generation != videoGeneration || plantMediaPlayer != player || videoFinished) {
+            if (generation != videoGeneration || plantMediaPlayer != player
+                    || videoFinished || !playing) {
                 return;
             }
             Duration now = player.getCurrentTime();
